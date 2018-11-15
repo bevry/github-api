@@ -1,6 +1,6 @@
 {
   "name": "githubauthquerystring",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Authorise GitHub API requests by appending the environments auth credentials to your request's query string.",
   "homepage": "https://github.com/bevry/githubauthquerystring",
   "license": "MIT",
@@ -44,7 +44,9 @@
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc>"
   ],
-  "contributors": [],
+  "contributors": [
+    "Benjamin Lupton (http://balupton.com)"
+  ],
   "bugs": {
     "url": "https://github.com/bevry/githubauthquerystring/issues"
   },
@@ -53,7 +55,7 @@
     "url": "https://github.com/bevry/githubauthquerystring.git"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "editions": [
     {

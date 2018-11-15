@@ -154,7 +154,9 @@ No sponsors yet! Will you be the first?
 
 <h3>Contributors</h3>
 
-No contributors yet! Will you be the first?
+These amazing people have contributed code to this project:
+
+<ul><li><a href="http://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/githubauthquerystring/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/githubauthquerystring">view contributions</a></li></ul>
 
 <a href="https://github.com/bevry/githubauthquerystring/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
