@@ -1,0 +1,32 @@
+sudo: false
+language: node_js
+node_js:
+- '0.8'
+- '0.10'
+- '0.12'
+- '4'
+- '6'
+- '8'
+- '10'
+- '11'
+matrix:
+  fast_finish: true
+  allow_failures:
+  - node_js: '0.8'
+  - node_js: '0.10'
+  - node_js: '0.12'
+cache:
+  directories:
+  - "$HOME/.npm"
+  - "$HOME/.yarn-cache"
+install:
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-install.bash)"
+before_script:
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-verify.bash)"
+after_success:
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/surge.bash)"
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-publish.bash)"
+notifications:
+  email:
+    recipients:
+      secure: n9xutf+qHlrDhgavn0R+jjjEYTsJIhiAH32mmPmCBRlGAi9VKzFYXfEaAUTBmaY3ziFjDmGAb0g7MiAup3EaMVn6x7TxaB3etWfs+bcA6lN6CuFN6Qs1M2CQhnGfPcwFsQtxYwcTbUulHX3jUeVgHShcWmIjiCR3lHSvfCp07RtskyTsX65EDCdK3iX/yFDrzC1WI6sfyDCV3UyhFz2KCBxizsanJlKXkHXpnQseSVlviUEQXG0xPWmohSanpKxEm+U+P7MTgg/Q40pxpfNRYNZsMwOOQ5XRez/d+TwG+Or5YzOUCBZe/bp/yfkoqyVPVR7AWkbH215cmD+typqOnMMKZHhbye0mJzSFqJFhO/EPShU2Jvmwub69QrJMMnfn7Cw1MQBtkfFAqv1NE/NB7kKZ9vooX5JeVoocTW2e2hi9E+OJwFUTalxMT5izAuJ1Lv4yS0FdifnUz/RoEkdGHx3pkgU97aYkwoPvXobMELjNTHApzD7ARcd8IYqW7xOSOlyJDOfNP82bQ9b8he0jGkA2Hu0KLQQ8nr3aSc/63XvuCNpVgfou4NsBc2wHtUxvEq0ndPyPwNciR56eqsZkbMy1e28u4IMHf+PriGxE2JoIsxMWKpPNixA4I32FPi66HJgx8zdhZFNn6MFCBe8iLpCFf0xJEftprYc6djFiJx4=
