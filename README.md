@@ -56,7 +56,7 @@ Authorise GitHub API requests by appending the environments auth credentials to 
 
 ## Usage
 
-[Complete API Documentation.](http://master.githubauthstring.bevry.surge.sh/docs/)
+[Complete API Documentation.](http://master.githubauthquerystring.bevry.surge.sh/docs/)
 
 ### Fetch
 
