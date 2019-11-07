@@ -1,7 +1,7 @@
 'use strict'
 
 const { equal } = require('assert-helpers')
-const joe = require('joe')
+const kava = require('kava')
 
 const { fetch, redact } = require('./index.js')
 
@@ -72,35 +72,26 @@ const redactFixtures = [
 	}
 ]
 
-joe.suite('githubauthquerystring', function (suite, test) {
-	suite('manual', function (suite, test) {
-		fixtures.forEach(function ({ input, output }, index) {
-			test(`test ${index}`, function () {
-				equal(
-					fetch(input),
-					output
-				)
+kava.suite('githubauthquerystring', function(suite, test) {
+	suite('manual', function(suite, test) {
+		fixtures.forEach(function({ input, output }, index) {
+			test(`test ${index}`, function() {
+				equal(fetch(input), output)
 			})
 		})
 	})
-	suite('env', function (suite, test) {
-		fixtures.forEach(function ({ input, output }, index) {
-			test(`test ${index}`, function () {
+	suite('env', function(suite, test) {
+		fixtures.forEach(function({ input, output }, index) {
+			test(`test ${index}`, function() {
 				process.env = input
-				equal(
-					fetch(),
-					output
-				)
+				equal(fetch(), output)
 			})
 		})
 	})
-	suite('redact', function (suite, test) {
-		redactFixtures.forEach(function ({ input, output }, index) {
-			test(`test ${index}`, function () {
-				equal(
-					redact(input),
-					output
-				)
+	suite('redact', function(suite, test) {
+		redactFixtures.forEach(function({ input, output }, index) {
+			test(`test ${index}`, function() {
+				equal(redact(input), output)
 			})
 		})
 	})

@@ -4,21 +4,20 @@ node_js:
 - '6'
 - '8'
 - '10'
-- '11'
+- '12'
+- '13'
 matrix:
   fast_finish: true
-cache:
-  directories:
-  - "$HOME/.npm"
-  - "$HOME/.yarn-cache"
+  allow_failures: []
+cache: npm
 install:
-- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-install.bash)"
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/be651cc263221278d0b3ab25802283fd26033f72/scripts/node-install.bash)"
 before_script:
-- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-verify.bash)"
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/be651cc263221278d0b3ab25802283fd26033f72/scripts/node-verify.bash)"
 after_success:
-- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/surge.bash)"
-- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/a16fffacc146944edb58d02bbc565bf467099b18/scripts/node-publish.bash)"
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/be651cc263221278d0b3ab25802283fd26033f72/scripts/surge.bash)"
+- eval "$(curl -fsSL https://raw.githubusercontent.com/bevry/awesome-travis/be651cc263221278d0b3ab25802283fd26033f72/scripts/node-publish.bash)"
 notifications:
   email:
     recipients:
-      secure: n9xutf+qHlrDhgavn0R+jjjEYTsJIhiAH32mmPmCBRlGAi9VKzFYXfEaAUTBmaY3ziFjDmGAb0g7MiAup3EaMVn6x7TxaB3etWfs+bcA6lN6CuFN6Qs1M2CQhnGfPcwFsQtxYwcTbUulHX3jUeVgHShcWmIjiCR3lHSvfCp07RtskyTsX65EDCdK3iX/yFDrzC1WI6sfyDCV3UyhFz2KCBxizsanJlKXkHXpnQseSVlviUEQXG0xPWmohSanpKxEm+U+P7MTgg/Q40pxpfNRYNZsMwOOQ5XRez/d+TwG+Or5YzOUCBZe/bp/yfkoqyVPVR7AWkbH215cmD+typqOnMMKZHhbye0mJzSFqJFhO/EPShU2Jvmwub69QrJMMnfn7Cw1MQBtkfFAqv1NE/NB7kKZ9vooX5JeVoocTW2e2hi9E+OJwFUTalxMT5izAuJ1Lv4yS0FdifnUz/RoEkdGHx3pkgU97aYkwoPvXobMELjNTHApzD7ARcd8IYqW7xOSOlyJDOfNP82bQ9b8he0jGkA2Hu0KLQQ8nr3aSc/63XvuCNpVgfou4NsBc2wHtUxvEq0ndPyPwNciR56eqsZkbMy1e28u4IMHf+PriGxE2JoIsxMWKpPNixA4I32FPi66HJgx8zdhZFNn6MFCBe8iLpCFf0xJEftprYc6djFiJx4=
+      secure: IXdILc9ME4tCX2/B0f6pZoWkWFItmxc29NwXqQaH/NqkzATm/RhqBpO9Dx3rM1sODeGg4womtzWj2fk4L3ODhTsGNRw27GYlFOW8GgOEL26XiDKzSb4c0OcurnAjxJEP0WaKauWEZ4WkYotI/WfyhTxyfj2UoVMHiI0hbSiySgF3nKXH7OneJ23uo93yq9txcTMVqagwDZjIfvq/wypg1rpXhaGJ+xhvcyyckvPgOzyyBOj32jzzCLAmLKTQtp7gCYy/XD+HiLYTG4VGYP+juLpGMpwDTAq56d9ulZEmP+78JYXBoNwTM769mLHysoq15Swo5yCj5cR8AnflNufSGzl5H8SMnoTXz96rWPRcgDJTLLUwXtPPpcNCQPUbvwN2WsIlEQcdmDZsnTPVZ501nOtvUIzkqLzB4g2CoXNCljwu7kRNGRCMDHKkwW2A2ajTkqQHRi7QpmBMWoPF+VrvciJlvM1AtLJvZ1YuAdmJAVr3/wgr/euPdJ5Ajzaqj5fa4T2ny0cl9eSaf1osp/IXu+2sLrf6PLFVx0LPnhI+F/iIseUyJALeNktZ1zqQhXm/N88BwD1Xm3Qj0QNLK1Ekb9JjjsZjPAEccDLHeVWchIO0zMHag+ETl1KKgdzuiRWmocyMrqDYYLU5LV6fQLzwBUNylpniZ/vJdrI6gk3QrrY=

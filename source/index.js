@@ -14,16 +14,15 @@
  * @param {string} [opts.GITHUB_CLIENT_SECRET]
  * @returns {string} the query string that you should append to your github API request url
  */
-function fetchGithubAuthQueryString (opts) {
+function fetchGithubAuthQueryString(opts) {
 	// https://developer.github.com/v3/#authentication
-	const { GITHUB_ACCESS_TOKEN, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = opts || process.env
+	const { GITHUB_ACCESS_TOKEN, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } =
+		opts || process.env
 	if (GITHUB_ACCESS_TOKEN) {
 		return `access_token=${GITHUB_ACCESS_TOKEN}`
-	}
-	else if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET) {
+	} else if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET) {
 		return `client_id=${GITHUB_CLIENT_ID}&client_secret=${GITHUB_CLIENT_SECRET}`
-	}
-	else {
+	} else {
 		return ''
 	}
 }
@@ -33,8 +32,11 @@ function fetchGithubAuthQueryString (opts) {
  * @param {string} value
  * @returns {string} the value with credentials redacted
  */
-function redactGithubAuthQueryString (value) {
-	return value.replace(/(&?)(access_token|client_id|client_secret)=\w+/gi, '$1$2=REDACTED')
+function redactGithubAuthQueryString(value) {
+	return value.replace(
+		/(&?)(access_token|client_id|client_secret)=\w+/gi,
+		'$1$2=REDACTED'
+	)
 }
 
 module.exports.fetch = fetchGithubAuthQueryString
