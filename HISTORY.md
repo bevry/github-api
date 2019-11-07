@@ -1,10 +1,17 @@
 # History
 
+## v1.1.0 2019 November 8
+
+-   Updated [base files](https://github.com/bevry/base) and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v1.0.2 2018 November 15
-- Fixed documentation link
+
+-   Fixed documentation link
 
 ## v1.0.1 2018 November 15
-- Update engines to reflect lack of Node v4 compatibility
+
+-   Update engines to reflect lack of Node v4 compatibility
 
 ## v1.0.0 2018 November 15
-- Initial working version
+
+-   Initial working version
