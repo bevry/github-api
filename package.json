@@ -73,7 +73,7 @@
   ],
   "main": "source/index.js",
   "devDependencies": {
-    "assert-helpers": "^4.9.7",
+    "assert-helpers": "^5.0.0",
     "eslint": "^6.6.0",
     "eslint-config-bevry": "^1.2.1",
     "eslint-config-prettier": "^6.5.0",
