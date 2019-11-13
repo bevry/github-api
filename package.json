@@ -1,6 +1,6 @@
 {
   "name": "githubauthquerystring",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Authorise GitHub API requests by appending the environments auth credentials to your request's query string.",
   "homepage": "https://github.com/bevry/githubauthquerystring",
   "license": "MIT",
@@ -35,9 +35,11 @@
       "opencollectiveUsername": "bevry",
       "patreonUsername": "bevry",
       "paypalURL": "https://bevry.me/paypal",
-      "wishlistURL": "https://bevry.me/wishlist"
+      "wishlistURL": "https://bevry.me/wishlist",
+      "travisTLD": "com"
     }
   },
+  "funding": "https://bevry.me/fund",
   "author": "2018+ Benjamin Lupton <b@lupton.cc>",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc>"
@@ -73,16 +75,16 @@
   ],
   "main": "source/index.js",
   "devDependencies": {
-    "assert-helpers": "^4.9.7",
+    "assert-helpers": "4.10.0",
     "eslint": "^6.6.0",
     "eslint-config-bevry": "^1.2.1",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
     "jsdoc": "^3.6.3",
-    "kava": "^3.1.0",
+    "kava": "^3.2.0",
     "minami": "^1.2.3",
-    "prettier": "^1.18.2",
-    "projectz": "^1.7.5",
+    "prettier": "^1.19.1",
+    "projectz": "^1.10.0",
     "surge": "^0.21.3",
     "valid-directory": "^1.0.0"
   },
@@ -117,9 +119,5 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
-  },
-  "funding": {
-    "type": "cooperative",
-    "url": "https://bevry.me/fund"
   }
 }
