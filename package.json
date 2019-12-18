@@ -1,6 +1,6 @@
 {
   "name": "githubauthquerystring",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Authorise GitHub API requests by appending the environments auth credentials to your request's query string.",
   "homepage": "https://github.com/bevry/githubauthquerystring",
   "license": "MIT",

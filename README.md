@@ -37,10 +37,6 @@ Authorise GitHub API requests by appending the environments auth credentials to 
 
 [Complete API Documentation.](http://master.githubauthquerystring.bevry.surge.sh/docs/)
 
-
-
-
-
 ### Fetch
 
 Using environment variables:
@@ -114,16 +110,11 @@ import ghQueryString, {
 
 // using destructuring
 const {
-    default: ghQueryString
+    default: ghQueryString,
     fetch: fetchGithubAuthQueryString,
     redact: redactGithubAuthQueryString
 } = require('githubauthquerystring')
 ```
-
-
-
-
-
 
 <!-- INSTALL/ -->
 
@@ -140,7 +131,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.pika.dev/githubauthquerystring/^3.0.0'
+    import pkg from '//cdn.pika.dev/githubauthquerystring/^3.0.1'
 </script>
 ```
 
@@ -148,7 +139,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthquerystring@^3.0.0'
+    import pkg from '//unpkg.com/githubauthquerystring@^3.0.1'
 </script>
 ```
 
@@ -156,7 +147,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthquerystring@3.0.0'
+    import pkg from '//dev.jspm.io/githubauthquerystring@3.0.1'
 </script>
 ```
 

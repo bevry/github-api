@@ -1,5 +1,9 @@
 # History
 
+## v3.0.1 2019 December 18
+
+-   Fixed an error in a `README.md` example
+
 ## v3.0.0 2019 December 18
 
 -   Converted from JavaScript to TypeScript
