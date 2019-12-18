@@ -1,5 +1,12 @@
 # History
 
+## v3.0.0 2019 December 18
+
+-   Converted from JavaScript to TypeScript
+-   Added default export for when the initial enviroment variables are good enough
+-   Removed the long-form method names, as [you can rename them yourself](https://github.com/bevry/githubauthquerystring#renaming)
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v2.3.0 2019 December 9
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)

@@ -1,11 +1,13 @@
-'use strict'
+import { equal } from 'assert-helpers'
+import kava from 'kava'
+import { fetch, redact, GitHubCredentials } from './index.js'
 
-const { equal } = require('assert-helpers')
-const kava = require('kava')
+interface Fixture {
+	input: GitHubCredentials
+	output: string
+}
 
-const { fetch, redact } = require('./index.js')
-
-const fixtures = [
+const fixtures: Fixture[] = [
 	{
 		input: {
 			GITHUB_ACCESS_TOKEN: 'gat'
@@ -13,12 +15,14 @@ const fixtures = [
 		output: 'access_token=gat'
 	},
 	{
+		// @ts-ignore deliberately invalid for testing
 		input: {
 			GITHUB_CLIENT_ID: 'gci'
 		},
 		output: ''
 	},
 	{
+		// @ts-ignore deliberately invalid for testing
 		input: {
 			GITHUB_CLIENT_SECRET: 'gcs'
 		},
@@ -32,12 +36,17 @@ const fixtures = [
 		output: 'client_id=gci&client_secret=gcs'
 	},
 	{
-		input: {},
+		input: {} as GitHubCredentials,
 		output: ''
 	}
 ]
 
-const redactFixtures = [
+interface RedactFixture {
+	input: string
+	output: string
+}
+
+const redactFixtures: RedactFixture[] = [
 	{
 		input: 'url?client_id=9d5&client_secret=fbd58',
 		output: 'url?client_id=REDACTED&client_secret=REDACTED'
@@ -76,6 +85,7 @@ kava.suite('githubauthquerystring', function(suite, test) {
 	suite('manual', function(suite, test) {
 		fixtures.forEach(function({ input, output }, index) {
 			test(`test ${index}`, function() {
+				// @ts-ignore
 				equal(fetch(input), output)
 			})
 		})

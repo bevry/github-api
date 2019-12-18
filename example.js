@@ -1,15 +1,15 @@
 'use strict'
 
-const { fetchGithubAuthQueryString, redactGithubAuthQueryString } = require('./')
+const { fetch, redact } = require('./')
 
 // fetch the url
-const githubAuthQueryString = fetchGithubAuthQueryString({
+const githubAuthQueryString = fetch({
 	GITHUB_CLIENT_ID: 'value',
 	GITHUB_CLIENT_SECRET: 'value'
 })
-const githubApiURL = `https://api.github.com/some/call?${githubAuthQueryString}`
-console.log(githubApiURL)
+const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+console.log(githubURL)
 
 // now redact it
-const githubApiRedactedURL = redactGithubAuthQueryString(githubApiURL)
-console.log(githubApiRedactedURL)
+const githubURLRedacted = redact(githubURL)
+console.log(githubURLRedacted)

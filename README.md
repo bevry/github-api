@@ -33,6 +33,98 @@ Authorise GitHub API requests by appending the environments auth credentials to 
 <!-- /DESCRIPTION -->
 
 
+## Usage
+
+[Complete API Documentation.](http://master.githubauthquerystring.bevry.surge.sh/docs/)
+
+
+
+
+
+### Fetch
+
+Using environment variables:
+
+```javascript
+import githubAuthQueryString from 'githubauthquerystring'
+const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+```
+
+Using manual `GITHUB_ACCESS_TOKEN`:
+
+```javascript
+import { fetch } from 'githubauthquerystring'
+const githubAuthQueryString = fetch({
+    GITHUB_ACCESS_TOKEN: 'value'
+})
+const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+```
+
+Using manual `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`:
+
+```javascript
+import { fetch } from 'githubauthquerystring'
+const githubAuthQueryString = fetch({
+    GITHUB_CLIENT_ID: 'value',
+    GITHUB_CLIENT_SECRET: 'value'
+})
+const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+```
+
+If the values did not exist or were not in a valid combination, then an empty string will be returned.
+
+### Redaction
+
+When error reporting, you should redact the error message to prevent credentials from leaking in log files:
+
+```javascript
+import { fetch as fetchGithubAuthQueryString, redact } from 'githubauthquerystring'
+import 'fetch' from 'cross-fetch'
+
+// fetch the url
+const githubAuthQueryString = fetchGithubAuthQueryString({
+    GITHUB_CLIENT_ID: 'value',
+    GITHUB_CLIENT_SECRET: 'value'
+})
+const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+
+// fetch the response
+(async function () {
+    try {
+        const resp = await fetch(githubURL)
+        const data = await resp.json()
+    }
+    catch (err) {
+        // redact the error before logging it
+        console.error(redact(err.message))
+    }
+})()
+```
+
+### Renaming
+
+If you would like to rename the methods to something else, you can do it like so:
+
+```javascript
+// using named imports
+import ghQueryString, {
+    fetch as fetchGithubAuthQueryString,
+    redact as redactGithubAuthQueryString
+} from 'githubauthquerystring'
+
+// using destructuring
+const {
+    default: ghQueryString
+    fetch: fetchGithubAuthQueryString,
+    redact: redactGithubAuthQueryString
+} = require('githubauthquerystring')
+```
+
+
+
+
+
+
 <!-- INSTALL/ -->
 
 <h2>Install</h2>
@@ -40,86 +132,44 @@ Authorise GitHub API requests by appending the environments auth credentials to 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
 <ul>
 <li>Install: <code>npm install --save githubauthquerystring</code></li>
-<li>Require: <code>require('githubauthquerystring')</code></li>
+<li>Import: <code>import pkg from ('githubauthquerystring')</code></li>
+<li>Require: <code>const pkg = require('githubauthquerystring').default</code></li>
 </ul>
+
+<a href="https://www.pika.dev/cdn" title="100% Native ES Modules CDN"><h3>pika</h3></a>
+
+``` html
+<script type="module">
+    import pkg from '//cdn.pika.dev/githubauthquerystring/^3.0.0'
+</script>
+```
+
+<a href="https://unpkg.com" title="unpkg is a fast, global content delivery network for everything on npm"><h3>unpkg</h3></a>
+
+``` html
+<script type="module">
+    import pkg from '//unpkg.com/githubauthquerystring@^3.0.0'
+</script>
+```
+
+<a href="https://jspm.io" title="Native ES Modules CDN"><h3>jspm</h3></a>
+
+``` html
+<script type="module">
+    import pkg from '//dev.jspm.io/githubauthquerystring@3.0.0'
+</script>
+```
 
 <h3><a href="https://editions.bevry.me" title="Editions are the best way to produce and consume packages you care about.">Editions</a></h3>
 
 <p>This package is published with the following editions:</p>
 
-<ul><li><code>githubauthquerystring</code> aliases <code>githubauthquerystring/source/index.js</code></li>
-<li><code>githubauthquerystring/source/index.js</code> is esnext source code with require for modules</li></ul>
-
-<p>Environments older than Node.js v8 may need <a href="https://babeljs.io/docs/usage/polyfill/" title="A polyfill that emulates missing ECMAScript environment features">Babel's Polyfill</a> or something similar.</p>
-
-<h3><a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a></h3>
-
-This project provides its type information via inline <a href="http://usejsdoc.org" title="JSDoc is an API documentation generator for JavaScript, similar to Javadoc or phpDocumentor">JSDoc Comments</a>. To make use of this in <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a>, set your <code>maxNodeModuleJsDepth</code> compiler option to `5` or thereabouts. You can accomlish this via your `tsconfig.json` file like so:
-
-``` json
-{
-  "compilerOptions": {
-    "maxNodeModuleJsDepth": 5
-  }
-}
-```
+<ul><li><code>githubauthquerystring/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>githubauthquerystring/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>githubauthquerystring</code> aliases <code>githubauthquerystring/edition-esnext/index.js</code></li>
+<li><code>githubauthquerystring/edition-esnext/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
 
 <!-- /INSTALL -->
-
-
-## Usage
-
-[Complete API Documentation.](http://master.githubauthquerystring.bevry.surge.sh/docs/)
-
-### Fetch
-
-Use `require('githubauthquerystring').fetch()` to fetch the GitHub Auth Query String that you need to authorise your GitHub API request to avoid rate limits.
-
-Using environment variables:
-
-``` javascript
-const githubAuthQueryString = require('githubauthquerystring').fetch()
-const githubApiURL = `https://api.github.com/some/call?${githubAuthQueryString}`
-```
-
-Using manual `GITHUB_ACCESS_TOKEN`:
-
-``` javascript
-const githubAuthQueryString = require('githubauthquerystring').fetch({
-    GITHUB_ACCESS_TOKEN: 'value'
-})
-const githubApiURL = `https://api.github.com/some/call?${githubAuthQueryString}`
-```
-
-Using manual `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`:
-
-``` javascript
-const githubAuthQueryString = require('githubauthquerystring').fetch({
-    GITHUB_CLIENT_ID: 'value',
-    GITHUB_CLIENT_SECRET: 'value'
-})
-const githubApiURL = `https://api.github.com/some/call?${githubAuthQueryString}`
-```
-
-If the values did not exist or were not in a valid combination, then an empty string will be returned.
-
-### Redaction
-
-Use `require('githubauthquerystring').redact(url)` to redact the credentials from a URL for error handling and logging.
-
-``` javascript
-const {fetchGithubAuthQueryString, redactGithubAuthQueryString} = require('githubauthquerystring')
-
-// fetch the url
-const githubAuthQueryString = fetchGithubAuthQueryString({
-    GITHUB_CLIENT_ID: 'value',
-    GITHUB_CLIENT_SECRET: 'value'
-})
-const githubApiURL = `https://api.github.com/some/call?${githubAuthQueryString}`
-
-// now redact it
-const githubApiRedactedURL = redactGithubAuthQueryString(githubApiURL)
-```
 
 
 <!-- HISTORY/ -->
