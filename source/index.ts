@@ -30,7 +30,7 @@ export type GitHubCredentials = StrictUnion<GitHubToken | GitHubClient>
  * @example If your credentials are an arbitary object, then typecast like so:
  * ``` typescript
  * import {fetch, GitHubCredentials} from 'githubauthquerystring'
- * fetchGithubAuthQueryString({} as GitHubCredentials)
+ * fetch({} as GitHubCredentials)
  * ```
  */
 export function fetch(
