@@ -4,7 +4,7 @@
 
 -   Fixed for latest TypeScript
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
--   Minimum required node version changed from `node: >=8` to `node: >=10` to keep up with mandatory ecosystem changes
+-   <s>Minimum required node version changed from `node: >=8` to `node: >=10` to keep up with mandatory ecosystem changes</s> not actually applied, will be applied in next major
 
 ## v3.0.1 2019 December 18
 
