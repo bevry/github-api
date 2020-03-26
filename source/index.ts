@@ -23,6 +23,9 @@ interface GitHubClient {
  */
 export type GitHubCredentials = StrictUnion<GitHubToken | GitHubClient>
 
+/** GitHub credentialed environment */
+export type GitHubEnv = NodeJS.ProcessEnv & GitHubCredentials
+
 /**
  * Fetch the GitHub Auth Query String.
  * @param credentials If no credentials were passed, then the environment variables are used if they exist.
@@ -34,7 +37,7 @@ export type GitHubCredentials = StrictUnion<GitHubToken | GitHubClient>
  * ```
  */
 export function fetch(
-	credentials: GitHubCredentials = process && (process.env as GitHubCredentials)
+	credentials: GitHubCredentials = process?.env as GitHubEnv
 ) {
 	if (credentials.GITHUB_ACCESS_TOKEN) {
 		return `access_token=${credentials.GITHUB_ACCESS_TOKEN}`

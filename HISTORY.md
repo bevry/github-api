@@ -1,5 +1,11 @@
 # History
 
+## v4.0.0 2020 March 27
+
+-   Fixed for latest TypeScript
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+-   Minimum required node version changed from `node: >=8` to `node: >=10` to keep up with mandatory ecosystem changes
+
 ## v3.0.1 2019 December 18
 
 -   Fixed an error in a `README.md` example

@@ -51,7 +51,7 @@ Using manual `GITHUB_ACCESS_TOKEN`:
 ```javascript
 import { fetch } from 'githubauthquerystring'
 const githubAuthQueryString = fetch({
-    GITHUB_ACCESS_TOKEN: 'value'
+    GITHUB_ACCESS_TOKEN: 'value',
 })
 const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
 ```
@@ -62,7 +62,7 @@ Using manual `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`:
 import { fetch } from 'githubauthquerystring'
 const githubAuthQueryString = fetch({
     GITHUB_CLIENT_ID: 'value',
-    GITHUB_CLIENT_SECRET: 'value'
+    GITHUB_CLIENT_SECRET: 'value',
 })
 const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
 ```
@@ -105,14 +105,14 @@ If you would like to rename the methods to something else, you can do it like so
 // using named imports
 import ghQueryString, {
     fetch as fetchGithubAuthQueryString,
-    redact as redactGithubAuthQueryString
+    redact as redactGithubAuthQueryString,
 } from 'githubauthquerystring'
 
 // using destructuring
 const {
     default: ghQueryString,
     fetch: fetchGithubAuthQueryString,
-    redact: redactGithubAuthQueryString
+    redact: redactGithubAuthQueryString,
 } = require('githubauthquerystring')
 ```
 
@@ -131,7 +131,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.pika.dev/githubauthquerystring/^3.0.1'
+    import pkg from '//cdn.pika.dev/githubauthquerystring/^4.0.0'
 </script>
 ```
 
@@ -139,7 +139,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthquerystring@^3.0.1'
+    import pkg from '//unpkg.com/githubauthquerystring@^4.0.0'
 </script>
 ```
 
@@ -147,7 +147,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthquerystring@3.0.1'
+    import pkg from '//dev.jspm.io/githubauthquerystring@4.0.0'
 </script>
 ```
 
@@ -157,8 +157,8 @@ const {
 
 <ul><li><code>githubauthquerystring/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
 <li><code>githubauthquerystring/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>githubauthquerystring</code> aliases <code>githubauthquerystring/edition-esnext/index.js</code></li>
-<li><code>githubauthquerystring/edition-esnext/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
+<li><code>githubauthquerystring</code> aliases <code>githubauthquerystring/edition-es2018/index.js</code></li>
+<li><code>githubauthquerystring/edition-es2018/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#9th_Edition_-_ECMAScript_2018" title="ECMAScript ES2018">ES2018</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
 
 <!-- /INSTALL -->
 

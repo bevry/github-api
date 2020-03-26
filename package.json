@@ -1,6 +1,6 @@
 {
   "name": "githubauthquerystring",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Authorise GitHub API requests by appending the environments auth credentials to your request's query string.",
   "homepage": "https://github.com/bevry/githubauthquerystring",
   "license": "MIT",
@@ -90,12 +90,12 @@
       }
     },
     {
-      "description": "TypeScript compiled against ESNext for Node.js with Require for modules",
-      "directory": "edition-esnext",
+      "description": "TypeScript compiled against ES2018 for Node.js with Require for modules",
+      "directory": "edition-es2018",
       "entry": "index.js",
       "tags": [
         "javascript",
-        "esnext",
+        "es2018",
         "require"
       ],
       "engines": {
@@ -106,34 +106,34 @@
   ],
   "types": "source/index.ts",
   "type": "commonjs",
-  "main": "edition-esnext/index.js",
+  "main": "edition-es2018/index.js",
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
     "simplytyped": "^3.2.3"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.12.0",
-    "@typescript-eslint/parser": "^2.12.0",
-    "assert-helpers": "^5.8.0",
-    "eslint": "^6.7.2",
-    "eslint-config-bevry": "^2.3.0",
-    "eslint-config-prettier": "^6.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "assert-helpers": "^6.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-bevry": "^3.0.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.2",
     "kava": "^4.4.0",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.2",
     "projectz": "^1.19.0",
     "surge": "^0.21.3",
-    "typedoc": "^0.15.5",
-    "typescript": "^3.7.3",
+    "typedoc": "^0.17.3",
+    "typescript": "^3.8.3",
     "valid-directory": "^1.6.0",
     "valid-module": "^1.0.0"
   },
   "scripts": {
     "our:clean": "rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
-    "our:compile": "npm run our:compile:edition-browsers && npm run our:compile:edition-esnext",
+    "our:compile": "npm run our:compile:edition-browsers && npm run our:compile:edition-es2018",
     "our:compile:edition-browsers": "tsc --module ESNext --target ESNext --outDir ./edition-browsers --project tsconfig.json && test -d edition-browsers/source && ( mv edition-browsers/source edition-temp && rm -Rf edition-browsers && mv edition-temp edition-browsers ) || true",
-    "our:compile:edition-esnext": "tsc --module commonjs --target ESNext --outDir ./edition-esnext --project tsconfig.json && test -d edition-esnext/source && ( mv edition-esnext/source edition-temp && rm -Rf edition-esnext && mv edition-temp edition-esnext ) || true",
+    "our:compile:edition-es2018": "tsc --module commonjs --target ES2018 --outDir ./edition-es2018 --project tsconfig.json && test -d edition-es2018/source && ( mv edition-es2018/source edition-temp && rm -Rf edition-es2018 && mv edition-temp edition-es2018 ) || true",
     "our:deploy": "echo no need for this project",
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:docs": "npm run our:meta:docs:typedoc",
@@ -152,9 +152,9 @@
     "our:verify:directory": "valid-directory",
     "our:verify:eslint": "eslint --fix --ignore-pattern '**/*.d.ts' --ignore-pattern '**/vendor/' --ignore-pattern '**/node_modules/' --ext .mjs,.js,.jsx,.ts,.tsx ./source",
     "our:verify:module": "valid-module",
-    "our:verify:prettier": "prettier --write ./source/**",
+    "our:verify:prettier": "prettier --write .",
     "our:verify:typescript": "tsc --noEmit --project tsconfig.json",
-    "test": "node ./edition-esnext/test.js"
+    "test": "node ./edition-es2018/test.js"
   },
   "eslintConfig": {
     "extends": [
