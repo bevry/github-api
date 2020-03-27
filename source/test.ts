@@ -1,10 +1,19 @@
-import { equal } from 'assert-helpers'
+import { equal, errorEqual } from 'assert-helpers'
 import kava from 'kava'
-import { fetch, redact, GitHubCredentials, GitHubEnv } from './index.js'
+import fetch from 'cross-fetch'
+import {
+	githubQueryString,
+	githubAuthorizationHeader,
+	redact,
+	GitHubCredentials,
+} from './index.js'
+const ghapi = process.env.GITHUB_API || 'https://api.github.com'
+console.log(ghapi)
 
 interface Fixture {
 	input: GitHubCredentials
-	output: string
+	output?: string
+	error?: string
 }
 
 const fixtures: Fixture[] = [
@@ -19,14 +28,14 @@ const fixtures: Fixture[] = [
 		input: {
 			GITHUB_CLIENT_ID: 'gci',
 		},
-		output: '',
+		error: 'missing',
 	},
 	{
 		// @ts-ignore deliberately invalid for testing
 		input: {
 			GITHUB_CLIENT_SECRET: 'gcs',
 		},
-		output: '',
+		error: 'missing',
 	},
 	{
 		input: {
@@ -37,7 +46,7 @@ const fixtures: Fixture[] = [
 	},
 	{
 		input: {} as GitHubCredentials,
-		output: '',
+		error: 'missing',
 	},
 ]
 
@@ -81,28 +90,65 @@ const redactFixtures: RedactFixture[] = [
 	},
 ]
 
-kava.suite('githubauthquerystring', function (suite, test) {
-	suite('manual', function (suite, test) {
-		fixtures.forEach(function ({ input, output }, index) {
+kava.suite('githubauthreq', function (suite, test) {
+	suite('query', function (suite, test) {
+		fixtures.forEach(function ({ input, output, error }, index) {
 			test(`test ${index}`, function () {
-				// @ts-ignore
-				equal(fetch(input), output)
+				try {
+					equal(githubQueryString(input), output)
+				} catch (err) {
+					if (!error) throw err
+					errorEqual(err, error, 'error was as expected')
+				}
 			})
 		})
 	})
-	suite('env', function (suite, test) {
-		fixtures.forEach(function ({ input, output }, index) {
-			test(`test ${index}`, function () {
-				process.env = input as GitHubEnv
-				equal(fetch(), output)
-			})
-		})
-	})
+
 	suite('redact', function (suite, test) {
 		redactFixtures.forEach(function ({ input, output }, index) {
 			test(`test ${index}`, function () {
 				equal(redact(input), output)
 			})
+		})
+	})
+
+	suite('manual', function (suite, test) {
+		test('header', function (done) {
+			fetch(`${ghapi}/rate_limit`, {
+				headers: {
+					Accept: 'application/vnd.github.v3+json',
+					Authorization: githubAuthorizationHeader(),
+				},
+			})
+				.then((res) => res.json())
+				.then((result) => console.log(result))
+				.then((result) => done())
+				.catch(done)
+		})
+
+		test('header', function (done) {
+			fetch(`${ghapi}/user`, {
+				headers: {
+					Accept: 'application/vnd.github.v3+json',
+					Authorization: githubAuthorizationHeader(),
+				},
+			})
+				.then((res) => res.json())
+				.then((result) => console.log(result))
+				.then((result) => done())
+				.catch(done)
+		})
+
+		test('query', function (done) {
+			fetch(`${ghapi}/user?${githubQueryString()}`, {
+				headers: {
+					Accept: 'application/vnd.github.v3+json',
+				},
+			})
+				.then((res) => res.json())
+				.then((result) => console.log(result))
+				.then(() => done())
+				.catch((err: Error) => done(new Error(redact(err.toString()))))
 		})
 	})
 })

@@ -1,14 +1,13 @@
 {
-  "name": "githubauthquerystring",
-  "version": "4.0.0",
-  "description": "Authorise GitHub API requests by appending the environments auth credentials to your request's query string.",
-  "homepage": "https://github.com/bevry/githubauthquerystring",
+  "name": "githubauthreq",
+  "version": "5.0.0",
+  "description": "Authorise GitHub API requests with the appropriate environment variables",
+  "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",
   "keywords": [
     "api",
     "auth",
     "browser",
-    "export-default",
     "github",
     "module",
     "querystring",
@@ -56,14 +55,14 @@
     "Benjamin Lupton (http://balupton.com)"
   ],
   "bugs": {
-    "url": "https://github.com/bevry/githubauthquerystring/issues"
+    "url": "https://github.com/bevry/githubauthreq/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bevry/githubauthquerystring.git"
+    "url": "https://github.com/bevry/githubauthreq.git"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "editions": [
     {
@@ -99,7 +98,7 @@
         "require"
       ],
       "engines": {
-        "node": "8 || 10 || 12 || 13",
+        "node": "10 || 12",
         "browsers": false
       }
     }
@@ -110,6 +109,7 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
+    "cross-fetch": "^3.0.4",
     "simplytyped": "^3.2.3"
   },
   "devDependencies": {

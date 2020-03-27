@@ -1,4 +1,4 @@
-import { StrictUnion } from 'simplytyped'
+import type { StrictUnion } from 'simplytyped'
 
 /**
  * If the variable `GITHUB_ACCESS_TOKEN` exists, use that according to:
@@ -36,7 +36,7 @@ export type GitHubEnv = NodeJS.ProcessEnv & GitHubCredentials
  * fetch({} as GitHubCredentials)
  * ```
  */
-export function fetch(
+export function githubQueryString(
 	credentials: GitHubCredentials = process?.env as GitHubEnv
 ) {
 	if (credentials.GITHUB_ACCESS_TOKEN) {
@@ -44,10 +44,21 @@ export function fetch(
 	} else if (credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET) {
 		return `client_id=${credentials.GITHUB_CLIENT_ID}&client_secret=${credentials.GITHUB_CLIENT_SECRET}`
 	} else {
-		return ''
+		throw new Error('missing github credentials for query string')
 	}
 }
 
+export function githubAuthorizationHeader(
+	credentials: GitHubCredentials = process?.env as GitHubEnv
+) {
+	if (credentials.GITHUB_ACCESS_TOKEN) {
+		return `token ${credentials.GITHUB_ACCESS_TOKEN}`
+	} else if (credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET) {
+		return `Basic ${credentials.GITHUB_CLIENT_ID}:${credentials.GITHUB_CLIENT_SECRET}`
+	} else {
+		throw new Error('missing github credentials for authorization header')
+	}
+}
 /**
  * Redact any github credentials from a string.
  * @param value The string to redact credentials from.
@@ -59,6 +70,3 @@ export function redact(value: string) {
 		'$1$2=REDACTED'
 	)
 }
-
-/** GitHub auth query string for the initial environment variables */
-export default fetch()

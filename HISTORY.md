@@ -1,5 +1,12 @@
 # History
 
+## v5.0.0 2020 March 27
+
+-   Updated for [GitHub's new authorization recommendations](https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param)
+    -   Introduced new `githubAuthorizationHeader` method, and renamed `fetch` to `githubQueryString`, and removed default export
+    -   Renamed the package from `githubauthquerystring` to `githubauthreq`
+-   Minimum required node version changed from `node: >=8` to `node: >=10` to keep up with mandatory ecosystem changes
+
 ## v4.0.0 2020 March 27
 
 -   Fixed for latest TypeScript

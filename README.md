@@ -1,17 +1,17 @@
 <!-- TITLE/ -->
 
-<h1>githubauthquerystring</h1>
+<h1>githubauthreq</h1>
 
 <!-- /TITLE -->
 
 
 <!-- BADGES/ -->
 
-<span class="badge-travisci"><a href="http://travis-ci.com/bevry/githubauthquerystring" title="Check this project's build status on TravisCI"><img src="https://img.shields.io/travis/com/bevry/githubauthquerystring/master.svg" alt="Travis CI Build Status" /></a></span>
-<span class="badge-npmversion"><a href="https://npmjs.org/package/githubauthquerystring" title="View this project on NPM"><img src="https://img.shields.io/npm/v/githubauthquerystring.svg" alt="NPM version" /></a></span>
-<span class="badge-npmdownloads"><a href="https://npmjs.org/package/githubauthquerystring" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/githubauthquerystring.svg" alt="NPM downloads" /></a></span>
-<span class="badge-daviddm"><a href="https://david-dm.org/bevry/githubauthquerystring" title="View the status of this project's dependencies on DavidDM"><img src="https://img.shields.io/david/bevry/githubauthquerystring.svg" alt="Dependency Status" /></a></span>
-<span class="badge-daviddmdev"><a href="https://david-dm.org/bevry/githubauthquerystring#info=devDependencies" title="View the status of this project's development dependencies on DavidDM"><img src="https://img.shields.io/david/dev/bevry/githubauthquerystring.svg" alt="Dev Dependency Status" /></a></span>
+<span class="badge-travisci"><a href="http://travis-ci.com/bevry/githubauthreq" title="Check this project's build status on TravisCI"><img src="https://img.shields.io/travis/com/bevry/githubauthreq/master.svg" alt="Travis CI Build Status" /></a></span>
+<span class="badge-npmversion"><a href="https://npmjs.org/package/githubauthreq" title="View this project on NPM"><img src="https://img.shields.io/npm/v/githubauthreq.svg" alt="NPM version" /></a></span>
+<span class="badge-npmdownloads"><a href="https://npmjs.org/package/githubauthreq" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/githubauthreq.svg" alt="NPM downloads" /></a></span>
+<span class="badge-daviddm"><a href="https://david-dm.org/bevry/githubauthreq" title="View the status of this project's dependencies on DavidDM"><img src="https://img.shields.io/david/bevry/githubauthreq.svg" alt="Dependency Status" /></a></span>
+<span class="badge-daviddmdev"><a href="https://david-dm.org/bevry/githubauthreq#info=devDependencies" title="View the status of this project's development dependencies on DavidDM"><img src="https://img.shields.io/david/dev/bevry/githubauthreq.svg" alt="Dev Dependency Status" /></a></span>
 <br class="badge-separator" />
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
 <span class="badge-patreon"><a href="https://patreon.com/bevry" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
@@ -28,92 +28,64 @@
 
 <!-- DESCRIPTION/ -->
 
-Authorise GitHub API requests by appending the environments auth credentials to your request's query string.
+Authorise GitHub API requests with the appropriate environment variables
 
 <!-- /DESCRIPTION -->
 
 
 ## Usage
 
-[Complete API Documentation.](http://master.githubauthquerystring.bevry.surge.sh/docs/globals.html)
+[Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/globals.html)
 
 ### Fetch
+
+#### Header
 
 Using environment variables:
 
 ```javascript
-import githubAuthQueryString from 'githubauthquerystring'
-const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
+import { githubAuthorizationHeader } from 'githubauthreq'
+fetch('https://api.github.com/user', {
+    headers: {
+        Authorization: githubAuthorizationHeader(),
+        Accept: 'application/vnd.github.v3+json',
+    },
+})
 ```
 
-Using manual `GITHUB_ACCESS_TOKEN`:
+#### Query String
+
+Using environment variables:
 
 ```javascript
-import { fetch } from 'githubauthquerystring'
-const githubAuthQueryString = fetch({
-    GITHUB_ACCESS_TOKEN: 'value',
+import { githubQueryString } from 'githubauthreq'
+fetch(`https://api.github.com/user?${githubQueryString()}`, {
+    headers: {
+        Accept: 'application/vnd.github.v3+json',
+    },
 })
-const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
 ```
 
-Using manual `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`:
+### Manual
 
-```javascript
-import { fetch } from 'githubauthquerystring'
-const githubAuthQueryString = fetch({
-    GITHUB_CLIENT_ID: 'value',
-    GITHUB_CLIENT_SECRET: 'value',
-})
-const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
-```
+Both `githubAuthorizationHeader` and `githubQueryString` accept an object containing either:
 
-If the values did not exist or were not in a valid combination, then an empty string will be returned.
+-   `GITHUB_ACCESS_TOKEN`
+-   `GITHUB_CLIENT_ID` + `GITHUB_CLIENT_SECRET`
+
+By default they will use `process.env` if it exists
 
 ### Redaction
 
-When error reporting, you should redact the error message to prevent credentials from leaking in log files:
+When using query string, you should redact the error message to prevent credentials from leaking in log files:
 
 ```javascript
-import { fetch as fetchGithubAuthQueryString, redact } from 'githubauthquerystring'
-import 'fetch' from 'cross-fetch'
-
-// fetch the url
-const githubAuthQueryString = fetchGithubAuthQueryString({
-    GITHUB_CLIENT_ID: 'value',
-    GITHUB_CLIENT_SECRET: 'value'
-})
-const githubURL = `https://api.github.com/user?${githubAuthQueryString}`
-
-// fetch the response
-(async function () {
-    try {
-        const resp = await fetch(githubURL)
-        const data = await resp.json()
-    }
-    catch (err) {
-        // redact the error before logging it
-        console.error(redact(err.message))
-    }
-})()
-```
-
-### Renaming
-
-If you would like to rename the methods to something else, you can do it like so:
-
-```javascript
-// using named imports
-import ghQueryString, {
-    fetch as fetchGithubAuthQueryString,
-    redact as redactGithubAuthQueryString,
-} from 'githubauthquerystring'
-
-// using destructuring
-const {
-    default: ghQueryString,
-    fetch: fetchGithubAuthQueryString,
-    redact: redactGithubAuthQueryString,
-} = require('githubauthquerystring')
+import { githubQueryString, redact } from 'githubauthreq'
+fetch(`https://api.github.com/user?${githubQueryString()}`, {
+    headers: {
+        Accept: 'application/vnd.github.v3+json',
+    },
+}).catch((err) => console.error(redact(err.message)))
 ```
 
 <!-- INSTALL/ -->
@@ -122,16 +94,16 @@ const {
 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
 <ul>
-<li>Install: <code>npm install --save githubauthquerystring</code></li>
-<li>Import: <code>import pkg from ('githubauthquerystring')</code></li>
-<li>Require: <code>const pkg = require('githubauthquerystring').default</code></li>
+<li>Install: <code>npm install --save githubauthreq</code></li>
+<li>Import: <code>import * as pkg from ('githubauthreq')</code></li>
+<li>Require: <code>const pkg = require('githubauthreq')</code></li>
 </ul>
 
 <a href="https://www.pika.dev/cdn" title="100% Native ES Modules CDN"><h3>pika</h3></a>
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.pika.dev/githubauthquerystring/^4.0.0'
+    import * as pkg from '//cdn.pika.dev/githubauthreq/^5.0.0'
 </script>
 ```
 
@@ -139,7 +111,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthquerystring@^4.0.0'
+    import * as pkg from '//unpkg.com/githubauthreq@^5.0.0'
 </script>
 ```
 
@@ -147,7 +119,7 @@ const {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthquerystring@4.0.0'
+    import * as pkg from '//dev.jspm.io/githubauthreq@5.0.0'
 </script>
 ```
 
@@ -155,10 +127,10 @@ const {
 
 <p>This package is published with the following editions:</p>
 
-<ul><li><code>githubauthquerystring/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>githubauthquerystring/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>githubauthquerystring</code> aliases <code>githubauthquerystring/edition-es2018/index.js</code></li>
-<li><code>githubauthquerystring/edition-es2018/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#9th_Edition_-_ECMAScript_2018" title="ECMAScript ES2018">ES2018</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
+<ul><li><code>githubauthreq/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>githubauthreq/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#ES.Next" title="ECMAScript Next">ESNext</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>githubauthreq</code> aliases <code>githubauthreq/edition-es2018/index.js</code></li>
+<li><code>githubauthreq/edition-es2018/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#9th_Edition_-_ECMAScript_2018" title="ECMAScript ES2018">ES2018</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li></ul>
 
 <!-- /INSTALL -->
 
@@ -167,7 +139,7 @@ const {
 
 <h2>History</h2>
 
-<a href="https://github.com/bevry/githubauthquerystring/blob/master/HISTORY.md#files">Discover the release history by heading on over to the <code>HISTORY.md</code> file.</a>
+<a href="https://github.com/bevry/githubauthreq/blob/master/HISTORY.md#files">Discover the release history by heading on over to the <code>HISTORY.md</code> file.</a>
 
 <!-- /HISTORY -->
 
@@ -176,7 +148,7 @@ const {
 
 <h2>Contribute</h2>
 
-<a href="https://github.com/bevry/githubauthquerystring/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
+<a href="https://github.com/bevry/githubauthreq/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /CONTRIBUTE -->
 
@@ -209,10 +181,10 @@ No sponsors yet! Will you be the first?
 
 These amazing people have contributed code to this project:
 
-<ul><li><a href="http://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/githubauthquerystring/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/githubauthquerystring">view contributions</a></li>
-<li><a href="http://github.com/apps/dependabot-preview">dependabot-preview[bot]</a> — <a href="https://github.com/bevry/githubauthquerystring/commits?author=dependabot-preview[bot]" title="View the GitHub contributions of dependabot-preview[bot] on repository bevry/githubauthquerystring">view contributions</a></li></ul>
+<ul><li><a href="http://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/githubauthreq/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/githubauthreq">view contributions</a></li>
+<li><a href="http://github.com/apps/dependabot-preview">dependabot-preview[bot]</a> — <a href="https://github.com/bevry/githubauthreq/commits?author=dependabot-preview[bot]" title="View the GitHub contributions of dependabot-preview[bot] on repository bevry/githubauthreq">view contributions</a></li></ul>
 
-<a href="https://github.com/bevry/githubauthquerystring/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
+<a href="https://github.com/bevry/githubauthreq/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /BACKERS -->
 
