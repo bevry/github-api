@@ -1,5 +1,12 @@
 # History
 
+## v5.1.0 2020 April 27
+
+-   Renamed `githubQueryString` to `getParams` with b/c alias for `githubQueryString`, `fetch`, and `default`
+-   Renamed `githubAuthorizationHeader` to `getAuthHeader` with b/c alias for `githubAuthorizationHeader`
+-   Renamed `redact` to `redactParams` with b/c alias for `redact`
+-   Added new `getHeaders`
+
 ## v5.0.0 2020 March 27
 
 -   Updated for [GitHub's new authorization recommendations](https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param)

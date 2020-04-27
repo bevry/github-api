@@ -2,9 +2,9 @@ import { equal, errorEqual } from 'assert-helpers'
 import kava from 'kava'
 import fetch from 'cross-fetch'
 import {
-	githubQueryString,
-	githubAuthorizationHeader,
-	redact,
+	getParams,
+	getAuthHeader,
+	redactParams,
 	GitHubCredentials,
 } from './index.js'
 const ghapi = process.env.GITHUB_API || 'https://api.github.com'
@@ -95,7 +95,7 @@ kava.suite('githubauthreq', function (suite, test) {
 		fixtures.forEach(function ({ input, output, error }, index) {
 			test(`test ${index}`, function () {
 				try {
-					equal(githubQueryString(input), output)
+					equal(getParams(input), output)
 				} catch (err) {
 					if (!error) throw err
 					errorEqual(err, error, 'error was as expected')
@@ -107,17 +107,17 @@ kava.suite('githubauthreq', function (suite, test) {
 	suite('redact', function (suite, test) {
 		redactFixtures.forEach(function ({ input, output }, index) {
 			test(`test ${index}`, function () {
-				equal(redact(input), output)
+				equal(redactParams(input), output)
 			})
 		})
 	})
 
-	suite('manual', function (suite, test) {
-		test('header', function (done) {
+	suite('env', function (suite, test) {
+		test('rate limit header', function (done) {
 			fetch(`${ghapi}/rate_limit`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
-					Authorization: githubAuthorizationHeader(),
+					Authorization: getAuthHeader(),
 				},
 			})
 				.then((res) => res.json())
@@ -126,11 +126,11 @@ kava.suite('githubauthreq', function (suite, test) {
 				.catch(done)
 		})
 
-		test('header', function (done) {
+		test('user header', function (done) {
 			fetch(`${ghapi}/user`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
-					Authorization: githubAuthorizationHeader(),
+					Authorization: getAuthHeader(),
 				},
 			})
 				.then((res) => res.json())
@@ -139,8 +139,8 @@ kava.suite('githubauthreq', function (suite, test) {
 				.catch(done)
 		})
 
-		test('query', function (done) {
-			fetch(`${ghapi}/user?${githubQueryString()}`, {
+		test('user query', function (done) {
+			fetch(`${ghapi}/user?${getParams()}`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
 				},
@@ -148,7 +148,7 @@ kava.suite('githubauthreq', function (suite, test) {
 				.then((res) => res.json())
 				.then((result) => console.log(result))
 				.then(() => done())
-				.catch((err: Error) => done(new Error(redact(err.toString()))))
+				.catch((err: Error) => done(new Error(redactParams(err.toString()))))
 		})
 	})
 })

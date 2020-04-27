@@ -44,10 +44,17 @@ Authorise GitHub API requests with the appropriate environment variables
 Using environment variables:
 
 ```javascript
-import { githubAuthorizationHeader } from 'githubauthreq'
+import { getHeaders } from 'githubauthreq'
+fetch('https://api.github.com/user', {
+    headers: getHeaders(),
+})
+```
+
+```javascript
+import { getAuthHeader } from 'githubauthreq'
 fetch('https://api.github.com/user', {
     headers: {
-        Authorization: githubAuthorizationHeader(),
+        Authorization: getAuthHeader(),
         Accept: 'application/vnd.github.v3+json',
     },
 })
@@ -58,8 +65,8 @@ fetch('https://api.github.com/user', {
 Using environment variables:
 
 ```javascript
-import { githubQueryString } from 'githubauthreq'
-fetch(`https://api.github.com/user?${githubQueryString()}`, {
+import { getParams } from 'githubauthreq'
+fetch(`https://api.github.com/user?${getParams()}`, {
     headers: {
         Accept: 'application/vnd.github.v3+json',
     },
@@ -68,7 +75,7 @@ fetch(`https://api.github.com/user?${githubQueryString()}`, {
 
 ### Manual
 
-Both `githubAuthorizationHeader` and `githubQueryString` accept an object containing either:
+Both `getAuthHeader` and `getParams` accept an object containing either:
 
 -   `GITHUB_ACCESS_TOKEN`
 -   `GITHUB_CLIENT_ID` + `GITHUB_CLIENT_SECRET`
@@ -80,12 +87,12 @@ By default they will use `process.env` if it exists
 When using query string, you should redact the error message to prevent credentials from leaking in log files:
 
 ```javascript
-import { githubQueryString, redact } from 'githubauthreq'
-fetch(`https://api.github.com/user?${githubQueryString()}`, {
+import { getParams, redactParams } from 'githubauthreq'
+fetch(`https://api.github.com/user?${getParams()}`, {
     headers: {
         Accept: 'application/vnd.github.v3+json',
     },
-}).catch((err) => console.error(redact(err.message)))
+}).catch((err) => console.error(redactParams(err.message)))
 ```
 
 <!-- INSTALL/ -->
@@ -103,7 +110,7 @@ fetch(`https://api.github.com/user?${githubQueryString()}`, {
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.pika.dev/githubauthreq/^5.0.0'
+    import * as pkg from '//cdn.pika.dev/githubauthreq/^5.1.0'
 </script>
 ```
 
@@ -111,7 +118,7 @@ fetch(`https://api.github.com/user?${githubQueryString()}`, {
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/githubauthreq@^5.0.0'
+    import * as pkg from '//unpkg.com/githubauthreq@^5.1.0'
 </script>
 ```
 
@@ -119,7 +126,7 @@ fetch(`https://api.github.com/user?${githubQueryString()}`, {
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/githubauthreq@5.0.0'
+    import * as pkg from '//dev.jspm.io/githubauthreq@5.1.0'
 </script>
 ```
 

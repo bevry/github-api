@@ -30,13 +30,8 @@ export type GitHubEnv = NodeJS.ProcessEnv & GitHubCredentials
  * Fetch the GitHub Auth Query String.
  * @param credentials If no credentials were passed, then the environment variables are used if they exist.
  * @returns The query string that you should append to your github API request url. Will be an empty string if no valid credentials were provided.
- * @example If your credentials are an arbitary object, then typecast like so:
- * ``` typescript
- * import {fetch, GitHubCredentials} from 'githubauthquerystring'
- * fetch({} as GitHubCredentials)
- * ```
  */
-export function githubQueryString(
+export function getParams(
 	credentials: GitHubCredentials = process?.env as GitHubEnv
 ) {
 	if (credentials.GITHUB_ACCESS_TOKEN) {
@@ -48,7 +43,17 @@ export function githubQueryString(
 	}
 }
 
-export function githubAuthorizationHeader(
+// Aliases
+export const githubQueryString = getParams
+export const fetch = getParams
+export default getParams
+
+/**
+ * Fetch the GitHub Authorization Header.
+ * @param credentials If no credentials were passed, then the environment variables are used if they exist.
+ * @returns The Authorization header to attach to the request to the GitHub request.
+ */
+export function getAuthHeader(
 	credentials: GitHubCredentials = process?.env as GitHubEnv
 ) {
 	if (credentials.GITHUB_ACCESS_TOKEN) {
@@ -59,14 +64,35 @@ export function githubAuthorizationHeader(
 		throw new Error('missing github credentials for authorization header')
 	}
 }
+
+// Aliases
+export const githubAuthorizationHeader = getAuthHeader
+
+/**
+ * Fetch the headers to attach to the request to the GitHub API
+ * @param credentials If no credentials were passed, then the environment variables are used if they exist.
+ * @returns The headers to attach to the request to the GitHub request.
+ */
+export function getHeaders(
+	credentials: GitHubCredentials = process?.env as GitHubEnv
+) {
+	return {
+		Accept: 'application/vnd.github.v3+json',
+		Authorization: getAuthHeader(credentials),
+	}
+}
+
 /**
  * Redact any github credentials from a string.
  * @param value The string to redact credentials from.
- * @return The string with the credentials redacted
+ * @returns The string with the credentials redacted
  */
-export function redact(value: string) {
+export function redactParams(value: string) {
 	return value.replace(
 		/(&?)(access_token|client_id|client_secret)=\w+/gi,
 		'$1$2=REDACTED'
 	)
 }
+
+// Alias
+export const redact = redactParams

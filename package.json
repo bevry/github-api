@@ -1,6 +1,6 @@
 {
   "name": "githubauthreq",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "Authorise GitHub API requests with the appropriate environment variables",
   "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",
