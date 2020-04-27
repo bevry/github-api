@@ -1,5 +1,9 @@
 # History
 
+## v5.1.1 2020 April 27
+
+-   Correctly move `cross-fetch` from dependency to dev dependency
+
 ## v5.1.0 2020 April 27
 
 -   Renamed `githubQueryString` to `getParams` with b/c alias for `githubQueryString`, `fetch`, and `default`
