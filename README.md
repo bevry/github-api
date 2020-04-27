@@ -75,7 +75,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ### Manual
 
-Both `getAuthHeader` and `getParams` accept an object containing either:
+`getHeaders`, `getAuthHeader`, `getParams` accept an object containing either:
 
 -   `GITHUB_ACCESS_TOKEN`
 -   `GITHUB_CLIENT_ID` + `GITHUB_CLIENT_SECRET`
