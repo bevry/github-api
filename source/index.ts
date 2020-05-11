@@ -18,13 +18,33 @@ interface GitHubClient {
 }
 
 /**
- * Provide either `GITHUB_ACCESS_TOKEN` or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
+ * Provide `GITHUB_ACCESS_TOKEN` or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`
  * https://developer.github.com/v3/#authentication
  */
 export type GitHubCredentials = StrictUnion<GitHubToken | GitHubClient>
 
 /** GitHub credentialed environment */
 export type GitHubEnv = NodeJS.ProcessEnv & GitHubCredentials
+
+/**
+ * Check whether or not sufficient github credentials were supplied
+ * @param credentials If no credentials were passed, then the environment variables are used if they exist.
+ * @returns `true` if valid, otherwise throws if invalid
+ */
+export function validate(
+	credentials: GitHubCredentials = process?.env as GitHubEnv
+) {
+	if (
+		credentials.GITHUB_ACCESS_TOKEN ||
+		(credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET)
+	) {
+		return true
+	} else {
+		throw new Error(
+			'missing github credentials; provide `GITHUB_ACCESS_TOKEN` or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`'
+		)
+	}
+}
 
 /**
  * Fetch the GitHub Auth Query String.
