@@ -110,7 +110,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.pika.dev/githubauthreq/^5.11.0'
+    import pkg from '//cdn.pika.dev/githubauthreq/^5.12.0'
 </script>
 ```
 
@@ -118,7 +118,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthreq@^5.11.0'
+    import pkg from '//unpkg.com/githubauthreq@^5.12.0'
 </script>
 ```
 
@@ -126,7 +126,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthreq@5.11.0'
+    import pkg from '//dev.jspm.io/githubauthreq@5.12.0'
 </script>
 ```
 
