@@ -7,8 +7,9 @@ import {
 	redactParams,
 	GitHubCredentials,
 } from './index.js'
-const ghapi = process.env.GITHUB_API || 'https://api.github.com'
-console.log(ghapi)
+import { env } from 'process'
+const { GITHUB_API = 'https://api.github.com' } = env
+console.log(GITHUB_API)
 
 interface Fixture {
 	input: GitHubCredentials
@@ -114,7 +115,7 @@ kava.suite('githubauthreq', function (suite, test) {
 
 	suite('env', function (suite, test) {
 		test('rate limit header', function (done) {
-			fetch(`${ghapi}/rate_limit`, {
+			fetch(`${GITHUB_API}/rate_limit`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
 					Authorization: getAuthHeader(),
@@ -127,7 +128,7 @@ kava.suite('githubauthreq', function (suite, test) {
 		})
 
 		test('user header', function (done) {
-			fetch(`${ghapi}/user`, {
+			fetch(`${GITHUB_API}/user`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
 					Authorization: getAuthHeader(),
@@ -140,7 +141,7 @@ kava.suite('githubauthreq', function (suite, test) {
 		})
 
 		test('user query', function (done) {
-			fetch(`${ghapi}/user?${getParams()}`, {
+			fetch(`${GITHUB_API}/user?${getParams()}`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
 				},
