@@ -1,8 +1,7 @@
 'use strict'
-
-/** @type {typeof import("./source/test.ts") } */
+/** @type {typeof import("./compiled-types/index.d.ts") } */
 module.exports = require('editions').requirePackage(
 	__dirname,
 	require,
-	'test.js'
+	'index.js'
 )
