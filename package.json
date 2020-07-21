@@ -1,6 +1,6 @@
 {
   "name": "githubauthreq",
-  "version": "5.14.0",
+  "version": "5.14.1",
   "description": "Authorise GitHub API requests with the appropriate environment variables",
   "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",
@@ -153,6 +153,7 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
+    "editions": "^3.13.0",
     "simplytyped": "^3.3.0"
   },
   "devDependencies": {
@@ -161,7 +162,6 @@
     "@typescript-eslint/parser": "^3.7.0",
     "assert-helpers": "^6.17.0",
     "cross-fetch": "^3.0.5",
-    "editions": "^3.13.0",
     "eslint": "^7.5.0",
     "eslint-config-bevry": "^3.16.0",
     "eslint-config-prettier": "^6.11.0",
