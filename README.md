@@ -106,11 +106,11 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 <li>Require: <code>const pkg = require('githubauthreq').default</code></li>
 </ul>
 
-<a href="https://www.pika.dev/cdn" title="100% Native ES Modules CDN"><h3>pika</h3></a>
+<a href="https://www.skypack.dev" title="Skypack is a JavaScript Delivery Network for modern web apps"><h3>Skypack</h3></a>
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.pika.dev/githubauthreq/^5.16.0'
+    import pkg from '//cdn.skypack.dev/githubauthreq@^5.17.0'
 </script>
 ```
 
@@ -118,7 +118,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthreq@^5.16.0'
+    import pkg from '//unpkg.com/githubauthreq@^5.17.0'
 </script>
 ```
 
@@ -126,7 +126,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthreq@5.16.0'
+    import pkg from '//dev.jspm.io/githubauthreq@5.17.0'
 </script>
 ```
 
