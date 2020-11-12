@@ -2,14 +2,16 @@ import { equal, errorEqual } from 'assert-helpers'
 import kava from 'kava'
 import fetch from 'cross-fetch'
 import {
-	getParams,
+	getQueryString,
 	getAuthHeader,
-	redactParams,
+	getApiUrl,
+	redactSearchParams,
 	GitHubCredentials,
+	getHeaders,
+	getUrl,
 } from './index.js'
 import { env } from 'process'
-const { GITHUB_API = 'https://api.github.com' } = env
-console.log(GITHUB_API)
+const api = getApiUrl(env as GitHubCredentials)
 
 interface Fixture {
 	input: GitHubCredentials
@@ -92,11 +94,11 @@ const redactFixtures: RedactFixture[] = [
 ]
 
 kava.suite('githubauthreq', function (suite, test) {
-	suite('query', function (suite, test) {
+	suite('fixtures', function (suite, test) {
 		fixtures.forEach(function ({ input, output, error }, index) {
 			test(`test ${index}`, function () {
 				try {
-					equal(getParams(input), output)
+					equal(getQueryString(input), output)
 				} catch (err) {
 					if (!error) throw err
 					errorEqual(err, error, 'error was as expected')
@@ -108,48 +110,31 @@ kava.suite('githubauthreq', function (suite, test) {
 	suite('redact', function (suite, test) {
 		redactFixtures.forEach(function ({ input, output }, index) {
 			test(`test ${index}`, function () {
-				equal(redactParams(input), output)
+				equal(redactSearchParams(input), output)
 			})
 		})
 	})
 
-	suite('env', function (suite, test) {
+	suite('fetch', function (suite, test) {
 		test('rate limit header', function (done) {
-			fetch(`${GITHUB_API}/rate_limit`, {
+			fetch(`${api}/rate_limit`, {
 				headers: {
 					Accept: 'application/vnd.github.v3+json',
-					Authorization: getAuthHeader(),
+					Authorization: getAuthHeader(env as GitHubCredentials),
 				},
 			})
-				.then((res) => res.json())
-				.then((result) => console.log(result))
-				.then((result) => done())
+				.then((response) => response.json())
+				.then((result) => {
+					// eslint-disable-next-line no-console
+					console.log(result)
+					equal(
+						result.rate.limit > 60,
+						true,
+						`the rate limit of ${result.rate.limit} should be more than the free tier of 60`
+					)
+					done()
+				})
 				.catch(done)
-		})
-
-		test('user header', function (done) {
-			fetch(`${GITHUB_API}/user`, {
-				headers: {
-					Accept: 'application/vnd.github.v3+json',
-					Authorization: getAuthHeader(),
-				},
-			})
-				.then((res) => res.json())
-				.then((result) => console.log(result))
-				.then((result) => done())
-				.catch(done)
-		})
-
-		test('user query', function (done) {
-			fetch(`${GITHUB_API}/user?${getParams()}`, {
-				headers: {
-					Accept: 'application/vnd.github.v3+json',
-				},
-			})
-				.then((res) => res.json())
-				.then((result) => console.log(result))
-				.then(() => done())
-				.catch((err: Error) => done(new Error(redactParams(err.toString()))))
 		})
 	})
 })

@@ -28,7 +28,7 @@
 
 <!-- DESCRIPTION/ -->
 
-Authorise GitHub API requests with the appropriate environment variables
+Authorize GitHub API requests with the appropriate credentials and preferences.
 
 <!-- /DESCRIPTION -->
 
@@ -37,62 +37,27 @@ Authorise GitHub API requests with the appropriate environment variables
 
 [Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/globals.html)
 
-### Fetch
+```typescript
+// imports with typescript
+import { GitHubCredentials, getHeaders, getApiUrl, getUrl, redactSearchParams } from 'githubauthreq'
+import { env } from 'process
+const githubCredentials = env as GitHubCredentials
+// if using javascript, omit GitHubCredentials
 
-#### Header
-
-Using environment variables:
-
-```javascript
-import { getHeaders } from 'githubauthreq'
-fetch('https://api.github.com/user', {
-    headers: getHeaders(),
+// recommended: authorization via headers
+fetch(getApiUrl(githubCredentials) + '/user', {
+    headers: getHeaders(githubCredentials),
 })
-```
 
-```javascript
-import { getAuthHeader } from 'githubauthreq'
-fetch('https://api.github.com/user', {
-    headers: {
-        Authorization: getAuthHeader(),
-        Accept: 'application/vnd.github.v3+json',
-    },
-})
-```
-
-#### Query String
-
-Using environment variables:
-
-```javascript
-import { getParams } from 'githubauthreq'
-fetch(`https://api.github.com/user?${getParams()}`, {
-    headers: {
-        Accept: 'application/vnd.github.v3+json',
-    },
-})
-```
-
-### Manual
-
-`getHeaders`, `getAuthHeader`, `getParams` accept an object containing either:
-
--   `GITHUB_ACCESS_TOKEN`
--   `GITHUB_CLIENT_ID` + `GITHUB_CLIENT_SECRET`
-
-By default they will use `process.env` if it exists
-
-### Redaction
-
-When using query string, you should redact the error message to prevent credentials from leaking in log files:
-
-```javascript
-import { getParams, redactParams } from 'githubauthreq'
-fetch(`https://api.github.com/user?${getParams()}`, {
-    headers: {
-        Accept: 'application/vnd.github.v3+json',
-    },
-}).catch((err) => console.error(redactParams(err.message)))
+// alternative: authorization via url
+try {
+    // if you want to customize the search params, you can also use: { searchParams: new URLSearchParams() }
+    fetch(getUrl(githubCredentials, {pathname: '/user'}))
+}
+catch (err) {
+    // redact the credentials from the error
+    console.error(redactSearchParams(err.message))
+}
 ```
 
 <!-- INSTALL/ -->
@@ -110,7 +75,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.skypack.dev/githubauthreq@^5.19.0'
+    import pkg from '//cdn.skypack.dev/githubauthreq@^6.0.0'
 </script>
 ```
 
@@ -118,7 +83,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/githubauthreq@^5.19.0'
+    import pkg from '//unpkg.com/githubauthreq@^6.0.0'
 </script>
 ```
 
@@ -126,7 +91,7 @@ fetch(`https://api.github.com/user?${getParams()}`, {
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/githubauthreq@5.19.0'
+    import pkg from '//dev.jspm.io/githubauthreq@6.0.0'
 </script>
 ```
 
