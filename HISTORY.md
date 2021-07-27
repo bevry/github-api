@@ -1,5 +1,9 @@
 # History
 
+## v6.1.0 2021 July 28
+
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v6.0.0 2020 November 12
 
 -   Rewrote the API to support new authorization variables, preferences, and usage
