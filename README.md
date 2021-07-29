@@ -35,7 +35,7 @@ Authorize GitHub API requests with the appropriate credentials and preferences.
 
 ## Usage
 
-[Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/globals.html)
+[Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/)
 
 ```typescript
 // imports with typescript
@@ -75,7 +75,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.skypack.dev/githubauthreq@^6.2.0'
+    import * as pkg from '//cdn.skypack.dev/githubauthreq@^6.3.0'
 </script>
 ```
 
@@ -83,7 +83,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/githubauthreq@^6.2.0'
+    import * as pkg from '//unpkg.com/githubauthreq@^6.3.0'
 </script>
 ```
 
@@ -91,7 +91,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/githubauthreq@6.2.0'
+    import * as pkg from '//dev.jspm.io/githubauthreq@6.3.0'
 </script>
 ```
 
