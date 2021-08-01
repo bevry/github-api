@@ -32,6 +32,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   publish:
     if: ${{ github.event_name == 'push' }}
     needs: test

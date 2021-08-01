@@ -22,7 +22,7 @@ type GitHubToken = StrictUnion<
 			GITHUB_ACCESS_TOKEN: string
 	  }
 	| {
-			/** https://docs.github.com/en/free-pro-team@latest/actions/reference/authentication-in-a-workflow#about-the-github_token-secret */
+			/** https://docs.github.com/en/actions/reference/authentication-in-a-workflow#about-the-github_token-secret */
 			GITHUB_TOKEN: string
 	  }
 >

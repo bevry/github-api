@@ -202,5 +202,10 @@
   "prettier": {
     "semi": false,
     "singleQuote": true
+  },
+  "boundation": {
+    "githubActionTestEnv": {
+      "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+    }
   }
 }
