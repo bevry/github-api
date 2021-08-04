@@ -1,4 +1,6 @@
+// external
 import type { StrictUnion } from 'simplytyped'
+import _fetch from 'node-fetch'
 
 /** If the variable `GITHUB_API_URL` or `GITHUB_API` exists, use that, otherwise use the value `https://api.github.com`. */
 type GitHubApiUrl = StrictUnion<
@@ -66,7 +68,7 @@ export function validate(credentials: GitHubCredentials) {
 
 /**
  * Get the desired GitHub Access Token from the credentials.
- * You probably want {@link getURL} instead.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  */
 export function getAccessToken(credentials: GitHubCredentials): string | null {
 	return credentials.GITHUB_ACCESS_TOKEN || credentials.GITHUB_TOKEN || null
@@ -74,7 +76,7 @@ export function getAccessToken(credentials: GitHubCredentials): string | null {
 
 /**
  * Get the GitHub Authorization Search Params.
- * You probably want {@link getURL} instead.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  * @param credentials The params to use for the authorization variables.
  * @param params If you wish to set the params on an existing URLSearchParams instance, then provide it here.
  * @returns The search params that you should append to your github API request url.
@@ -93,6 +95,7 @@ export function getSearchParams(
 	} else {
 		// throw with detail errors
 		validate(credentials)
+
 		// if that doesn't throw, then fallback to this
 		throw new Error('invalid github credentials')
 	}
@@ -100,8 +103,32 @@ export function getSearchParams(
 }
 
 /**
+ * Remove any GitHub Credentials from a URL Search Params instance.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
+ */
+export function removeSearchParams(params = new URLSearchParams()) {
+	params.delete('access_token')
+	params.delete('client_id')
+	params.delete('client_secret')
+	return params
+}
+
+/**
+ * Redact any GitHub Credentials from a URL string.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
+ * @param value The string to redact credentials from.
+ * @returns The string with the credentials redacted.
+ */
+export function redactSearchParams(value: string) {
+	return value.replace(
+		/(&?)(access_token|client_id|client_secret)=\w+/gi,
+		'$1$2=REDACTED'
+	)
+}
+
+/**
  * Get the GitHub Authorization as a Query String.
- * You probably want {@link getURL} instead.
+ * You probably want to use {@link getURL} directly, instead of going through this method.
  */
 export function getQueryString(credentials: GitHubCredentials) {
 	return getSearchParams(credentials).toString()
@@ -110,7 +137,8 @@ export function getQueryString(credentials: GitHubCredentials) {
 /**
  * Get the GitHub Authorization Header.
  * Use as the `Authorization` header within {@link fetch} calls.
- * You probably want {@link getHeaders} instead.
+ * You probably want to use {@link getHeaders} or {@link fetch} directly, instead of going through this method.
+ * @throws If no valid GitHub Authorization was provided.
  */
 export function getAuthHeader(credentials: GitHubCredentials) {
 	const accessToken = getAccessToken(credentials)
@@ -126,66 +154,121 @@ export function getAuthHeader(credentials: GitHubCredentials) {
 /**
  * Get the headers to attach to the request to the GitHub API.
  * Use as the headers object within {@link fetch} calls.
- * Make sure to use with {@link getApiUrl} to make sure you are using the desired hostname.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  */
-export function getHeaders(credentials: GitHubCredentials) {
+export function getHeaders(
+	credentials: GitHubCredentials,
+	headers: Record<string, string> = {}
+) {
 	return {
 		Accept: 'application/vnd.github.v3+json',
 		Authorization: getAuthHeader(credentials),
+		...headers,
 	}
 }
 
 /**
- * Get the desired Github API URL string.
- * As this does not include any credentials, use with {@link getAuthHeader} to authorize correctly.
- * Otherwise use {@link getURL} to get a credentialed URL.
+ * Remove any GitHub Credentials from a Headers instance.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  */
-export function getApiUrl(credentials: GitHubCredentials) {
-	return (
-		credentials.GITHUB_API_URL ||
-		credentials.GITHUB_API ||
-		'https://api.github.com'
-	)
+export function removeHeaders(headers: Record<string, string>) {
+	// @ts-ignore
+	delete headers.Authorization
+	return headers
 }
 
 /**
- * Get the credentialed GitHub API URL instance.
- * Uses {@link getApiUrl} to fill the hostname, and uses {@link getSearchParams} to fill the credentials.
+ * Get the desired Github API URL, using {@link removeSearchParams}.to ensure there are no credentials.
+ * As this URL does not include credentials, use with {@link getAuthHeader} to authorize correctly.
+ * Otherwise use {@link getCredentialedURL} to get a credentialed URL.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  */
 export function getURL(
 	credentials: GitHubCredentials,
-	props?: { pathname?: string; searchParams?: URLSearchParams }
-): URL {
+	props?: {
+		pathname?: string
+		searchParams?: URLSearchParams | Record<string, string>
+	}
+) {
+	// prepare
+	const hostname =
+		credentials.GITHUB_API_URL ||
+		credentials.GITHUB_API ||
+		'https://api.github.com'
+
 	// fetch url
-	const url = new URL(getApiUrl(credentials))
-	// apply params
-	getSearchParams(credentials, url.searchParams)
-	if (props?.searchParams)
-		props.searchParams.forEach((value, key) => url.searchParams.set(key, value))
-	// apply pathname via append, as otherwise urls like `https://bevry.me/api/github` will not work
-	if (props?.pathname) url.pathname += props.pathname
+	const url = new URL(hostname)
+
+	// add user params
+	if (props?.searchParams) {
+		if (props.searchParams instanceof URLSearchParams) {
+			props.searchParams.forEach((value, key) =>
+				url.searchParams.set(key, value)
+			)
+		} else {
+			Object.entries(props.searchParams).forEach(([key, value]) =>
+				url.searchParams.set(key, value)
+			)
+		}
+	}
+
+	// ensure that there are no credentials in the URL
+	removeSearchParams(url.searchParams)
+
+	// add user pathname
+	// the convoluted way of doing this is to make sure that with or without / is valid
+	// as the GITHUB_API hostname may be something like `https://bevry.me/api/github`
+	if (props?.pathname) {
+		url.pathname = [
+			url.pathname.replace(/^[/]+|[/]+$/, ''),
+			props.pathname.replace(/^[/]+|[/]+$/, ''),
+		]
+			.filter((i) => i)
+			.join('/')
+	}
+
 	// return
 	return url
 }
 
 /**
- * Get the credentialed GitHub API URL string from {@link getURL}.
+ * Get the credentialed GitHub API URL instance.
+ * Uses {@link getURL} to get the URL, then uses {@link getSearchParams} to add the credentials.
+ * You probably want to use {@link fetch} directly, instead of going through this method.
  */
-export function getUrl(
+export function getCredentialedURL(
 	credentials: GitHubCredentials,
-	props?: { pathname?: string; searchParams?: URLSearchParams }
-) {
-	return getURL(credentials, props).toString()
+	props?: {
+		pathname?: string
+		searchParams?: URLSearchParams | Record<string, string>
+	}
+): URL {
+	// fetch url
+	const url = getURL(credentials, props)
+
+	// add auth params
+	getSearchParams(credentials, url.searchParams)
+
+	// return
+	return url
 }
 
 /**
- * Redact any GitHub Credentials from a URL string.
- * @param value The string to redact credentials from.
- * @returns The string with the credentials redacted.
+ * Fetches a GitHub API response via secure headers authorization.
+ * Uses {@link getURL} to get the URL, then uses {@link getHeaders} to add the credentials.
+ * This is probably the method you want to use.
  */
-export function redactSearchParams(value: string) {
-	return value.replace(
-		/(&?)(access_token|client_id|client_secret)=\w+/gi,
-		'$1$2=REDACTED'
-	)
+export function fetch(
+	credentials: GitHubCredentials,
+	props?: {
+		pathname?: string
+		searchParams?: URLSearchParams | Record<string, string>
+		headers?: Record<string, string>
+	}
+) {
+	const url = getURL(credentials, props)
+	const opts = {
+		headers: getHeaders(credentials, props && props.headers),
+	}
+	return _fetch(url, opts)
 }

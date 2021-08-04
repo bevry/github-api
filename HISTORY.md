@@ -1,5 +1,9 @@
 # History
 
+## v7.0.0 2021 August 4
+
+-   Rewrote the API, now all you have to do is use its exported `fetch` method in most cases
+
 ## v6.4.0 2021 August 4
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)

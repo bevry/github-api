@@ -1,6 +1,6 @@
 {
   "name": "githubauthreq",
-  "version": "6.4.0",
+  "version": "7.0.0",
   "description": "Authorize GitHub API requests with the appropriate credentials and preferences.",
   "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",
@@ -142,6 +142,7 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
+    "node-fetch": "^2.6.1",
     "simplytyped": "^3.3.0"
   },
   "devDependencies": {

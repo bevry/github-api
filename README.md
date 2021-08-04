@@ -37,28 +37,36 @@ Authorize GitHub API requests with the appropriate credentials and preferences.
 
 [Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/)
 
+Using TypeScript:
+
 ```typescript
-// imports with typescript
-import { GitHubCredentials, getHeaders, getApiUrl, getUrl, redactSearchParams } from 'githubauthreq'
-import { env } from 'process
+// imports using typescript
+import { fetch, GitHubCredentials } from 'githubauthreq'
+import { env } from 'process'
 const githubCredentials = env as GitHubCredentials
-// if using javascript, omit GitHubCredentials
 
-// recommended: authorization via headers
-fetch(getApiUrl(githubCredentials) + '/user', {
-    headers: getHeaders(githubCredentials),
+// fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
+fetch(githubCredentials, {
+    pathname: `user`,
+    // searchParams, headers
 })
-
-// alternative: authorization via url
-try {
-    // if you want to customize the search params, you can also use: { searchParams: new URLSearchParams() }
-    fetch(getUrl(githubCredentials, {pathname: '/user'}))
-}
-catch (err) {
-    // redact the credentials from the error
-    console.error(redactSearchParams(err.message))
-}
 ```
+
+Using JavaScript:
+
+```javascript
+// imports with javascript
+import { fetch } from 'githubauthreq'
+import { env as githubCredentials } from 'process'
+
+// fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
+fetch(githubCredentials, {
+    pathname: `user`,
+    // searchParams, headers
+})
+```
+
+If you wish for a more manual approach, refer to the [Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/).
 
 <!-- INSTALL/ -->
 
@@ -75,7 +83,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.skypack.dev/githubauthreq@^6.4.0'
+    import * as pkg from '//cdn.skypack.dev/githubauthreq@^7.0.0'
 </script>
 ```
 
@@ -83,7 +91,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/githubauthreq@^6.4.0'
+    import * as pkg from '//unpkg.com/githubauthreq@^7.0.0'
 </script>
 ```
 
@@ -91,7 +99,7 @@ catch (err) {
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/githubauthreq@6.4.0'
+    import * as pkg from '//dev.jspm.io/githubauthreq@7.0.0'
 </script>
 ```
 

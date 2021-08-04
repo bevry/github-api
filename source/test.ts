@@ -1,17 +1,14 @@
 import { equal, errorEqual } from 'assert-helpers'
 import kava from 'kava'
-import fetch from 'cross-fetch'
 import {
 	getQueryString,
-	getAuthHeader,
-	getApiUrl,
 	redactSearchParams,
+	fetch,
 	GitHubCredentials,
-	getHeaders,
-	getUrl,
+	getURL,
 } from './index.js'
 import { env } from 'process'
-const api = getApiUrl(env as GitHubCredentials)
+const envCredentials = env as GitHubCredentials
 
 interface Fixture {
 	input: GitHubCredentials
@@ -117,12 +114,10 @@ kava.suite('githubauthreq', function (suite, test) {
 
 	suite('fetch', function (suite, test) {
 		test('rate limit header', function (done) {
-			fetch(`${api}/rate_limit`, {
-				headers: {
-					Accept: 'application/vnd.github.v3+json',
-					Authorization: getAuthHeader(env as GitHubCredentials),
-				},
-			})
+			const props = {
+				pathname: `rate_limit`,
+			}
+			fetch(envCredentials, props)
 				.then((response) => response.json())
 				.then((result) => {
 					// eslint-disable-next-line no-console
@@ -134,7 +129,10 @@ kava.suite('githubauthreq', function (suite, test) {
 					)
 					done()
 				})
-				.catch(done)
+				.catch((err) => {
+					console.error('failed to fetch', getURL(envCredentials, props))
+					done(err)
+				})
 		})
 	})
 })
