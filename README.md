@@ -38,7 +38,6 @@ Authorize GitHub API requests with the appropriate credentials and preferences.
 [Complete API Documentation.](http://master.github-api.bevry.surge.sh/docs/)
 
 ```typescript
-// imports using typescript
 import { query } from '@bevry/github-api'
 
 // fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
