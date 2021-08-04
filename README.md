@@ -49,7 +49,7 @@ const data = await response.json()
 console.log(data)
 ```
 
-If you wish for a more manual approach, refer to the [Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/).
+If you wish for a more manual approach, refer to the [Complete API Documentation.](http://master.github-api.bevry.surge.sh/docs/).
 
 <!-- INSTALL/ -->
 
