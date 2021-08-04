@@ -2,7 +2,7 @@
   "name": "@bevry/github-api",
   "version": "9.0.0",
   "description": "Authorize GitHub API requests with the appropriate credentials and preferences.",
-  "homepage": "https://github.com/bevry/github-api",
+  "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",
   "keywords": [
     "api",
@@ -47,9 +47,9 @@
       "paypalURL": "https://bevry.me/paypal",
       "wishlistURL": "https://bevry.me/wishlist",
       "githubUsername": "bevry",
-      "githubRepository": "github-api",
-      "githubSlug": "bevry/github-api",
-      "npmPackageName": "github-api"
+      "githubRepository": "githubauthreq",
+      "githubSlug": "bevry/githubauthreq",
+      "npmPackageName": "@bevry/github-api"
     }
   },
   "funding": "https://bevry.me/fund",
@@ -61,11 +61,11 @@
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
   "bugs": {
-    "url": "https://github.com/bevry/github-api/issues"
+    "url": "https://github.com/bevry/githubauthreq/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bevry/github-api.git"
+    "url": "https://github.com/bevry/githubauthreq.git"
   },
   "engines": {
     "node": ">=10"
