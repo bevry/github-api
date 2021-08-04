@@ -1,8 +1,8 @@
 {
-  "name": "githubauthreq",
-  "version": "8.0.0",
+  "name": "@bevry/github-api",
+  "version": "9.0.0",
   "description": "Authorize GitHub API requests with the appropriate credentials and preferences.",
-  "homepage": "https://github.com/bevry/githubauthreq",
+  "homepage": "https://github.com/bevry/github-api",
   "license": "MIT",
   "keywords": [
     "api",
@@ -47,9 +47,9 @@
       "paypalURL": "https://bevry.me/paypal",
       "wishlistURL": "https://bevry.me/wishlist",
       "githubUsername": "bevry",
-      "githubRepository": "githubauthreq",
-      "githubSlug": "bevry/githubauthreq",
-      "npmPackageName": "githubauthreq"
+      "githubRepository": "github-api",
+      "githubSlug": "bevry/github-api",
+      "npmPackageName": "github-api"
     }
   },
   "funding": "https://bevry.me/fund",
@@ -61,11 +61,11 @@
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
   "bugs": {
-    "url": "https://github.com/bevry/githubauthreq/issues"
+    "url": "https://github.com/bevry/github-api/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bevry/githubauthreq.git"
+    "url": "https://github.com/bevry/github-api.git"
   },
   "engines": {
     "node": ">=10"
@@ -142,6 +142,7 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
+    "@bevry/wait": "^1.0.0",
     "node-fetch": "^2.6.1",
     "simplytyped": "^3.3.0"
   },

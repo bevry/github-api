@@ -1,17 +1,17 @@
 <!-- TITLE/ -->
 
-<h1>githubauthreq</h1>
+<h1>@bevry/github-api</h1>
 
 <!-- /TITLE -->
 
 
 <!-- BADGES/ -->
 
-<span class="badge-githubworkflow"><a href="https://github.com/bevry/githubauthreq/actions?query=workflow%3Abevry" title="View the status of this project's GitHub Workflow: bevry"><img src="https://github.com/bevry/githubauthreq/workflows/bevry/badge.svg" alt="Status of the GitHub Workflow: bevry" /></a></span>
-<span class="badge-npmversion"><a href="https://npmjs.org/package/githubauthreq" title="View this project on NPM"><img src="https://img.shields.io/npm/v/githubauthreq.svg" alt="NPM version" /></a></span>
-<span class="badge-npmdownloads"><a href="https://npmjs.org/package/githubauthreq" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/githubauthreq.svg" alt="NPM downloads" /></a></span>
-<span class="badge-daviddm"><a href="https://david-dm.org/bevry/githubauthreq" title="View the status of this project's dependencies on DavidDM"><img src="https://img.shields.io/david/bevry/githubauthreq.svg" alt="Dependency Status" /></a></span>
-<span class="badge-daviddmdev"><a href="https://david-dm.org/bevry/githubauthreq#info=devDependencies" title="View the status of this project's development dependencies on DavidDM"><img src="https://img.shields.io/david/dev/bevry/githubauthreq.svg" alt="Dev Dependency Status" /></a></span>
+<span class="badge-githubworkflow"><a href="https://github.com/bevry/github-api/actions?query=workflow%3Abevry" title="View the status of this project's GitHub Workflow: bevry"><img src="https://github.com/bevry/github-api/workflows/bevry/badge.svg" alt="Status of the GitHub Workflow: bevry" /></a></span>
+<span class="badge-npmversion"><a href="https://npmjs.org/package/github-api" title="View this project on NPM"><img src="https://img.shields.io/npm/v/github-api.svg" alt="NPM version" /></a></span>
+<span class="badge-npmdownloads"><a href="https://npmjs.org/package/github-api" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/github-api.svg" alt="NPM downloads" /></a></span>
+<span class="badge-daviddm"><a href="https://david-dm.org/bevry/github-api" title="View the status of this project's dependencies on DavidDM"><img src="https://img.shields.io/david/bevry/github-api.svg" alt="Dependency Status" /></a></span>
+<span class="badge-daviddmdev"><a href="https://david-dm.org/bevry/github-api#info=devDependencies" title="View the status of this project's development dependencies on DavidDM"><img src="https://img.shields.io/david/dev/bevry/github-api.svg" alt="Dev Dependency Status" /></a></span>
 <br class="badge-separator" />
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
 <span class="badge-patreon"><a href="https://patreon.com/bevry" title="Donate to this project using Patreon"><img src="https://img.shields.io/badge/patreon-donate-yellow.svg" alt="Patreon donate button" /></a></span>
@@ -35,32 +35,19 @@ Authorize GitHub API requests with the appropriate credentials and preferences.
 
 ## Usage
 
-[Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/)
-
-Using TypeScript:
+[Complete API Documentation.](http://master.github-api.bevry.surge.sh/docs/)
 
 ```typescript
 // imports using typescript
-import { fetch } from 'githubauthreq'
+import { query } from '@bevry/github-api'
 
 // fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
-fetch({
+const response = await query({
     pathname: `user`,
-    // url, searchParams, headers, credentials = process.env as GitHubCredentials
+    // searchParams, headers, credentials, url, userAgent
 })
-```
-
-Using JavaScript:
-
-```javascript
-// imports with javascript
-import { fetch } from 'githubauthreq'
-
-// fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
-fetch({
-    pathname: `user`,
-    // url, searchParams, headers, credentials = process.env
-})
+const data = await response.json()
+console.log(data)
 ```
 
 If you wish for a more manual approach, refer to the [Complete API Documentation.](http://master.githubauthreq.bevry.surge.sh/docs/).
@@ -71,16 +58,16 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
 <ul>
-<li>Install: <code>npm install --save githubauthreq</code></li>
-<li>Import: <code>import * as pkg from ('githubauthreq')</code></li>
-<li>Require: <code>const pkg = require('githubauthreq')</code></li>
+<li>Install: <code>npm install --save @bevry/github-api</code></li>
+<li>Import: <code>import * as pkg from ('@bevry/github-api')</code></li>
+<li>Require: <code>const pkg = require('@bevry/github-api')</code></li>
 </ul>
 
 <a href="https://www.skypack.dev" title="Skypack is a JavaScript Delivery Network for modern web apps"><h3>Skypack</h3></a>
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.skypack.dev/githubauthreq@^8.0.0'
+    import * as pkg from '//cdn.skypack.dev/@bevry/github-api@^9.0.0'
 </script>
 ```
 
@@ -88,7 +75,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/githubauthreq@^8.0.0'
+    import * as pkg from '//unpkg.com/@bevry/github-api@^9.0.0'
 </script>
 ```
 
@@ -96,7 +83,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/githubauthreq@8.0.0'
+    import * as pkg from '//dev.jspm.io/@bevry/github-api@9.0.0'
 </script>
 ```
 
@@ -104,11 +91,11 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 <p>This package is published with the following editions:</p>
 
-<ul><li><code>githubauthreq/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>githubauthreq/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#11th_Edition_–_ECMAScript_2020" title="ECMAScript ES2020">ES2020</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>githubauthreq</code> aliases <code>githubauthreq/edition-es2019/index.js</code></li>
-<li><code>githubauthreq/edition-es2019/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#10th_Edition_-_ECMAScript_2019" title="ECMAScript ES2019">ES2019</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 10 || 12 || 14 || 16 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
-<li><code>githubauthreq/edition-es2019-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#10th_Edition_-_ECMAScript_2019" title="ECMAScript ES2019">ES2019</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 12 || 14 || 16 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
+<ul><li><code>@bevry/github-api/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>@bevry/github-api/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#11th_Edition_–_ECMAScript_2020" title="ECMAScript ES2020">ES2020</a> for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>@bevry/github-api</code> aliases <code>@bevry/github-api/edition-es2019/index.js</code></li>
+<li><code>@bevry/github-api/edition-es2019/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#10th_Edition_-_ECMAScript_2019" title="ECMAScript ES2019">ES2019</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 10 || 12 || 14 || 16 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
+<li><code>@bevry/github-api/edition-es2019-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against <a href="https://en.wikipedia.org/wiki/ECMAScript#10th_Edition_-_ECMAScript_2019" title="ECMAScript ES2019">ES2019</a> for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 12 || 14 || 16 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
 
 <!-- /INSTALL -->
 
@@ -117,7 +104,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 <h2>History</h2>
 
-<a href="https://github.com/bevry/githubauthreq/blob/master/HISTORY.md#files">Discover the release history by heading on over to the <code>HISTORY.md</code> file.</a>
+<a href="https://github.com/bevry/github-api/blob/master/HISTORY.md#files">Discover the release history by heading on over to the <code>HISTORY.md</code> file.</a>
 
 <!-- /HISTORY -->
 
@@ -126,7 +113,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 <h2>Contribute</h2>
 
-<a href="https://github.com/bevry/githubauthreq/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
+<a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /CONTRIBUTE -->
 
@@ -139,7 +126,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 These amazing people are maintaining this project:
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/githubauthreq/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/githubauthreq">view contributions</a></li></ul>
+<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
 
 <h3>Sponsors</h3>
 
@@ -159,9 +146,9 @@ No sponsors yet! Will you be the first?
 
 These amazing people have contributed code to this project:
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/githubauthreq/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/githubauthreq">view contributions</a></li></ul>
+<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
 
-<a href="https://github.com/bevry/githubauthreq/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
+<a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /BACKERS -->
 

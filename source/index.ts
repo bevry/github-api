@@ -1,6 +1,7 @@
 // external
 import type { StrictUnion } from 'simplytyped'
 import _fetch from 'node-fetch'
+import wait from '@bevry/wait'
 
 // defaults
 import { env } from 'process'
@@ -270,17 +271,20 @@ export function getCredentialedURL(
 
 /**
  * Fetches a GitHub API response via secure headers authorization.
+ * You must await for the fetch response, as it will re-attempt when encountering 429 Too Many Requests.
  * Uses {@link getURL} to get the URL, then uses {@link getHeaders} to add the credentials.
  * This is probably the method you want to use.
  * If the credentials property is nullish, then the environment variables are attempted.
+ * If the user agent is nullish, then it will be set to `"@bevry/github-api"`
  */
-export function fetch(
+export async function query(
 	props: {
 		credentials?: GitHubCredentials
 		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
 		headers?: Record<string, string>
+		userAgent?: string
 	} = {}
 ) {
 	// default credentials
@@ -290,9 +294,23 @@ export function fetch(
 	// prep
 	const url = getURL(props)
 	const opts = {
-		headers: getHeaders(props.credentials!, props.headers),
+		headers: getHeaders(props.credentials!, {
+			'User-Agent': props.userAgent || '@bevry/github-api',
+			...(props.headers || {}),
+		}),
 	}
 
-	// fetch and return
-	return _fetch(url, opts)
+	// fetch
+	let response = await _fetch(url, opts)
+	while (response.status === 429) {
+		// wait a minute
+		console.warn(
+			`[${url}] returned status code [429 Too Many Requests] will try again in a minute`
+		)
+		await wait(60 * 1000)
+		response = _fetch(url, opts)
+	}
+
+	// return
+	return response
 }

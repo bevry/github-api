@@ -1,5 +1,11 @@
 # History
 
+## v9.0.0 2021 August 5
+
+-   Renamed from `githubauthreq` to `@bevry/github-api`
+-   Renamed `fetch` to `query`, to reflect API differences and now that `query` needs to be awaited
+-   `query` now supports a `userAgent` property that you can set to your API client
+
 ## v8.0.0 2021 August 4
 
 -   `getURL`, `getCredentialedURL`, and `fetch` now accept a single argument, which is the same as before but now supports `url` and `credentials` properties, and if `credentials` is nullish then it attempts to use the environment variables

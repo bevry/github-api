@@ -3,7 +3,7 @@ import kava from 'kava'
 import {
 	getQueryString,
 	redactSearchParams,
-	fetch,
+	query,
 	GitHubCredentials,
 } from './index.js'
 
@@ -111,7 +111,7 @@ kava.suite('githubauthreq', function (suite, test) {
 
 	suite('fetch', function (suite, test) {
 		test('rate limit header', function (done) {
-			fetch({
+			query({
 				pathname: `rate_limit`,
 			})
 				.then((response) => response.json())
