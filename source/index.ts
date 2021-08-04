@@ -2,6 +2,10 @@
 import type { StrictUnion } from 'simplytyped'
 import _fetch from 'node-fetch'
 
+// defaults
+import { env } from 'process'
+const envCredentials = env as GitHubCredentials
+
 /** If the variable `GITHUB_API_URL` or `GITHUB_API` exists, use that, otherwise use the value `https://api.github.com`. */
 type GitHubApiUrl = StrictUnion<
 	| {
@@ -182,22 +186,27 @@ export function removeHeaders(headers: Record<string, string>) {
  * As this URL does not include credentials, use with {@link getAuthHeader} to authorize correctly.
  * Otherwise use {@link getCredentialedURL} to get a credentialed URL.
  * You probably want to use {@link fetch} directly, instead of going through this method.
+ * If the credentials property is nullish, then the environment variables are attempted.
  */
 export function getURL(
-	credentials: GitHubCredentials,
-	props?: {
+	props: {
+		credentials?: GitHubCredentials
+		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
-	}
+	} = {}
 ) {
-	// prepare
-	const hostname =
-		credentials.GITHUB_API_URL ||
-		credentials.GITHUB_API ||
-		'https://api.github.com'
+	// default credentials
+	if (props.credentials == null)
+		props = { ...props, credentials: envCredentials }
 
 	// fetch url
-	const url = new URL(hostname)
+	const url = new URL(
+		props.url ||
+			props.credentials!.GITHUB_API_URL ||
+			props.credentials!.GITHUB_API ||
+			'https://api.github.com'
+	)
 
 	// add user params
 	if (props?.searchParams) {
@@ -235,19 +244,25 @@ export function getURL(
  * Get the credentialed GitHub API URL instance.
  * Uses {@link getURL} to get the URL, then uses {@link getSearchParams} to add the credentials.
  * You probably want to use {@link fetch} directly, instead of going through this method.
+ * If the credentials property is nullish, then the environment variables are attempted.
  */
 export function getCredentialedURL(
-	credentials: GitHubCredentials,
-	props?: {
+	props: {
+		credentials?: GitHubCredentials
+		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
-	}
+	} = {}
 ): URL {
+	// default credentials
+	if (props.credentials == null)
+		props = { ...props, credentials: envCredentials }
+
 	// fetch url
-	const url = getURL(credentials, props)
+	const url = getURL(props)
 
 	// add auth params
-	getSearchParams(credentials, url.searchParams)
+	getSearchParams(props.credentials!, url.searchParams)
 
 	// return
 	return url
@@ -257,18 +272,27 @@ export function getCredentialedURL(
  * Fetches a GitHub API response via secure headers authorization.
  * Uses {@link getURL} to get the URL, then uses {@link getHeaders} to add the credentials.
  * This is probably the method you want to use.
+ * If the credentials property is nullish, then the environment variables are attempted.
  */
 export function fetch(
-	credentials: GitHubCredentials,
-	props?: {
+	props: {
+		credentials?: GitHubCredentials
+		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
 		headers?: Record<string, string>
-	}
+	} = {}
 ) {
-	const url = getURL(credentials, props)
+	// default credentials
+	if (props.credentials == null)
+		props = { ...props, credentials: envCredentials }
+
+	// prep
+	const url = getURL(props)
 	const opts = {
-		headers: getHeaders(credentials, props && props.headers),
+		headers: getHeaders(props.credentials!, props.headers),
 	}
+
+	// fetch and return
 	return _fetch(url, opts)
 }

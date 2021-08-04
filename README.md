@@ -41,14 +41,12 @@ Using TypeScript:
 
 ```typescript
 // imports using typescript
-import { fetch, GitHubCredentials } from 'githubauthreq'
-import { env } from 'process'
-const githubCredentials = env as GitHubCredentials
+import { fetch } from 'githubauthreq'
 
 // fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
-fetch(githubCredentials, {
+fetch({
     pathname: `user`,
-    // searchParams, headers
+    // url, searchParams, headers, credentials = process.env as GitHubCredentials
 })
 ```
 
@@ -57,12 +55,11 @@ Using JavaScript:
 ```javascript
 // imports with javascript
 import { fetch } from 'githubauthreq'
-import { env as githubCredentials } from 'process'
 
 // fetches the GitHub API URL securely via headers authorization, so no redaction is necessary
-fetch(githubCredentials, {
+fetch({
     pathname: `user`,
-    // searchParams, headers
+    // url, searchParams, headers, credentials = process.env
 })
 ```
 
@@ -83,7 +80,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 ``` html
 <script type="module">
-    import * as pkg from '//cdn.skypack.dev/githubauthreq@^7.0.0'
+    import * as pkg from '//cdn.skypack.dev/githubauthreq@^8.0.0'
 </script>
 ```
 
@@ -91,7 +88,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 ``` html
 <script type="module">
-    import * as pkg from '//unpkg.com/githubauthreq@^7.0.0'
+    import * as pkg from '//unpkg.com/githubauthreq@^8.0.0'
 </script>
 ```
 
@@ -99,7 +96,7 @@ If you wish for a more manual approach, refer to the [Complete API Documentation
 
 ``` html
 <script type="module">
-    import * as pkg from '//dev.jspm.io/githubauthreq@7.0.0'
+    import * as pkg from '//dev.jspm.io/githubauthreq@8.0.0'
 </script>
 ```
 

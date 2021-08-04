@@ -1,5 +1,9 @@
 # History
 
+## v8.0.0 2021 August 4
+
+-   `getURL`, `getCredentialedURL`, and `fetch` now accept a single argument, which is the same as before but now supports `url` and `credentials` properties, and if `credentials` is nullish then it attempts to use the environment variables
+
 ## v7.0.0 2021 August 4
 
 -   Rewrote the API, now all you have to do is use its exported `fetch` method in most cases

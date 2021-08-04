@@ -1,6 +1,6 @@
 {
   "name": "githubauthreq",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Authorize GitHub API requests with the appropriate credentials and preferences.",
   "homepage": "https://github.com/bevry/githubauthreq",
   "license": "MIT",

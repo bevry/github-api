@@ -5,10 +5,7 @@ import {
 	redactSearchParams,
 	fetch,
 	GitHubCredentials,
-	getURL,
 } from './index.js'
-import { env } from 'process'
-const envCredentials = env as GitHubCredentials
 
 interface Fixture {
 	input: GitHubCredentials
@@ -114,10 +111,9 @@ kava.suite('githubauthreq', function (suite, test) {
 
 	suite('fetch', function (suite, test) {
 		test('rate limit header', function (done) {
-			const props = {
+			fetch({
 				pathname: `rate_limit`,
-			}
-			fetch(envCredentials, props)
+			})
 				.then((response) => response.json())
 				.then((result) => {
 					// eslint-disable-next-line no-console
@@ -129,10 +125,7 @@ kava.suite('githubauthreq', function (suite, test) {
 					)
 					done()
 				})
-				.catch((err) => {
-					console.error('failed to fetch', getURL(envCredentials, props))
-					done(err)
-				})
+				.catch(done)
 		})
 	})
 })
