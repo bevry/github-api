@@ -1,0 +1,173 @@
+Boundation v1.79.0 [/Users/balupton/Projects/campjs/boundation]
+Running on [/Users/balupton/Projects/campjs/auto/github-api]
+[1m[4mreading the package.json file...[24m[22m
+[1m[4m...read the package.json file...[24m[22m
+[1m[4mreading the now.json file...[24m[22m
+[1m[4m...missing the /Users/balupton/Projects/campjs/auto/github-api/now.json file...[24m[22m
+[1m[4mreading the vercel.json file...[24m[22m
+[1m[4m...missing the /Users/balupton/Projects/campjs/auto/github-api/vercel.json file...[24m[22m
+Automated [1m[4mname[24m[22m via --auto to [1m[32m@bevry/github-api[39m[22m
+Automated [1m[4mdescription[24m[22m via --auto to [1m[32mAuthorize GitHub API requests with the appropriate credentials and preferences.[39m[22m
+Automated [1m[4mkeywords[24m[22m via skip to [1m[32mapi, auth, browser, es2017, github, module, node, querystring, typed, types, typescript[39m[22m
+Automated [1m[4mrepoUrl[24m[22m via --auto to [1m[32mgit@github.com:bevry/github-api.git[39m[22m
+Automated [1m[4mgithubSlug[24m[22m via skip to [1m[32mbevry/github-api[39m[22m
+Automated [1m[4mauthor[24m[22m via --auto to [1m[32m2018+ Benjamin Lupton <b@lupton.cc> (https://balupton.com)[39m[22m
+Automated [1m[4morganisation[24m[22m via --auto to [1m[32mbevry[39m[22m
+Automated [1m[4mtype[24m[22m via --auto to [1m[32mpackage[39m[22m
+[2mAutomated[22m [2m[1m[4mwebsite[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mdocpadWebsite[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mstaticWebsite[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mstaticDirectory[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mdeployTarget[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mvercelWebsite[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mvercelName[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mvercelAliases[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mnextWebsite[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+Automated [1m[4mdocpadPlugin[24m[22m via skip to [1m[32mfalse[39m[22m
+Automated [1m[4mpackageManager[24m[22m via --auto to [1m[32mnpm[39m[22m
+Automated [1m[4mlanguages[24m[22m via --auto to [1m[32m["typescript"][39m[22m
+Automated [1m[4mlanguage[24m[22m via skip to [1m[32mtypescript[39m[22m
+Automated [1m[4mtsconfig[24m[22m via --auto to [1m[32mtsconfig.json[39m[22m
+Automated [1m[4msourceModule[24m[22m via skip to [1m[32mtrue[39m[22m
+Automated [1m[4mflowtype[24m[22m via skip to [1m[32mfalse[39m[22m
+Automated [1m[4mnpm[24m[22m via skip to [1m[32mtrue[39m[22m
+Automated [1m[4mbrowser[24m[22m via --auto to [1m[32mtrue[39m[22m
+Automated [1m[4mbrowsers[24m[22m via --auto to [1m[32mdefaults[39m[22m
+Automated [1m[4mdom[24m[22m via --auto to [1m[32mfalse[39m[22m
+Automated [1m[4mcompileNode[24m[22m via skip to [1m[32mtrue[39m[22m
+Automated [1m[4mcompilerNode[24m[22m via --auto to [1m[32mtypescript[39m[22m
+Automated [1m[4mcompileBrowser[24m[22m via skip to [1m[32mtrue[39m[22m
+Automated [1m[4mcompilerBrowser[24m[22m via --auto to [1m[32mtypescript[39m[22m
+Automated [1m[4mtargetModules[24m[22m via --auto to [1m[32m["require","import"][39m[22m
+Automated [1m[4msourceDirectory[24m[22m via --auto to [1m[32msource[39m[22m
+Automated [1m[4mindexEntry[24m[22m via skip to [1m[32mindex[39m[22m
+Automated [1m[4mnodeEntry[24m[22m via skip to [1m[32mindex[39m[22m
+Automated [1m[4mbrowserEntry[24m[22m via skip to [1m[32mindex[39m[22m
+Automated [1m[4mtestEntry[24m[22m via skip to [1m[32mtest[39m[22m
+Automated [1m[4mbin[24m[22m via --auto to [1m[32mfalse[39m[22m
+[2mAutomated[22m [2m[1m[4mbinEntry[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+[2mAutomated[22m [2m[1m[4mbinExecutable[24m[22m[22m [2mvia[22m [2mwhen[22m [2mto[22m [2m[1m[32mundefined[39m[22m[22m
+Automated [1m[4mdesiredNodeOnly[24m[22m via --auto to [1m[32mfalse[39m[22m
+Automated [1m[4mnodeVersions[24m[22m via skip to [1m[32m["0.8","0.10","0.12","4","6","8","10","12","14","16","18","20","21"][39m[22m
+Automated [1m[4mdesiredNodeVersion[24m[22m via --auto to [1m[32m20[39m[22m
+Automated [1m[4mnodeVersionsSupported[24m[22m via --auto to [1m[32m["10","12","14","16","18","20","21"][39m[22m
+Automated [1m[4mnodeVersionSupportedMinimum[24m[22m via arg to [1m[32m18[39m[22m
+Automated [1m[4mnodeVersionSupportedMaximum[24m[22m via skip to [1m[32m21[39m[22m
+Automated [1m[4mnodeVersionsTestedRange[24m[22m via arg to [1m[32mfalse[39m[22m
+Automated [1m[4mnodeVersionsTested[24m[22m via skip to [1m[32m["10","12","14","16","18","20","21"][39m[22m
+Automated [1m[4mnodeVersionTestedMinimum[24m[22m via skip to [1m[32m10[39m[22m
+Automated [1m[4mnodeVersionTestedMaximum[24m[22m via skip to [1m[32m21[39m[22m
+Automated [1m[4mtargets[24m[22m via --auto to [1m[32m["ES2017"][39m[22m
+Automated [1m[4mkava[24m[22m via --auto to [1m[32mtrue[39m[22m
+Automated [1m[4mdocs[24m[22m via skip to [1m[32mtrue[39m[22m
+Automated [1m[4mdeploymentStrategy[24m[22m via --auto to [1m[32msurge[39m[22m
+[1m[4mcustomising package data...[24m[22m
+[1m[4m...customised package data[24m[22m
+[1m[4mupdating editions...[24m[22m
+editions: source, edition-browsers, edition-es2017, edition-es2017-esm
+[1m[4m...updated editions[24m[22m
+[1m[4mremoving old files...[24m[22m
+[1m[4m...removed old files[24m[22m
+[1m[4mrenaming old files...[24m[22m
+[1m[4m...renamed old files[24m[22m
+[1m[4mdownloading files...[24m[22m
+[1m[4m...downloaded files[24m[22m
+[1m[4mupdating readme file...[24m[22m
+[1m[4m...updated readme file[24m[22m
+[1m[4mupdating history file...[24m[22m
+[1m[4m...updated history file[24m[22m
+[1m[4mupdating runtime...[24m[22m
+[1m[4mscaffolding edition files...[24m[22m
+[1m[4m...scaffolded edition files[24m[22m
+[1m[4mwriting the package.json file...[24m[22m
+[1m[4m...wrote the package.json file[24m[22m
+[1m[4mwriting the package.json file...[24m[22m
+[1m[4m...wrote the package.json file[24m[22m
+[1m[4mreading the tsconfig.json file...[24m[22m
+[1m[4m...read the tsconfig.json file...[24m[22m
+[1m[4mwriting tsconfig file...[24m[22m
+[1m[4m...wrote tsconfig file[24m[22m
+[1m[4mupgrading the installed dependencies...[24m[22m
+Upgrading /Users/balupton/Projects/campjs/auto/github-api/package.json
+
+All dependencies match the latest package versions :)
+[1m[4m...upgraded the installed dependencies[24m[22m
+[1m[4madding the development dependencies...[24m[22m
+npm install --no-fund --no-audit --save-dev projectz@latest assert-helpers@latest kava@latest surge@latest make-deno-edition@latest @typescript-eslint/parser@latest prettier@latest eslint@latest eslint-config-bevry@latest eslint-config-prettier@latest eslint-plugin-prettier@latest @typescript-eslint/eslint-plugin@latest valid-directory@latest valid-module@latest typedoc@latest @types/node@latest @bevry/update-contributors@latest
+
+added 343 packages in 5s
+npm install --no-fund --no-audit --save-exact --save-dev typescript@~5.2
+
+up to date in 530ms
+[1m[4m...added the development dependencies[24m[22m
+[1m[4mrunning setup...[24m[22m
+
+> @bevry/github-api@9.0.0 our:setup
+> npm run our:setup:install
+
+
+> @bevry/github-api@9.0.0 our:setup:install
+> npm install
+
+
+up to date, audited 344 packages in 1s
+
+104 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (2 moderate, 2 critical)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+[1m[4m...ran setup[24m[22m
+[1m[4mrunning clean...[24m[22m
+
+> @bevry/github-api@9.0.0 our:clean
+> rm -Rf ./docs ./edition* ./es2015 ./es5 ./out ./.next
+
+[1m[4m...ran clean[24m[22m
+[1m[4mrunning compile...[24m[22m
+
+> @bevry/github-api@9.0.0 our:compile
+> npm run our:compile:deno && npm run our:compile:edition-browsers && npm run our:compile:edition-es2017 && npm run our:compile:edition-es2017-esm && npm run our:compile:types
+
+
+> @bevry/github-api@9.0.0 our:compile:deno
+> make-deno-edition --attempt
+
+make-deno-edition: OK!
+
+The optional deno edition could not be created for the following reasons:
+necessary entry file [/Users/balupton/Projects/campjs/auto/github-api/source/index.ts] failed
+optional test file [/Users/balupton/Projects/campjs/auto/github-api/source/test.ts] skipped
+
+
+> @bevry/github-api@9.0.0 our:compile:edition-browsers
+> tsc --module ESNext --target ES2022 --outDir ./edition-browsers --project tsconfig.json && ( test ! -d edition-browsers/source || ( mv edition-browsers/source edition-temp && rm -Rf edition-browsers && mv edition-temp edition-browsers ) )
+
+
+> @bevry/github-api@9.0.0 our:compile:edition-es2017
+> tsc --module commonjs --target ES2017 --outDir ./edition-es2017 --project tsconfig.json && ( test ! -d edition-es2017/source || ( mv edition-es2017/source edition-temp && rm -Rf edition-es2017 && mv edition-temp edition-es2017 ) ) && printf '%s' '{"type": "commonjs"}' > edition-es2017/package.json
+
+
+> @bevry/github-api@9.0.0 our:compile:edition-es2017-esm
+> tsc --module ESNext --target ES2017 --outDir ./edition-es2017-esm --project tsconfig.json && ( test ! -d edition-es2017-esm/source || ( mv edition-es2017-esm/source edition-temp && rm -Rf edition-es2017-esm && mv edition-temp edition-es2017-esm ) ) && printf '%s' '{"type": "module"}' > edition-es2017-esm/package.json
+
+
+> @bevry/github-api@9.0.0 our:compile:types
+> tsc --project tsconfig.json --emitDeclarationOnly --declaration --declarationMap --declarationDir ./compiled-types && ( test ! -d compiled-types/source || ( mv compiled-types/source edition-temp && rm -Rf compiled-types && mv edition-temp compiled-types ) )
+
+[1m[4m...ran compile[24m[22m
+[1m[4mreading the package.json file...[24m[22m
+[1m[4m...read the package.json file...[24m[22m
+[1m[4mupdate engines...[24m[22m
+[1m[4mdetermining engines for edition [edition-es2017-esm]...[24m[22m
+target:      *
+passed:      18.18.2, 20.9.0, 21.1.0
+.unique:     18.18.2, 20.9.0, 21.1.0
+failed:      12.22.12, 14.21.3, 16.20.2
+.unique:     12.22.12, 14.21.3, 16.20.2
+range:       18 || 20 || 21
+[1m[4m...determined engines for edition [edition-es2017-esm] as [18 || 20 || 21] against [12.22.12, 14.21.3, 16.20.2, 18.18.2, 20.9.0, 21.1.0][24m[22m
