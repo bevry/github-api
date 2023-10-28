@@ -5,7 +5,7 @@
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
 -   Updated license from [`MIT`](http://spdx.org/licenses/MIT.html) to [`Artistic-2.0`](http://spdx.org/licenses/Artistic-2.0.html)
 -   Minimum required node version changed from `node: >=10` to `node: >=18` to keep up with mandatory ecosystem changes
--   No longer uses `node-fetch`, instead uses the [native Node.js `fetch`](https://nodejs.org/api/globals.html#fetch)
+-   No longer uses `node-fetch`, instead uses the [Node.js `fetch` builtin](https://nodejs.org/api/globals.html#fetch)
 
 ## v9.0.0 2021 August 5
 
