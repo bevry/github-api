@@ -121,7 +121,7 @@ kava.suite('githubauthreq', function (suite, test) {
 					equal(
 						result.rate.limit > 60,
 						true,
-						`the rate limit of ${result.rate.limit} should be more than the free tier of 60`,
+						`the rate limit of ${result.rate.limit} should be more than the free tier of 60`
 					)
 					done()
 				})
