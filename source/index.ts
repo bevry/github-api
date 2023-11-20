@@ -65,7 +65,7 @@ export function validate(credentials: GitHubCredentials) {
 		return true
 	} else {
 		throw new Error(
-			'missing github credentials; provide `GITHUB_ACCESS_TOKEN` or `GITHUB_TOKEN`, or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`'
+			'missing github credentials; provide `GITHUB_ACCESS_TOKEN` or `GITHUB_TOKEN`, or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`',
 		)
 	}
 }
@@ -88,7 +88,7 @@ export function getAccessToken(credentials: GitHubCredentials): string | null {
  */
 export function getSearchParams(
 	credentials: GitHubCredentials,
-	params = new URLSearchParams()
+	params = new URLSearchParams(),
 ) {
 	const accessToken = getAccessToken(credentials)
 	if (accessToken) {
@@ -126,7 +126,7 @@ export function removeSearchParams(params = new URLSearchParams()) {
 export function redactSearchParams(value: string) {
 	return value.replace(
 		/(&?)(access_token|client_id|client_secret)=\w+/gi,
-		'$1$2=REDACTED'
+		'$1$2=REDACTED',
 	)
 }
 
@@ -162,7 +162,7 @@ export function getAuthHeader(credentials: GitHubCredentials) {
  */
 export function getHeaders(
 	credentials: GitHubCredentials,
-	headers: Record<string, string> = {}
+	headers: Record<string, string> = {},
 ) {
 	return {
 		Accept: 'application/vnd.github.v3+json',
@@ -194,7 +194,7 @@ export function getURL(
 		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
-	} = {}
+	} = {},
 ) {
 	// default credentials
 	if (props.credentials == null)
@@ -205,18 +205,18 @@ export function getURL(
 		props.url ||
 			props.credentials!.GITHUB_API_URL ||
 			props.credentials!.GITHUB_API ||
-			'https://api.github.com'
+			'https://api.github.com',
 	)
 
 	// add user params
 	if (props?.searchParams) {
 		if (props.searchParams instanceof URLSearchParams) {
 			props.searchParams.forEach((value, key) =>
-				url.searchParams.set(key, value)
+				url.searchParams.set(key, value),
 			)
 		} else {
 			Object.entries(props.searchParams).forEach(([key, value]) =>
-				url.searchParams.set(key, value)
+				url.searchParams.set(key, value),
 			)
 		}
 	}
@@ -252,7 +252,7 @@ export function getCredentialedURL(
 		url?: string
 		pathname?: string
 		searchParams?: URLSearchParams | Record<string, string>
-	} = {}
+	} = {},
 ): URL {
 	// default credentials
 	if (props.credentials == null)
@@ -284,7 +284,7 @@ export async function query(
 		searchParams?: URLSearchParams | Record<string, string>
 		headers?: Record<string, string>
 		userAgent?: string
-	} = {}
+	} = {},
 ): Promise<Response> {
 	// default credentials
 	if (props.credentials == null)
@@ -304,7 +304,7 @@ export async function query(
 	while (response.status === 429) {
 		// wait a minute
 		console.warn(
-			`[${url}] returned status code [429 Too Many Requests] will try again in a minute`
+			`[${url}] returned status code [429 Too Many Requests] will try again in a minute`,
 		)
 		await wait(60 * 1000)
 		response = await fetch(url, opts)
