@@ -1,19 +1,39 @@
-import { equal, errorEqual } from 'assert-helpers'
+// external
+import { equal, errorEqual, gt, gte } from 'assert-helpers'
 import kava from 'kava'
-import {
+import Errlop from 'errlop'
+
+// local
+import getGitHubLatestCommit, {
+	queryREST,
 	getQueryString,
 	redactSearchParams,
-	query,
+	getGitHubMembersFromOrganization,
+	getGitHubMembersFromOrganizations,
+	backerFields,
 	GitHubCredentials,
+	Fellow,
+	Backers,
+	getBackersFromRepository,
+	getBackersFromUsernames,
+	getGitHubRepositories,
+	getGitHubRepositoriesFromUsernames,
+	getGitHubRepositoriesFromSearch,
 } from './index.js'
+
+type Errback = (error?: Error) => void
 
 interface Fixture {
 	input: GitHubCredentials
 	output?: string
 	error?: string
 }
+interface RedactFixture {
+	input: string
+	output: string
+}
 
-const fixtures: Fixture[] = [
+const apiFixtures: Fixture[] = [
 	{
 		input: {
 			GITHUB_ACCESS_TOKEN: 'gat',
@@ -46,12 +66,6 @@ const fixtures: Fixture[] = [
 		error: 'missing',
 	},
 ]
-
-interface RedactFixture {
-	input: string
-	output: string
-}
-
 const redactFixtures: RedactFixture[] = [
 	{
 		input: 'url?client_id=9d5&client_secret=fbd58',
@@ -87,34 +101,52 @@ const redactFixtures: RedactFixture[] = [
 	},
 ]
 
-kava.suite('githubauthreq', function (suite, test) {
-	suite('fixtures', function (suite, test) {
-		fixtures.forEach(function ({ input, output, error }, index) {
-			test(`test ${index}`, function () {
-				try {
-					equal(getQueryString(input), output)
-				} catch (err) {
-					if (!error) throw err
-					errorEqual(err, error, 'error was as expected')
-				}
+function checkBackersCallback(
+	done: Errback,
+	expected: { [key: string]: number },
+) {
+	return function (result: Backers) {
+		for (const field of backerFields) {
+			try {
+				gte(
+					result[field].length,
+					expected[field],
+					`had at least ${expected[field]} ${field}`,
+				)
+			} catch (err) {
+				console.dir(result, { depth: 1 })
+				throw new Errlop(err)
+			}
+		}
+		setImmediate(done) // don't wrap done call in this promise
+	}
+}
+
+kava.suite('@bevry/github-api', function (suite, test) {
+	suite('api', function (suite, test) {
+		suite('fixtures', function (suite, test) {
+			apiFixtures.forEach(function ({ input, output, error }, index) {
+				test(`test ${index}`, function () {
+					try {
+						equal(getQueryString(input), output)
+					} catch (err) {
+						if (!error) throw err
+						errorEqual(err, error, 'error was as expected')
+					}
+				})
 			})
 		})
-	})
-
-	suite('redact', function (suite, test) {
-		redactFixtures.forEach(function ({ input, output }, index) {
-			test(`test ${index}`, function () {
-				equal(redactSearchParams(input), output)
+		suite('redact', function (suite, test) {
+			redactFixtures.forEach(function ({ input, output }, index) {
+				test(`test ${index}`, function () {
+					equal(redactSearchParams(input), output)
+				})
 			})
 		})
-	})
-
-	suite('fetch', function (suite, test) {
-		test('rate limit header', function (done) {
-			query({
+		test('fetch', function (done) {
+			queryREST<any>({
 				pathname: `rate_limit`,
 			})
-				.then((response) => response.json())
 				.then((result) => {
 					// eslint-disable-next-line no-console
 					console.log(result)
@@ -123,8 +155,97 @@ kava.suite('githubauthreq', function (suite, test) {
 						true,
 						`the rate limit of ${result.rate.limit} should be more than the free tier of 60`,
 					)
+					setImmediate(done) // don't wrap done call in this promise
+				})
+				.catch(done)
+		})
+	})
+	suite('commits', function (suite, test) {
+		test('latest', function (done) {
+			getGitHubLatestCommit('bevry/github')
+				.then(function (result) {
+					equal(typeof result, 'string', `${result} was a string`)
+					equal(Boolean(result), true, `${result} was truthy`)
 					done()
 				})
+				.catch(done)
+		})
+	})
+	suite('repositories', function (suite, test) {
+		test('repos', function (done) {
+			getGitHubRepositories(['bevry/github'])
+				.then(function (result) {
+					equal(Array.isArray(result), true, 'result is array')
+					gt(result.length, 0, 'result had items')
+					done()
+				})
+				.catch(done)
+		})
+		test('users', function (done) {
+			getGitHubRepositoriesFromUsernames(['browserstate'])
+				.then(function (result) {
+					equal(Array.isArray(result), true, 'result is array')
+					gt(result.length, 0, 'result had items')
+					done()
+				})
+				.catch(done)
+		})
+		// note that rate limits are per category, and for searches it is only 10 searches per interval
+		// test('search', function (done) {
+		// 	getGitHubRepositoriesFromSearch('@bevry-labs language:typescript')
+		// 		.then(function (result) {
+		// 			equal(Array.isArray(result), true, 'result is array')
+		// 			gt(result.length, 0, 'result had items')
+		// 			done()
+		// 		})
+		// 		.catch(done)
+		// })
+	})
+	suite('members', function (suite, test) {
+		test('org', function (done) {
+			getGitHubMembersFromOrganization('bevry')
+				.then((result) => {
+					gte(result.length, 2) // balupton, bevryme
+					setImmediate(done) // don't wrap done call in this promise
+				})
+				.catch(done)
+		})
+		test('orgs', function (done) {
+			getGitHubMembersFromOrganizations(['browserstate', 'interconnectapp'])
+				.then((result) => {
+					gte(result.length, 1)
+					setImmediate(done) // don't wrap done call in this promise
+				})
+				.catch(done)
+		})
+	})
+	suite('backers', function (suite, test) {
+		test('github', function (done) {
+			getBackersFromRepository('docpad/docpad')
+				.then(
+					checkBackersCallback(done, {
+						authors: 1,
+						maintainers: 1,
+						contributors: 10,
+						sponsors: 3,
+						funders: 4,
+						donors: 5,
+					}),
+				)
+				.catch(done)
+		})
+		test('orgs', function (done) {
+			getBackersFromUsernames(['bevry-labs'])
+				.then(
+					checkBackersCallback(done, {
+						authors: 1,
+						maintainers: 1,
+						contributors: 1,
+						sponsors: 3,
+						funders: 0,
+						donors: 3,
+					}),
+				)
 				.catch(done)
 		})
 	})

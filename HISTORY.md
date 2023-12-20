@@ -1,5 +1,13 @@
 # History
 
+## v11.0.0 2023 December 19
+
+-   Renamed from `@bevry/github-api` to `@bevry/github` to reflect the new scope and CLI tooling
+-   Added methods for fetching backers from a variety of sources
+-   `query` renamed to `queryREST` and now handles errors, parsing, and paging directly, and added `queryGraphQL`
+-   Rewrote to inline [github-commit](https://github.com/bevry-archive/github-commit), [github-contributors](https://github.com/bevry-archive/github-contributors), [github-members](https://github.com/bevry-archive/github-members), [github-repos](https://github.com/bevry-archive/github-repos), and added CLI to to integrate [update-contributors](https://github.com/bevry-archive/update-contributors) and the unreleased update-sponsors/update-backers/[sponsored](https://github.com/bevry-archive/sponsored)
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+
 ## v10.2.0 2023 November 20
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)

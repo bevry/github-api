@@ -2,7 +2,7 @@
 
 ## Security Practices
 
-This project meets standardized secure software development practices, including 2FA for all members, password managers with monitoring, secure secret retrieval instead of storage. [Learn about our practices.](https://tidelift.com/funding/github/npm/@bevry/github-api)
+This project meets standardized secure software development practices, including 2FA for all members, password managers with monitoring, secure secret retrieval instead of storage. [Learn about our practices.](https://tidelift.com/funding/github/npm/@bevry/github)
 
 ## Supported Versions
 
@@ -12,7 +12,7 @@ This project uses [Bevry's automated tooling](https://github.com/bevry/boundatio
 
 [Refer to automated support of ecosystem versions: `boundation` entries in `HISTORY.md`](https://github.com/bevry/github-api/blob/master/HISTORY.md)
 
-Besides testing and verification, out CI also [auto-merges](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions) [Dependabot security updates](https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates) and [auto-publishes](https://github.com/bevry-actions/npm) successful builds of the [`master` branch](https://github.com/bevry/wait/actions?query=branch%3Amaster) to the [`next` version tag](https://www.npmjs.com/package/@bevry/github-api?activeTab=versions), offering immediate resolutions before scheduled maintenance releases.
+Besides testing and verification, out CI also [auto-merges](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions) [Dependabot security updates](https://docs.github.com/en/code-security/dependabot/dependabot-security-updates/about-dependabot-security-updates) and [auto-publishes](https://github.com/bevry-actions/npm) successful builds of the [`master` branch](https://github.com/bevry/wait/actions?query=branch%3Amaster) to the [`next` version tag](https://www.npmjs.com/package/@bevry/github?activeTab=versions), offering immediate resolutions before scheduled maintenance releases.
 
 ## Reporting a Vulnerability
 
