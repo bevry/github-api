@@ -115,10 +115,10 @@ class InputError extends Error {
 	constructor(error?: string) {
 		let message = `
 			ABOUT:
-			Update sponsors, funders, donors in a package.json file, a text file, a markdown file, and/or a html file.
+			Fetch backers (authors, maintainers, contributors, funders, sponsors, donors) and if desired output/write to package.json, json, string, text, markdown, html.
 
 			USAGE:
-			update-backers [...options] [-- [...options]]
+			github-backers [...options] [-- [...options]]
 
 			OPTIONS:
 			--package=<string>

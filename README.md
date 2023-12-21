@@ -4,7 +4,6 @@
 
 <!-- /TITLE -->
 
-
 <!-- BADGES/ -->
 
 <span class="badge-githubworkflow"><a href="https://github.com/bevry/github-api/actions?query=workflow%3Abevry" title="View the status of this project's GitHub Workflow: bevry"><img src="https://github.com/bevry/github-api/workflows/bevry/badge.svg" alt="Status of the GitHub Workflow: bevry" /></a></span>
@@ -25,13 +24,11 @@
 
 <!-- /BADGES -->
 
-
 <!-- DESCRIPTION/ -->
 
 Interact with the GitHub API. CLI updates backer information (authors, maintainers, contributors, funders, sponsors, donors)
 
 <!-- /DESCRIPTION -->
-
 
 ## Usage
 
@@ -42,6 +39,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 <h2>Install</h2>
 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
+
 <h4>Install Globally</h4>
 <ul>
 <li>Install: <code>npm install --global @bevry/github</code></li>
@@ -57,7 +55,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <a href="https://www.skypack.dev" title="Skypack is a JavaScript Delivery Network for modern web apps"><h3>Skypack</h3></a>
 
-``` html
+```html
 <script type="module">
     import pkg from '//cdn.skypack.dev/@bevry/github@^11.0.0'
 </script>
@@ -65,7 +63,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <a href="https://unpkg.com" title="unpkg is a fast, global content delivery network for everything on npm"><h3>unpkg</h3></a>
 
-``` html
+```html
 <script type="module">
     import pkg from '//unpkg.com/@bevry/github@^11.0.0'
 </script>
@@ -73,7 +71,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <a href="https://jspm.io" title="Native ES Modules CDN"><h3>jspm</h3></a>
 
-``` html
+```html
 <script type="module">
     import pkg from '//dev.jspm.io/@bevry/github@11.0.0'
 </script>
@@ -92,7 +90,6 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <!-- /INSTALL -->
 
-
 <!-- HISTORY/ -->
 
 <h2>History</h2>
@@ -101,7 +98,6 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <!-- /HISTORY -->
 
-
 <!-- CONTRIBUTE/ -->
 
 <h2>Contribute</h2>
@@ -109,7 +105,6 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 <a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /CONTRIBUTE -->
-
 
 <!-- BACKERS/ -->
 
@@ -143,7 +138,6 @@ These amazing people have contributed code to this project:
 <a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /BACKERS -->
-
 
 <!-- LICENSE/ -->
 

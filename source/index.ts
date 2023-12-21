@@ -1922,6 +1922,51 @@ export async function getBackersFromSearch(
 	return getBackersFromRepositories(slugs, opts)
 }
 
+// @TODO this is getting too complicated, let's just put this all into projectz, and go back to github-api
+function renderBackersHeadings(output: any, headingLevel: number, packageData: PackageData | null = null): string {
+	return [
+		`<h${headingLevel}>Backers</h${headingLevel}>`,
+		`<h${headingLevel + 1}>Code</h${headingLevel + 1}>`,
+		getBadgesInCategory('contribute', packageData),
+		data.authors.length
+			? `<h${headingLevel + 2}>Authors</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.authors, {
+					displayYears: true,
+					displayDescription: true
+				})
+			: '',
+		data.maintainers.length
+			? `<h${headingLevel + 2}>Maintainers</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.maintainers, {
+					displayDescription: true
+				})
+			: '',
+		data.contributors.length
+			? `<h${headingLevel + 2}>Contributors</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.contributors, {
+					displayContributions: true,
+					githubRepoSlug: data.github.slug,
+				})
+			: '',
+		`<h${headingLevel + 1}>Finances</h${headingLevel + 1}>`,
+		getBadgesInCategory('funding', data),
+		data.funders.length
+			? `<h${headingLevel + 2}>Funders</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.funders, { displayDescription: true }) // @todo display descriptions if also sponsor
+			: '',
+		data.sponsors.length
+			? `<h${headingLevel + 2}>Sponsors</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.sponsors, { displayDescription: true }) // @Todo display descriptions if also sponsor
+			: '',
+		data.donors.length
+			? `<h${headingLevel + 2}>Donors</h${headingLevel + 2}>\n` +
+				getPeopleHTML(data.donors) // @Todo display descriptions if also sponsor
+			: '',
+	]
+		.filter(Boolean)
+		.join('\n\n')
+}
+
 function renderJoin(output: any, join?: string) {
 	if (join == null) {
 		return output
@@ -1942,8 +1987,42 @@ function renderJoin(output: any, join?: string) {
 			parts.map((i) => `<li>${i}</li>`).join('\n') +
 			`</${join.substring(1, 3)}>`
 		)
+	} else if (join === '<h1>' ) {
+
 	} else {
 		return parts.join(join)
+	}
+}
+
+function getFieldFormatOptions(field: BackerFields, formatOptions: FormatOptions): FormatOptions {
+	switch (field) {
+		case 'authors':
+			if ( ['markdown', 'html'].includes(formatOptions.format!) )
+				return {
+					displayYears: true,
+					displayDescription: true,
+					...formatOptions
+				}
+			return {
+				displayYears: true,
+				...formatOptions
+			}
+		case 'maintainers':
+		case 'contributors':
+			if ( ['markdown', 'html'].includes(formatOptions.format!) )
+				return {
+					displayContributions: true,
+					...formatOptions
+				}
+			return formatOptions
+		case 'funders':
+		case 'sponsors':
+			return {
+				displayDescription: true,
+				...formatOptions
+			}
+		default:
+			return formatOptions
 	}
 }
 
@@ -1969,24 +2048,16 @@ export function renderBackers(
 			for (const field of backerFields) {
 				if (formatOptions[field]) {
 					if (result[field].length) {
+						const customFormatOptions = getFieldFormatOptions(field, formatOptions)
 						if (field === 'authors') {
 							output.author = result[field]
 								.map((i) =>
-									i.toString({
-										displayYears: true,
-										displayEmail: true,
-										urlFields: ['githubUrl', 'url'],
-										...formatOptions,
-									}),
+									i.toString(customFormatOptions),
 								)
 								.join(', ')
 						} else {
-							// for package.json githubUrl must be used, as it allows de-duplication, homepages can change
 							output[field] = result[field].map((i) =>
-								i.toString({
-									urlFields: ['githubUrl', 'url'],
-									...formatOptions,
-								}),
+								i.toString(customFormatOptions),
 							)
 						}
 					} else {
@@ -2012,8 +2083,9 @@ export function renderBackers(
 			const output: any = {}
 			for (const field of backerFields) {
 				if (formatOptions[field] && result[field].length) {
+					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
 					output[field] = renderJoin(
-						result[field].map((i) => i.toString(formatOptions)),
+						result[field].map((i) => i.toString(customFormatOptions)),
 						formatOptions.joinBacker,
 					)
 				}
@@ -2025,12 +2097,12 @@ export function renderBackers(
 		case 'text': {
 			// customise
 			const prefixes = {
-				authors: '',
-				maintainers: '',
-				contributors: '',
-				funders: '',
-				sponsors: '',
-				donors: '',
+				authors: formatOptions.prefix,
+				maintainers: formatOptions.prefix,
+				contributors: formatOptions.prefix,
+				funders: formatOptions.prefix,
+				sponsors: formatOptions.prefix,
+				donors: formatOptions.prefix,
 			}
 			if (formatOptions.prefix === '') {
 				const nameAndSpace =
@@ -2048,9 +2120,10 @@ export function renderBackers(
 			const output: any = {}
 			for (const field of backerFields) {
 				if (formatOptions[field] && result[field].length) {
+					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
 					output[field] = renderJoin(
 						result[field].map((i) =>
-							i.toText({ ...formatOptions, prefix: prefixes[field] }),
+							i.toText({ ...customFormatOptions, prefix: prefixes[field] }),
 						),
 						formatOptions.joinBacker,
 					)
@@ -2064,8 +2137,9 @@ export function renderBackers(
 			const output: any = {}
 			for (const field of backerFields) {
 				if (formatOptions[field] && result[field].length) {
+					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
 					output[field] = renderJoin(
-						result[field].map((i) => i.toMarkdown(formatOptions)),
+						result[field].map((i) => i.toMarkdown(customFormatOptions)),
 						formatOptions.joinBacker,
 					)
 				}
@@ -2077,9 +2151,10 @@ export function renderBackers(
 		case 'html': {
 			const output: any = {}
 			for (const field of backerFields) {
+				const customFormatOptions = getFieldFormatOptions(field, formatOptions)
 				if (formatOptions[field] && result[field].length) {
 					output[field] = renderJoin(
-						result[field].map((i) => i.toHTML(formatOptions)),
+						result[field].map((i) => i.toHTML(customFormatOptions)),
 						formatOptions.joinBacker,
 					)
 				}

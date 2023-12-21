@@ -1,7 +1,7 @@
 {
   "name": "@bevry/github",
   "version": "11.0.0",
-  "description": "Interact with the GitHub API. CLI updates backer information (authors, maintainers, contributors, funders, sponsors, donors)",
+  "description": "Interact with the GitHub API. CLI can fetch and update backer information (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
   "license": "Artistic-2.0",
   "keywords": [
@@ -178,7 +178,7 @@
     }
   ],
   "bin": {
-    "update-backers": "bin.cjs"
+    "github-backers": "bin.cjs"
   },
   "types": "edition-types/index.d.ts",
   "type": "module",
@@ -205,7 +205,7 @@
     "@octokit/graphql": "^7.0.2",
     "arrange-package-json": "^5.0.0",
     "errlop": "^8.2.0",
-    "fellow": "^7.0.0",
+    "fellow": "../fellow",
     "js-yaml": "^4.1.0",
     "native-promise-pool": "^3.26.0",
     "simplytyped": "^3.3.0"
