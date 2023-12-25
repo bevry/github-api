@@ -5,9 +5,9 @@ import PromisePool from 'native-promise-pool'
 import { graphql as octokitGraphQL } from '@octokit/graphql'
 import { load as parseYAML } from 'js-yaml'
 import { append, flatten } from '@bevry/list'
+import trimEmptyKeys from 'trim-empty-keys'
 import Errlop from 'errlop'
-import arrangePackageData from 'arrange-package-json'
-import Fellow, { FormatOptions as FellowFormatOptions } from 'fellow'
+import Fellow from 'fellow'
 export { Fellow, PromisePool, Errlop }
 
 // defaults
@@ -22,6 +22,159 @@ async function fetchOk(url: string): Promise<boolean> {
 async function fetchNotOk(url: string): Promise<boolean> {
 	const ok = await fetchOk(url)
 	return !ok
+}
+
+// ====================================
+// Our Types
+
+/** Field names that we consider backers */
+export type BackerFields =
+	| 'author'
+	| 'authors'
+	| 'maintainers'
+	| 'contributors'
+	| 'funders'
+	| 'sponsors'
+	| 'donors'
+
+/** Field names that we consider backers */
+export const backerFields: Array<BackerFields> = [
+	'author',
+	'authors',
+	'maintainers',
+	'contributors',
+	'funders',
+	'sponsors',
+	'donors',
+]
+
+/** Collection of Sponsors, Funders, and Backers */
+export interface Backers {
+	/* Active copyright owners of the GitHub Repository */
+	author: Array<Fellow>
+	/* Eternal authors of the GitHub Repository */
+	authors: Array<Fellow>
+	/* Active admins/maintainers/publishers of the GitHub Repository */
+	maintainers: Array<Fellow>
+	/* Eternal contributors of the GitHub Repository */
+	contributors: Array<Fellow>
+
+	/* Initial financial backers of the GitHub Repository */
+	funders: Array<Fellow>
+	/* Active financial backers of the GitHub Repository */
+	sponsors: Array<Fellow>
+	/* Eternal financial backers of the GitHub Repository */
+	donors: Array<Fellow>
+}
+
+/** A rendering style for {@link Backers} */
+export enum BackersRenderFormat {
+	/** Used for package.json files, author is a CSV string, the rest are arrays of strings using {@link Fellow.toString} with appropriate defaults. Empty fields are trimmed. */
+	package = 'package',
+	/** Used for readme files, everything is an array of strings, using {@link Fellow.toHtml} with appropriate defaults. */
+	readme = 'readme',
+	/** Used for license files, author and authors are an array of strings, using {@link Fellow.toHtml} with appropriate defaults. */
+	copyright = 'copyright',
+	/** Used for shoutout.txt files, outputs a string with shoutouts to contributors, funders, and sponsors, using {@link Fellow.toText} with appropriate defaults. */
+	shoutout = 'shoutout',
+	/** Used for subsequent changelog entries, outputs a string with shoutout to sponsors, using {@link Fellow.toMarkdown} with appropriate defaults. */
+	update = 'update',
+	/** Used for initial changelog entry, outputs a string with shoutout to funders and sponsors, using {@link Fellow.toMarkdown} with appropriate defaults. */
+	release = 'release'
+}
+
+/** Backers Render Result */
+export interface BackersRenderResult {
+	package: {
+		author?: string
+		authors?: Array<string>
+		maintainers?: Array<string>
+		contributors?: Array<string>
+		funders?: Array<string>
+		sponsors?: Array<string>
+		donors?: Array<string>
+	}
+	readme: {
+		author?: Array<string>
+		authors?: Array<string>
+		maintainers?: Array<string>
+		contributors?: Array<string>
+		funders?: Array<string>
+		sponsors?: Array<string>
+		donors?: Array<string>
+	}
+	copyright: {
+		author?: Array<string>
+		authors?: Array<string>
+	}
+	shoutout: string
+	update: string
+	release: string
+}
+
+/** Options for rendering {@link Backers} */
+export interface BackersRenderOptions {
+	format: BackersRenderFormat
+	/** If provided with {@link BackersRenderFormat.html} will be used to generate contribtuion links. */
+	githubSlug?: string
+	/** If provided with {@link BackersRenderFormat.shoutout} will be used to prefix each shoutout. */
+	projectName?: string
+}
+
+/** Options for queries. */
+export interface QueryOptions {
+	/** Set to non-zero if you wish to restrict how many requests are made at once. */
+	concurrency?: number
+
+	/** The {@link PromisePool} instance to handle the {@link QueryOptions.concurrency} if specified. */
+	pool?: PromisePool<any>
+
+	/** For REST and GraphQL APIs, the GitHub API Credentials */
+	credentials?: GitHubCredentials
+
+	/** For GraphQL API, fetch this result field */
+	resultField?: string
+
+	/** For GraphQL API, start results after this cursor. */
+	afterCursor?: string
+
+	/** For REST and GraphQL APIs, how much results to return per page. */
+	size?: number
+
+	/** For REST API, start results at this page. */
+	page?: number
+
+	/** For REST API, set to non-zero if you wish to restrict how many pages are fetched. */
+	pages?: number
+
+	/** For REST API, the URL to use on the fetch. */
+	url?: string
+
+	/** For REST API, the pathname to use on the fetch. */
+	pathname?: string
+
+	/** For REST API, the search/query params to use on the fetch. */
+	searchParams?: URLSearchParams | Record<string, string>
+
+	/** For REST API, the headers to use on the fetch. */
+	headers?: Record<string, string>
+
+	/** For REST API, the user agent to use on the fetch. */
+	userAgent?: string
+
+	/** For REST API, the method to use on the fetch. */
+	method?: RequestInit['method']
+
+	/** For REST API, the body to use on the fetch. */
+	body?: RequestInit['body']
+}
+
+/** Export some types we consume, so that others can also use them. */
+export interface BackersQueryOptions extends QueryOptions {
+	/** The minimum amount of monthly cents to be considered a financial donor (only applies if we are aware of the financial amount). */
+	sponsorCentsThreshold?: number
+	/** The minimum amount of eternal cents to be considered a financial donor (only applies if we are aware of the financial amount). */
+	donorCentsThreshold?: number
 }
 
 // ====================================
@@ -47,18 +200,20 @@ export interface PackageData {
 	/** The Repository URL of the project */
 	repository?: string | { url?: string }
 
-	/* Copyright Owners of the GitHub Repository */
+	/* Active copyright owners of the GitHub Repository */
 	author?: string | PackagePerson
-	/* Admins/Maintainers/Publishers of the GitHub Repository */
+	/* Eternal authors of the GitHub Repository */
+	authors?: Array<string | PackagePerson>
+	/* Active admins/maintainers/publishers of the GitHub Repository */
 	maintainers?: Array<string | PackagePerson>
-	/* Contributors of the GitHub Repository */
+	/* Eternal contributors of the GitHub Repository */
 	contributors?: Array<string | PackagePerson>
 
 	/* Initial financial backers of the GitHub Repository */
 	funders?: Array<string | PackagePerson>
 	/* Active financial backers of the GitHub Repository */
 	sponsors?: Array<string | PackagePerson>
-	/* Historical financial backers of the GitHub Repository */
+	/* Eternal financial backers of the GitHub Repository */
 	donors?: Array<string | PackagePerson>
 
 	/** Badges configuration, see https://github.com/bevry/badges and https://github.com/bevry/projectz */
@@ -69,9 +224,6 @@ export interface PackageData {
 			opencollectiveUsername?: string
 		}
 	}
-
-	/** Incorrect naming of author, will be adjusted during execution */
-	authors?: string | PackagePerson | Array<string | PackagePerson>
 }
 
 /** Fetch the package data of a repository. */
@@ -84,7 +236,7 @@ export async function getPackageData(
 	if (!resp.ok) {
 		const error = new Error(`package.json not found for ${slug}`)
 		if (!fallback) throw error
-		console.warn(error.message)
+		console.warn(error.stack)
 		return fallback
 	}
 	try {
@@ -93,7 +245,7 @@ export async function getPackageData(
 	} catch (err: any) {
 		const error = new Errlop(`failed to parse package.json of ${slug}`, err)
 		if (!fallback) throw error
-		console.warn(error.message)
+		console.warn(error.stack)
 		return fallback
 	}
 }
@@ -107,7 +259,7 @@ export function getGitHubSlugFromUrl(url: string) {
 
 export function getGitHubSlugFromPackageData(
 	pkg: Pick<PackageData, 'homepage' | 'repository'>,
-) {
+): string {
 	let match = null
 	if (typeof pkg.repository === 'string') {
 		match = pkg.repository.match(/^(?:github:)?([^/:]+\/[^/:]+)$/)
@@ -117,12 +269,62 @@ export function getGitHubSlugFromPackageData(
 			url = pkg.repository && pkg.repository.url
 		} else if (typeof pkg.homepage === 'string') {
 			url = pkg.homepage
-		} else {
-			return null
 		}
-		match = url.match(/github\.com\/([^/:]+\/[^/:]+?)(?:\.git|\/)?$/)
+		if (url) {
+			match = url.match(/github\.com\/([^/:]+\/[^/:]+?)(?:\.git|\/)?$/)
+		}
 	}
-	return (match && match[1]) || null
+	const slug = match && match[1]
+	if (!slug)
+		throw new Error(
+			`Could not determine GitHub slug from package data: ${JSON.stringify(
+				pkg,
+				null,
+				'  ',
+			)}`,
+		)
+	return slug
+}
+
+// ====================================
+// FUNDING.yml Types
+
+/** A .github/FUNDING.yml response */
+export interface FundingData {
+	github?: string | Array<string>
+	patreon?: string | Array<string>
+	open_collective?: string | Array<string>
+	ko_fi?: string | Array<string>
+	liberapay?: string | Array<string>
+	custom?: string | Array<string>
+}
+
+/** Fetch the funding data of a repository. */
+async function getFundingData(
+	slug: string,
+	fallback?: FundingData,
+): Promise<FundingData> {
+	const url = `http://raw.github.com/${slug}/master/.github/FUNDING.yml`
+	const resp = await fetch(url, {})
+	if (!resp.ok) {
+		const error = new Error(`.github/FUNDING.yml not found for ${slug}`)
+		if (!fallback) throw error
+		console.warn(error.stack)
+		return fallback
+	}
+	try {
+		const fundingText = await resp.text()
+		const fundingData: FundingData = parseYAML(fundingText)
+		return fundingData
+	} catch (err: any) {
+		const error = new Errlop(
+			`failed to fetch .github/FUNDING.yml of ${slug}`,
+			err,
+		)
+		if (!fallback) throw error
+		console.warn(error.stack)
+		return fallback
+	}
 }
 
 // ====================================
@@ -162,7 +364,7 @@ function getThanksDevProfile([
 export async function getBackersFromThanksDev(
 	platform: ThanksDevPlatform,
 	username: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<ThanksDevBackers> {
 	let sponsors: Array<ThanksDevDonor> = [],
 		donors: Array<ThanksDevDonor> = []
@@ -266,7 +468,7 @@ function getOpenCollectiveProfile(member: OpenCollectiveMember): Fellow {
 /** Fetch backers from the OpenCollective API */
 export async function getBackersFromOpenCollective(
 	username: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<OpenCollectiveBackers> {
 	try {
 		const url = `https://opencollective.com/${username}/members.json`
@@ -314,104 +516,7 @@ export async function getBackersFromOpenCollective(
 }
 
 // ====================================
-// FUNDING.yml Types
-
-/** A .github/FUNDING.yml response */
-export interface FundingData {
-	github?: string | Array<string>
-	patreon?: string | Array<string>
-	open_collective?: string | Array<string>
-	ko_fi?: string | Array<string>
-	liberapay?: string | Array<string>
-	custom?: string | Array<string>
-}
-
-/** Fetch the funding data of a repository. */
-async function getFundingData(
-	slug: string,
-	fallback?: FundingData,
-): Promise<FundingData> {
-	const url = `http://raw.github.com/${slug}/master/.github/FUNDING.yml`
-	const resp = await fetch(url, {})
-	if (!resp.ok) {
-		const error = new Error(`.github/FUNDING.yml not found for ${slug}`)
-		if (!fallback) throw error
-		console.warn(error.message)
-		return fallback
-	}
-	try {
-		const fundingText = await resp.text()
-		const fundingData: FundingData = parseYAML(fundingText)
-		return fundingData
-	} catch (err: any) {
-		const error = new Errlop(
-			`failed to fetch .github/FUNDING.yml of ${slug}`,
-			err,
-		)
-		if (!fallback) throw error
-		console.warn(error.message)
-		return fallback
-	}
-}
-
-// ====================================
-// GitHub API Types
-
-/** Options for queries. */
-export interface QueryOptions {
-	/** Set to non-zero if you wish to restrict how many requests are made at once. */
-	concurrency?: number
-
-	/** The {@link PromisePool} instance to handle the {@link QueryOptions.concurrency} if specified. */
-	pool?: PromisePool<any>
-
-	/** For REST and GraphQL APIs, the GitHub API Credentials */
-	credentials?: GitHubCredentials
-
-	/** For GraphQL API, fetch this result field */
-	resultField?: string
-
-	/** For GraphQL API, start results after this cursor. */
-	afterCursor?: string
-
-	/** For REST and GraphQL APIs, how much results to return per page. */
-	size?: number
-
-	/** For REST API, start results at this page. */
-	page?: number
-
-	/** For REST API, set to non-zero if you wish to restrict how many pages are fetched. */
-	pages?: number
-
-	/** For REST API, the URL to use on the fetch. */
-	url?: string
-
-	/** For REST API, the pathname to use on the fetch. */
-	pathname?: string
-
-	/** For REST API, the search/query params to use on the fetch. */
-	searchParams?: URLSearchParams | Record<string, string>
-
-	/** For REST API, the headers to use on the fetch. */
-	headers?: Record<string, string>
-
-	/** For REST API, the user agent to use on the fetch. */
-	userAgent?: string
-
-	/** For REST API, the method to use on the fetch. */
-	method?: RequestInit['method']
-
-	/** For REST API, the body to use on the fetch. */
-	body?: RequestInit['body']
-}
-
-/** Export some types we consume, so that others can also use them. */
-export interface BackerQueryOptions extends QueryOptions {
-	/** The minimum amount of monthly cents to be considered a financial donor (only applies if we are aware of the financial amount). */
-	sponsorCentsThreshold?: number
-	/** The minimum amount of eternal cents to be considered a financial donor (only applies if we are aware of the financial amount). */
-	donorCentsThreshold?: number
-}
+// GitHub API
 
 /** GitHub's response when an error occurs. */
 export interface GitHubError {
@@ -480,9 +585,6 @@ export interface GitHubClient {
 export type GitHubCredentials = StrictUnion<GitHubToken | GitHubClient> &
 	Partial<GitHubApiUrl>
 
-// ====================================
-// GitHub API
-
 export type GitHubGraphQLResponse<T> = StrictUnion<GitHubError | T>
 export type GitHubRESTResponse<T> = StrictUnion<GitHubError | T>
 
@@ -523,6 +625,11 @@ export interface GitHubSponsorsGraphQL {
 			nodes: Array<GitHubSponsorGraphQL>
 		}
 	}
+}
+
+export interface GitHubSponsorsBackers {
+	sponsors: Array<Fellow>
+	donors: Array<Fellow>
 }
 
 export interface GitHubCommitREST {
@@ -781,103 +888,8 @@ export interface GitHubRepositoryREST extends GitHubSearchRepositoryREST {
 	source?: GitHubRepositoryREST
 }
 
-export type Formats =
-	| 'package'
-	| 'json'
-	| 'string'
-	| 'text'
-	| 'markdown'
-	| 'html'
-	| 'raw'
-export const formats: Array<Formats> = [
-	'package',
-	'json',
-	'string',
-	'text',
-	'markdown',
-	'html',
-	'raw',
-]
-export interface FormatOptions extends FellowFormatOptions {
-	/** The format to render the result as */
-	format?: Formats
-	/** The string to join groups of backers for textual formats */
-	joinBackers?: string
-	/** The string to join individual backers for textual formats */
-	joinBacker?: string
-
-	/** Whether or not to display/modify authors? */
-	authors?: boolean
-	/** Whether or not to display/modify maintainers? */
-	maintainers?: boolean
-	/** Whether or not to display/modify contributors? */
-	contributors?: boolean
-
-	/** Whether or not to display/modify funders? */
-	funders?: boolean
-	/** Whether or not to display/modify sponsors? */
-	sponsors?: boolean
-	/** Whether or not to display/modify donors? */
-	donors?: boolean
-}
-
-/** Field names that we consider backers */
-export type BackerFields =
-	| 'authors'
-	| 'maintainers'
-	| 'contributors'
-	| 'funders'
-	| 'sponsors'
-	| 'donors'
-
-/** Field names that we consider backers */
-export const backerFields: Array<BackerFields> = [
-	'authors',
-	'maintainers',
-	'contributors',
-	'funders',
-	'sponsors',
-	'donors',
-]
-
-/** Collection of Sponsors, Funders, and Backers */
-export interface Backers {
-	/* Copyright Owners of the GitHub Repository */
-	authors: Array<Fellow>
-	/* Admins/Maintainers/Publishers of the GitHub Repository */
-	maintainers: Array<Fellow>
-	/* Contributors of the GitHub Repository */
-	contributors: Array<Fellow>
-
-	/* Initial financial backers of the GitHub Repository */
-	funders: Array<Fellow>
-	/* Active financial backers of the GitHub Repository */
-	sponsors: Array<Fellow>
-	/* Historical financial backers of the GitHub Repository */
-	donors: Array<Fellow>
-}
-
 // ====================================
 // GitHub API Methods
-
-/**
- * Check whether or not sufficient GitHub credentials were supplied.
- * @returns `true` if valid
- * @throws if invalid
- */
-export function validate(credentials: GitHubCredentials = envCredentials) {
-	const accessToken = getAccessToken(credentials)
-	if (
-		accessToken ||
-		(credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET)
-	) {
-		return true
-	} else {
-		throw new Error(
-			'missing github credentials; provide `GITHUB_ACCESS_TOKEN` or `GITHUB_TOKEN`, or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`',
-		)
-	}
-}
 
 /**
  * Get the desired GitHub Access Token from the credentials.
@@ -887,6 +899,32 @@ export function getAccessToken(
 	credentials: GitHubCredentials = envCredentials,
 ): string | null {
 	return credentials.GITHUB_ACCESS_TOKEN || credentials.GITHUB_TOKEN || null
+}
+
+/**  Check whether or not sufficient GitHub credentials were supplied. */
+export function hasCredentials(
+	credentials: GitHubCredentials = envCredentials,
+): boolean {
+	const accessToken = getAccessToken(credentials)
+	const valid =
+		accessToken ||
+		(credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET)
+	return Boolean(valid)
+}
+
+/**
+ * Check whether or not sufficient GitHub credentials were supplied.
+ * @throws if invalid
+ */
+export function validateCredentials(
+	credentials: GitHubCredentials = envCredentials,
+): true {
+	if (hasCredentials(credentials)) return true
+	throw new Errlop({
+		code: 'INVALID_GITHUB_AUTH',
+		message:
+			'Insufficient GitHub credentials: provide `GITHUB_ACCESS_TOKEN` or `GITHUB_TOKEN`, or a combination of `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`',
+	})
 }
 
 /**
@@ -901,6 +939,7 @@ export function getSearchParams(
 	credentials: GitHubCredentials = envCredentials,
 	params = new URLSearchParams(),
 ) {
+	validateCredentials(credentials)
 	const accessToken = getAccessToken(credentials)
 	if (accessToken) {
 		params.set('access_token', accessToken)
@@ -908,11 +947,11 @@ export function getSearchParams(
 		params.set('client_id', credentials.GITHUB_CLIENT_ID)
 		params.set('client_secret', credentials.GITHUB_CLIENT_SECRET)
 	} else {
-		// throw with detail errors
-		validate(credentials)
-
-		// if that doesn't throw, then fallback to this
-		throw new Error('invalid github credentials')
+		throw new Errlop({
+			code: 'INVALID_STATE',
+			message:
+				'validateCredentails failed to determine invalid GitHub Credentials',
+		})
 	}
 	return params
 }
@@ -942,16 +981,31 @@ export function removeSearchParams(params: URLSearchParams) {
 }
 
 /**
- * Redact any GitHub Credentials from a URL string.
+ * Redact any GitHub Credentials in their URLSearchParams from a string.
  * You probably want to use {@link fetch} directly, instead of going through this method.
  * @param value The string to redact credentials from.
  * @returns The string with the credentials redacted.
  */
-export function redactSearchParams(value: string) {
+export function redactSearchParams(value: string): string {
 	return value.replace(
 		/(&?)(access_token|client_id|client_secret)=\w+/gi,
 		'$1$2=REDACTED',
 	)
+}
+
+/** Redact the GitHub Credentials in any form from a string */
+export function redactCredentials(
+	value: string,
+	credentials: GitHubCredentials = envCredentials,
+): string {
+	value = redactSearchParams(value)
+	let cred: any = getAccessToken(credentials)
+	if (cred) value = value.replaceAll(cred, 'REDACTED')
+	cred = credentials.GITHUB_CLIENT_ID
+	if (cred) value = value.replaceAll(cred, 'REDACTED')
+	cred = credentials.GITHUB_CLIENT_SECRET
+	if (cred) value = value.replaceAll(cred, 'REDACTED')
+	return value
 }
 
 /**
@@ -971,13 +1025,18 @@ export function getQueryString(
  * @throws If no valid GitHub Authorization was provided.
  */
 export function getAuthHeader(credentials: GitHubCredentials = envCredentials) {
+	validateCredentials(credentials)
 	const accessToken = getAccessToken(credentials)
 	if (accessToken) {
 		return `token ${accessToken}`
 	} else if (credentials.GITHUB_CLIENT_ID && credentials.GITHUB_CLIENT_SECRET) {
 		return `Basic ${credentials.GITHUB_CLIENT_ID}:${credentials.GITHUB_CLIENT_SECRET}`
 	} else {
-		throw new Error('missing github credentials for authorization header')
+		throw new Errlop({
+			code: 'INVALID_STATE',
+			message:
+				'validateCredentails failed to determine invalid GitHub Credentials',
+		})
 	}
 }
 
@@ -1328,7 +1387,7 @@ export async function getGitHubRepositoriesFromUsernames(
  */
 export async function getGitHubUser(
 	username: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Fellow> {
 	try {
 		const githubProfile: GitHubUserGraphQL = await queryGraphQL(
@@ -1380,7 +1439,7 @@ export async function getGitHubUser(
  */
 export async function getGitHubOrganization(
 	username: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Fellow> {
 	// fetch
 	// https://docs.github.com/en/graphql/overview/explorer
@@ -1475,13 +1534,8 @@ export async function getGitHubProfile(
 	}
 }
 
-export interface GitHubSponsorsBackers {
-	sponsors: Array<Fellow>
-	donors: Array<Fellow>
-}
-
 /** Get a Fellow of a GitHub Sponsors member */
-function getGitHubSponsorsProfile(githubProfile: GitHubSponsorGraphQL): Fellow {
+export function getGitHubSponsorsProfile(githubProfile: GitHubSponsorGraphQL): Fellow {
 	return Fellow.ensure({
 		githubProfile,
 		company: githubProfile.company,
@@ -1499,7 +1553,7 @@ function getGitHubSponsorsProfile(githubProfile: GitHubSponsorGraphQL): Fellow {
 /** Fetch backers from the GitHub Sponsors API */
 export async function getBackersFromGitHubSponsors(
 	username: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<GitHubSponsorsBackers> {
 	try {
 		// fetch
@@ -1642,7 +1696,7 @@ export async function getGitHubMembersFromOrganization(
 /** Fetch members from multiple GitHub organizations */
 export async function getGitHubMembersFromOrganizations(
 	orgs: Array<string>,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Array<Fellow>> {
 	const lists = await Promise.all(
 		orgs.map((org) => getGitHubMembersFromOrganization(org, opts)),
@@ -1650,14 +1704,61 @@ export async function getGitHubMembersFromOrganizations(
 	return flatten(lists)
 }
 
-/** Fetch backers from a GitHub repository slug */
+/** For each backer, append to the result */
+function appendBackers(target: Backers, source: Partial<Backers>): Backers {
+	for (const field of backerFields) {
+		const list = source[field]
+		if (list) append(target[field], list)
+	}
+	return target
+}
+
+/** For each backer, attach them to the slug for the appropriate associations */
+function attachBackersToGitHubSlug(
+	result: Backers,
+	slug: string | null,
+): Backers {
+	if (slug) {
+		for (const author of result.author) author.authorOfRepositories.add(slug)
+		for (const author of result.authors) author.authorOfRepositories.add(slug)
+		for (const maintainer of result.maintainers)
+			maintainer.maintainerOfRepositories.add(slug)
+		for (const contributor of result.contributors)
+			contributor.contributorOfRepositories.add(slug)
+		for (const funder of result.funders) funder.funderOfRepositories.add(slug)
+		for (const sponsor of result.sponsors)
+			sponsor.sponsorOfRepositories.add(slug)
+		for (const donor of result.donors) donor.donorOfRepositories.add(slug)
+	}
+	return result
+}
+
+/** Process latest backers from a GitHub repository, fetching remote data */
 export async function getBackersFromRepository(
-	slug: string,
-	opts: BackerQueryOptions = {},
+	slugOrPackageData: string | PackageData,
+	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
+	let slug: string = '',
+		packageData: PackageData
 	try {
+		// if slug, fetch remote packageData, if packageData, extract slug
+		if (typeof slugOrPackageData === 'string') {
+			// fetch packageData from slug
+			slug = slugOrPackageData
+			packageData = await getPackageData(slug, {})
+		} else {
+			// extract slug from packagedata
+			packageData = slugOrPackageData
+			slug = getGitHubSlugFromPackageData(packageData)
+		}
+
 		// prepare
-		const packageData: PackageData = await getPackageData(slug, {})
+		const authed = hasCredentials(opts.credentials)
+		if (!authed) {
+			console.warn(
+				'GitHub credentials not provided, will skip fetching GitHub Contributors, Sponsors, and Profiles',
+			)
+		}
 		let fundingData: FundingData
 		const fallbackUsername = slug.split('/')[0]
 
@@ -1694,15 +1795,35 @@ export async function getBackersFromRepository(
 			}
 		}
 
-		// prepare result from package data
-		const result = getBackersFromPackageData(packageData)
+		// prepare backers from package data
+		const result = attachBackersToGitHubSlug(
+			{
+				author: Fellow.add(packageData.author),
+				authors: Fellow.add(packageData.author, packageData.authors),
+				maintainers: Fellow.add(packageData.maintainers),
+				contributors: Fellow.add(
+					packageData.maintainers,
+					packageData.contributors,
+				),
+				funders: Fellow.add(packageData.funders),
+				sponsors: Fellow.add(packageData.sponsors),
+				donors: Fellow.add(
+					packageData.funders,
+					packageData.sponsors,
+					packageData.donors,
+				),
+			},
+			slug,
+		)
 
 		// add contributors
-		try {
-			const fetchedContributors = await getGitHubContributors(slug, opts)
-			append(result.contributors, fetchedContributors)
-		} catch (err) {
-			console.warn(err)
+		if (authed) {
+			try {
+				const fetchedContributors = await getGitHubContributors(slug, opts)
+				append(result.contributors, fetchedContributors)
+			} catch (err: any) {
+				console.warn(err.stack)
+			}
 		}
 
 		// order by least details, to most accurate details, so ThanksDev, OpenCollective, GitHub Sponsors
@@ -1716,8 +1837,8 @@ export async function getBackersFromRepository(
 					opts,
 				)
 				appendBackers(result, fetchedBackers)
-			} catch (err) {
-				console.warn(err)
+			} catch (err: any) {
+				console.warn(err.stack)
 			}
 		} else {
 			console.warn(`Unable to determine ThanksDev username for ${slug}`)
@@ -1731,41 +1852,46 @@ export async function getBackersFromRepository(
 					opts,
 				)
 				appendBackers(result, fetchedBackers)
-			} catch (err) {
-				console.warn(err)
+			} catch (err: any) {
+				console.warn(err.stack)
 			}
 		} else {
 			console.warn(`Unable to determine OpenCollective username for ${slug}`)
 		}
 
 		// GitHubSponsors
-		if (githubSponsorsUsername) {
-			try {
-				const fetchedBackers = await getBackersFromGitHubSponsors(
-					githubSponsorsUsername,
-					opts,
-				)
-				appendBackers(result, fetchedBackers)
-			} catch (err) {
-				console.warn(err)
+		if (authed) {
+			if (githubSponsorsUsername) {
+				try {
+					const fetchedBackers = await getBackersFromGitHubSponsors(
+						githubSponsorsUsername,
+						opts,
+					)
+					appendBackers(result, fetchedBackers)
+				} catch (err: any) {
+					console.warn(err.stack)
+				}
+			} else {
+				console.warn(`Unable to determine GitHub Sponsors username for ${slug}`)
 			}
-		} else {
-			console.warn(`Unable to determine GitHub Sponsors username for ${slug}`)
 		}
 
-		// fetch additional details
-		await Promise.all(
-			Array.from(result.donors).map(async (fellow) => {
-				if (fellow.githubUsername && !fellow.githubProfile) {
-					const profile = await getGitHubProfile(fellow.githubUsername, opts)
-				}
-			}),
-		)
+		// fetch additional details, if able
+		if (authed) {
+			await Promise.all(
+				Array.from(result.donors).map(async (fellow) => {
+					if (fellow.githubUsername && !fellow.githubProfile) {
+						await getGitHubProfile(fellow.githubUsername, opts)
+					}
+				}),
+			)
+		}
 
 		// attach to slug, which enables us to remove duplicates by fetching by slug
 		// (duplicates can occur if new details allowed us to merge two old entries)
 		attachBackersToGitHubSlug(result, slug)
 		return {
+			author: result.author,
 			authors: Fellow.authorsOfRepository(slug),
 			maintainers: Fellow.maintainersOfRepository(slug),
 			contributors: Fellow.contributorsOfRepository(slug),
@@ -1775,11 +1901,14 @@ export async function getBackersFromRepository(
 		}
 	} catch (err) {
 		const error = new Errlop(
-			`Failed to fetch backers for GitHub Repository: ${slug}`,
+			`Failed to fetch backers for GitHub Repository: ${
+				slug || slugOrPackageData
+			}`,
 			err,
 		)
-		console.warn(error)
+		console.warn(error.stack)
 		return {
+			author: [],
 			authors: [],
 			maintainers: [],
 			contributors: [],
@@ -1790,80 +1919,17 @@ export async function getBackersFromRepository(
 	}
 }
 
-/** Fetch backers from package.json data */
-export function getBackersFromPackageData(packageData: PackageData): Backers {
-	// prepare
-	const slug = getGitHubSlugFromPackageData(packageData)
-	const authors = new Set<Fellow>()
-	const maintainers = new Set<Fellow>()
-	const contributors = new Set<Fellow>()
-	const funders = new Set<Fellow>()
-	const sponsors = new Set<Fellow>()
-	const donors = new Set<Fellow>()
-
-	// add package.json data
-	append(authors, Fellow.add(packageData.author, packageData.authors))
-	append(maintainers, Fellow.add(packageData.maintainers))
-	append(
-		contributors,
-		Fellow.add(authors, maintainers, packageData.contributors),
-	)
-	append(funders, Fellow.add(packageData.funders))
-	append(sponsors, Fellow.add(packageData.sponsors))
-	append(donors, Fellow.add(funders, sponsors, packageData.donors))
-
-	// remove duplicates of any that were merged after fetching the latest details
-	return attachBackersToGitHubSlug(
-		{
-			authors: Fellow.sort(authors),
-			maintainers: Fellow.sort(maintainers),
-			contributors: Fellow.sort(contributors),
-			funders: Fellow.sort(funders),
-			sponsors: Fellow.sort(sponsors),
-			donors: Fellow.sort(donors),
-		},
-		slug,
-	)
-}
-
-/** For each backer, append to the result */
-function appendBackers(target: Backers, source: Partial<Backers>): Backers {
-	for (const field of backerFields) {
-		const list = source[field]
-		if (list) append(target[field], list)
-	}
-	return target
-}
-
-/** For each backer, attach them to the slug for the appropriate associations */
-function attachBackersToGitHubSlug(
-	result: Backers,
-	slug: string | null,
-): Backers {
-	if (slug) {
-		for (const author of result.authors) author.authorOfRepositories.add(slug)
-		for (const maintainer of result.maintainers)
-			maintainer.maintainerOfRepositories.add(slug)
-		for (const contributor of result.contributors)
-			contributor.contributorOfRepositories.add(slug)
-		for (const funder of result.funders) funder.funderOfRepositories.add(slug)
-		for (const sponsor of result.sponsors)
-			sponsor.sponsorOfRepositories.add(slug)
-		for (const donor of result.donors) donor.donorOfRepositories.add(slug)
-	}
-	return result
-}
-
 /** Fetch backers from GitHub repository slugs */
 export async function getBackersFromRepositories(
 	slugs: Array<string>,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
 	const results = await Promise.all(
 		slugs.map((slug) => getBackersFromRepository(slug, opts)),
 	)
 
-	// de-duplicate across repos
+	// flattern and de-duplicate across repos
+	const author = new Set<Fellow>()
 	const authors = new Set<Fellow>()
 	const maintainers = new Set<Fellow>()
 	const contributors = new Set<Fellow>()
@@ -1871,6 +1937,7 @@ export async function getBackersFromRepositories(
 	const sponsors = new Set<Fellow>()
 	const donors = new Set<Fellow>()
 	for (const result of results) {
+		append(author, result.author)
 		append(authors, result.authors)
 		append(maintainers, result.maintainers)
 		append(contributors, result.contributors)
@@ -1880,6 +1947,7 @@ export async function getBackersFromRepositories(
 	}
 
 	return {
+		author: Fellow.sort(author),
 		authors: Fellow.sort(authors),
 		maintainers: Fellow.sort(maintainers),
 		contributors: Fellow.sort(contributors),
@@ -1892,7 +1960,7 @@ export async function getBackersFromRepositories(
 /**  Fetch backers for all repositories by these usernames (users, organizations) */
 export async function getBackersFromUsernames(
 	usernames: Array<string>,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
 	const repos = await getGitHubRepositoriesFromUsernames(usernames, opts)
 
@@ -1911,7 +1979,7 @@ export async function getBackersFromUsernames(
  */
 export async function getBackersFromSearch(
 	query: string,
-	opts: BackerQueryOptions = {},
+	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
 	const repos = await getGitHubRepositoriesFromSearch(query, opts)
 
@@ -1922,249 +1990,377 @@ export async function getBackersFromSearch(
 	return getBackersFromRepositories(slugs, opts)
 }
 
-// @TODO this is getting too complicated, let's just put this all into projectz, and go back to github-api
-function renderBackersHeadings(output: any, headingLevel: number, packageData: PackageData | null = null): string {
-	return [
-		`<h${headingLevel}>Backers</h${headingLevel}>`,
-		`<h${headingLevel + 1}>Code</h${headingLevel + 1}>`,
-		getBadgesInCategory('contribute', packageData),
-		data.authors.length
-			? `<h${headingLevel + 2}>Authors</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.authors, {
+export async function renderBackers<T extends BackersRenderFormat>(
+	backers: Partial<Backers>,
+	opts: BackersRenderOptions & { format: T },
+): Promise<BackersRenderResult[T]>
+export async function renderBackers(
+	backers: Partial<Backers>,
+	opts: BackersRenderOptions,
+): Promise<any> {
+	if (opts.format ===  BackersRenderFormat.package) {
+		return trimEmptyKeys({
+			author:
+				backers.author?.map((fellow) => fellow.toString({
 					displayYears: true,
-					displayDescription: true
-				})
-			: '',
-		data.maintainers.length
-			? `<h${headingLevel + 2}>Maintainers</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.maintainers, {
-					displayDescription: true
-				})
-			: '',
-		data.contributors.length
-			? `<h${headingLevel + 2}>Contributors</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.contributors, {
-					displayContributions: true,
-					githubRepoSlug: data.github.slug,
-				})
-			: '',
-		`<h${headingLevel + 1}>Finances</h${headingLevel + 1}>`,
-		getBadgesInCategory('funding', data),
-		data.funders.length
-			? `<h${headingLevel + 2}>Funders</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.funders, { displayDescription: true }) // @todo display descriptions if also sponsor
-			: '',
-		data.sponsors.length
-			? `<h${headingLevel + 2}>Sponsors</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.sponsors, { displayDescription: true }) // @Todo display descriptions if also sponsor
-			: '',
-		data.donors.length
-			? `<h${headingLevel + 2}>Donors</h${headingLevel + 2}>\n` +
-				getPeopleHTML(data.donors) // @Todo display descriptions if also sponsor
-			: '',
-	]
-		.filter(Boolean)
-		.join('\n\n')
-}
-
-function renderJoin(output: any, join?: string) {
-	if (join == null) {
-		return output
-	}
-	const parts = []
-	for (const [key, value] of Object.entries(output)) {
-		if (value) {
-			if (Array.isArray(value)) {
-				parts.push(...value)
-			} else {
-				parts.push(value)
-			}
-		}
-	}
-	if (join === '<ul>' || join === '<ol>') {
-		return (
-			join +
-			parts.map((i) => `<li>${i}</li>`).join('\n') +
-			`</${join.substring(1, 3)}>`
-		)
-	} else if (join === '<h1>' ) {
-
-	} else {
-		return parts.join(join)
-	}
-}
-
-function getFieldFormatOptions(field: BackerFields, formatOptions: FormatOptions): FormatOptions {
-	switch (field) {
-		case 'authors':
-			if ( ['markdown', 'html'].includes(formatOptions.format!) )
-				return {
-					displayYears: true,
+					urlFields: ['url'],
+				})).join(', '),
+			authors: backers.authors
+				?.map((fellow) =>
+					fellow.toString({ displayYears: true, displayDescription: true }),
+				)
+				.sort(),
+			maintainers: backers.maintainers?.map((fellow) => fellow.toString()),
+			contributors: backers.contributors?.map((fellow) => fellow.toString()),
+			funders: backers.funders?.map((fellow) =>
+				fellow.toString({
 					displayDescription: true,
-					...formatOptions
-				}
-			return {
-				displayYears: true,
-				...formatOptions
-			}
-		case 'maintainers':
-		case 'contributors':
-			if ( ['markdown', 'html'].includes(formatOptions.format!) )
-				return {
-					displayContributions: true,
-					...formatOptions
-				}
-			return formatOptions
-		case 'funders':
-		case 'sponsors':
-			return {
-				displayDescription: true,
-				...formatOptions
-			}
-		default:
-			return formatOptions
+				}),
+			),
+			sponsors: backers.funders?.map((fellow) =>
+				fellow.toString({
+					displayDescription: true,
+				}),
+			),
+			donors: backers.donors?.map((fellow) =>
+				fellow.toString({
+					displayDescription: false,
+				}),
+			),
+		} as BackersRenderResult[BackersRenderFormat.package])
+	} else if (opts.format ===  BackersRenderFormat.readme ) {
+		return trimEmptyKeys({
+			author:
+				backers.authors?.map((fellow) =>
+					fellow.toHtml({
+						displayYears: true,
+						displayDescription: true,
+					}),
+				) || null,
+			authors:
+				backers.authors?.map((fellow) =>
+					fellow.toHtml({
+						displayYears: true,
+						displayDescription: true,
+					}),
+				) || null,
+			maintainers:
+				backers.maintainers?.map((fellow) =>
+					fellow.toHtml({
+						// keep description for those which url is preferred over githubUrl
+						githubSlug: opts.githubSlug,
+						displayContributions: true,
+						urlFields: ['githubUrl', 'url'],
+					}),
+				) || null,
+			contributors:
+				backers.contributors?.map((fellow) =>
+					fellow.toHtml({
+						githubSlug: opts.githubSlug,
+						displayContributions: true,
+						urlFields: ['githubUrl', 'url'],
+					}),
+				) || null,
+			funders:
+				backers.funders?.map((fellow) =>
+					fellow.toHtml({ displayDescription: true }),
+				) || null,
+			sponsors:
+				backers.sponsors?.map((fellow) =>
+					fellow.toHtml({ displayDescription: true }),
+				) || null,
+			donors:
+				backers.donors?.map((fellow) =>
+					fellow.toHtml(),
+				) || null,
+		} as BackersRenderResult[BackersRenderFormat.readme])
+	} else if (opts.format ===  BackersRenderFormat.copyright ) {
+		return trimEmptyKeys({
+			author:
+				backers.author?.map((fellow) =>
+					fellow.toHtml({ displayCopyright: true, displayYears: true }),
+				) || null,
+			authors:
+				backers.authors?.map((fellow) =>
+					fellow.toHtml({ displayCopyright: true, displayYears: true }),
+				) || null,
+		}  as BackersRenderResult[BackersRenderFormat.copyright])
+	} else if (opts.format ===  BackersRenderFormat.shoutout ) {
+		const titleAndSpace = opts.projectName ? opts.projectName + ' ' : ''
+		return [
+			...(backers.contributors || []).map(
+				(fellow) =>
+					`Thank you to ${titleAndSpace}contributor 🤍 ${fellow.toText()}`,
+			),
+			...(backers.funders || []).map(
+				(fellow) =>
+					`Thank you to ${titleAndSpace}funder 🤍 ${fellow.toText()}`,
+			),
+			...(backers.sponsors || []).map(
+				(fellow) =>
+					`Thank you to ${titleAndSpace}sponsor 🤍 ${fellow.toText()}`,
+			),
+		].join('\n') as BackersRenderResult[BackersRenderFormat.shoutout]
+	} else if (opts.format ===  BackersRenderFormat.update ) {
+		return (backers.sponsors || []).length === 0
+			? ''
+			: '- Thank you to the sponsors: ' +
+					backers.sponsors?.map((fellow) => fellow.toMarkdown()).join('\n') as BackersRenderResult[BackersRenderFormat.update]
+	} else if (opts.format ===  BackersRenderFormat.release ) {
+		return [
+			(backers.funders || []).length === 0
+			? ''
+			: '- Thank you to the funders: ' +
+					backers.funders?.map((fellow) => fellow.toMarkdown()).join('\n')
+			,
+			(backers.sponsors || []).length === 0
+			? ''
+			: '- Thank you to the sponsors: ' +
+					backers.sponsors?.map((fellow) => fellow.toMarkdown()).join('\n')
+		].filter(Boolean).join('\n') as BackersRenderResult[BackersRenderFormat.release]
+	} else {
+		throw new Error(`Invalid format: ${opts.format}`)
 	}
 }
 
-/** Render a Backers result according to the desired format. */
-export function renderBackers(
-	result: Backers,
-	formatOptions: FormatOptions,
-	packageData: PackageData | null = null,
-): any {
-	// enable everything if nothing is enabled
-	const allNull = backerFields
-		.map((field) => formatOptions[field] == null)
-		.every(Boolean)
-	if (allNull) backerFields.forEach((field) => (formatOptions[field] = true))
-	// render
-	switch (formatOptions.format) {
-		case 'json':
-		case 'package': {
-			const output: any =
-				formatOptions.format === 'package' && packageData != null
-					? Object.assign({}, packageData)
-					: {}
-			for (const field of backerFields) {
-				if (formatOptions[field]) {
-					if (result[field].length) {
-						const customFormatOptions = getFieldFormatOptions(field, formatOptions)
-						if (field === 'authors') {
-							output.author = result[field]
-								.map((i) =>
-									i.toString(customFormatOptions),
-								)
-								.join(', ')
-						} else {
-							output[field] = result[field].map((i) =>
-								i.toString(customFormatOptions),
-							)
-						}
-					} else {
-						delete output[field]
-					}
-				}
-			}
-			delete output.authors
-			return formatOptions.format === 'package'
-				? arrangePackageData(output)
-				: output
-		}
-		case 'raw': {
-			const output: any = {}
-			for (const field of backerFields) {
-				if (formatOptions[field]) {
-					output[field] = result[field] || []
-				}
-			}
-			return result
-		}
-		case 'string': {
-			const output: any = {}
-			for (const field of backerFields) {
-				if (formatOptions[field] && result[field].length) {
-					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
-					output[field] = renderJoin(
-						result[field].map((i) => i.toString(customFormatOptions)),
-						formatOptions.joinBacker,
-					)
-				}
-			}
-			if (formatOptions.joinBackers != null)
-				return renderJoin(output, formatOptions.joinBackers)
-			return output
-		}
-		case 'text': {
-			// customise
-			const prefixes = {
-				authors: formatOptions.prefix,
-				maintainers: formatOptions.prefix,
-				contributors: formatOptions.prefix,
-				funders: formatOptions.prefix,
-				sponsors: formatOptions.prefix,
-				donors: formatOptions.prefix,
-			}
-			if (formatOptions.prefix === '') {
-				const nameAndSpace =
-					(packageData?.title || packageData?.name || '') + ' '
-				Object.assign(prefixes, {
-					authors: `Thank you to ${nameAndSpace}author 🤍`,
-					maintainers: `Thank you to ${nameAndSpace}maintainer 🤍`,
-					contributors: `Thank you to ${nameAndSpace}contributor 🤍`,
-					funders: `Thank you to ${nameAndSpace}funder 🤍`,
-					sponsors: `Thank you to ${nameAndSpace}sponsor 🤍`,
-					donors: `Thank you to ${nameAndSpace}donor 🤍`,
-				})
-			}
-			// render
-			const output: any = {}
-			for (const field of backerFields) {
-				if (formatOptions[field] && result[field].length) {
-					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
-					output[field] = renderJoin(
-						result[field].map((i) =>
-							i.toText({ ...customFormatOptions, prefix: prefixes[field] }),
-						),
-						formatOptions.joinBacker,
-					)
-				}
-			}
-			if (formatOptions.joinBackers != null)
-				return renderJoin(output, formatOptions.joinBackers)
-			return output
-		}
-		case 'markdown': {
-			const output: any = {}
-			for (const field of backerFields) {
-				if (formatOptions[field] && result[field].length) {
-					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
-					output[field] = renderJoin(
-						result[field].map((i) => i.toMarkdown(customFormatOptions)),
-						formatOptions.joinBacker,
-					)
-				}
-			}
-			if (formatOptions.joinBackers != null)
-				return renderJoin(output, formatOptions.joinBackers)
-			return output
-		}
-		case 'html': {
-			const output: any = {}
-			for (const field of backerFields) {
-				const customFormatOptions = getFieldFormatOptions(field, formatOptions)
-				if (formatOptions[field] && result[field].length) {
-					output[field] = renderJoin(
-						result[field].map((i) => i.toHTML(customFormatOptions)),
-						formatOptions.joinBacker,
-					)
-				}
-			}
-			if (formatOptions.joinBackers != null)
-				return renderJoin(output, formatOptions.joinBackers)
-			return output
-		}
-		default: {
-			throw new Error(`Invalid format [${formatOptions.format}]`)
-		}
-	}
-}
+
+// export type Formats =
+// 	| 'package'
+// 	| 'json'
+// 	| 'string'
+// 	| 'text'
+// 	| 'markdown'
+// 	| 'html'
+// 	| 'raw'
+// export const formats: Array<Formats> = [
+// 	'package',
+// 	'json',
+// 	'string',
+// 	'text',
+// 	'markdown',
+// 	'html',
+// 	'raw',
+// ]
+// export interface FormatOptions extends FellowFormatOptions {
+// 	/** The format to render the result as */
+// 	format?: Formats
+// 	/** The string to join groups of backers for textual formats */
+// 	joinBackers?: string
+// 	/** The string to join individual backers for textual formats */
+// 	joinBacker?: string
+
+// 	/** Whether or not to display/modify authors? */
+// 	authors?: boolean
+// 	/** Whether or not to display/modify maintainers? */
+// 	maintainers?: boolean
+// 	/** Whether or not to display/modify contributors? */
+// 	contributors?: boolean
+
+// 	/** Whether or not to display/modify funders? */
+// 	funders?: boolean
+// 	/** Whether or not to display/modify sponsors? */
+// 	sponsors?: boolean
+// 	/** Whether or not to display/modify donors? */
+// 	donors?: boolean
+// }
+// function renderJoin(output: any, join?: string) {
+// 	if (join == null) {
+// 		return output
+// 	}
+// 	const parts = []
+// 	for (const [key, value] of Object.entries(output)) {
+// 		if (value) {
+// 			if (Array.isArray(value)) {
+// 				parts.push(...value)
+// 			} else {
+// 				parts.push(value)
+// 			}
+// 		}
+// 	}
+// 	if (join === '<ul>' || join === '<ol>') {
+// 		return (
+// 			join +
+// 			parts.map((i) => `<li>${i}</li>`).join('\n') +
+// 			`</${join.substring(1, 3)}>`
+// 		)
+// 	} else if (join === '<h1>' ) {
+
+// 	} else {
+// 		return parts.join(join)
+// 	}
+// }
+
+// function getFieldFormatOptions(field: BackerFields, formatOptions: FormatOptions): FormatOptions {
+// 	switch (field) {
+// 		case 'authors':
+// 			if ( ['markdown', 'html'].includes(formatOptions.format!) )
+// 				return {
+// 					displayYears: true,
+// 					displayDescription: true,
+// 					...formatOptions
+// 				}
+// 			return {
+// 				displayYears: true,
+// 				...formatOptions
+// 			}
+// 		case 'maintainers':
+// 		case 'contributors':
+// 			if ( ['markdown', 'html'].includes(formatOptions.format!) )
+// 				return {
+// 					displayContributions: true,
+// 					...formatOptions
+// 				}
+// 			return formatOptions
+// 		case 'funders':
+// 		case 'sponsors':
+// 			return {
+// 				displayDescription: true,
+// 				...formatOptions
+// 			}
+// 		default:
+// 			return formatOptions
+// 	}
+// }
+
+// /** Render a Backers result according to the desired format. */
+// export function renderBackers(
+// 	result: Backers,
+// 	formatOptions: FormatOptions,
+// 	packageData: PackageData | null = null,
+// ): any {
+// 	// enable everything if nothing is enabled
+// 	const allNull = backerFields
+// 		.map((field) => formatOptions[field] == null)
+// 		.every(Boolean)
+// 	if (allNull) backerFields.forEach((field) => (formatOptions[field] = true))
+// 	// render
+// 	switch (formatOptions.format) {
+// 		case 'json':
+// 		case 'package': {
+// 			const output: any =
+// 				formatOptions.format === 'package' && packageData != null
+// 					? Object.assign({}, packageData)
+// 					: {}
+// 			for (const field of backerFields) {
+// 				if (formatOptions[field]) {
+// 					if (result[field].length) {
+// 						const customFormatOptions = getFieldFormatOptions(field, formatOptions)
+// 						if (field === 'authors') {
+// 							output.author = result[field]
+// 								.map((i) =>
+// 									i.toString(customFormatOptions),
+// 								)
+// 								.join(', ')
+// 						} else {
+// 							output[field] = result[field].map((i) =>
+// 								i.toString(customFormatOptions),
+// 							)
+// 						}
+// 					} else {
+// 						delete output[field]
+// 					}
+// 				}
+// 			}
+// 			delete output.authors
+// 			return formatOptions.format === 'package'
+// 				? arrangePackageData(output)
+// 				: output
+// 		}
+// 		case 'raw': {
+// 			const output: any = {}
+// 			for (const field of backerFields) {
+// 				if (formatOptions[field]) {
+// 					output[field] = result[field] || []
+// 				}
+// 			}
+// 			return result
+// 		}
+// 		case 'string': {
+// 			const output: any = {}
+// 			for (const field of backerFields) {
+// 				if (formatOptions[field] && result[field].length) {
+// 					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
+// 					output[field] = renderJoin(
+// 						result[field].map((i) => i.toString(customFormatOptions)),
+// 						formatOptions.joinBacker,
+// 					)
+// 				}
+// 			}
+// 			if (formatOptions.joinBackers != null)
+// 				return renderJoin(output, formatOptions.joinBackers)
+// 			return output
+// 		}
+// 		case 'text': {
+// 			// customise
+// 			const prefixes = {
+// 				authors: formatOptions.prefix,
+// 				maintainers: formatOptions.prefix,
+// 				contributors: formatOptions.prefix,
+// 				funders: formatOptions.prefix,
+// 				sponsors: formatOptions.prefix,
+// 				donors: formatOptions.prefix,
+// 			}
+// 			if (formatOptions.prefix === '') {
+// 				const nameAndSpace =
+// 					(packageData?.title || packageData?.name || '') + ' '
+// 				Object.assign(prefixes, {
+// 					authors: `Thank you to ${nameAndSpace}author 🤍`,
+// 					maintainers: `Thank you to ${nameAndSpace}maintainer 🤍`,
+// 					contributors: `Thank you to ${nameAndSpace}contributor 🤍`,
+// 					funders: `Thank you to ${nameAndSpace}funder 🤍`,
+// 					sponsors: `Thank you to ${nameAndSpace}sponsor 🤍`,
+// 					donors: `Thank you to ${nameAndSpace}donor 🤍`,
+// 				})
+// 			}
+// 			// render
+// 			const output: any = {}
+// 			for (const field of backerFields) {
+// 				if (formatOptions[field] && result[field].length) {
+// 					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
+// 					output[field] = renderJoin(
+// 						result[field].map((i) =>
+// 							i.toText({ ...customFormatOptions, prefix: prefixes[field] }),
+// 						),
+// 						formatOptions.joinBacker,
+// 					)
+// 				}
+// 			}
+// 			if (formatOptions.joinBackers != null)
+// 				return renderJoin(output, formatOptions.joinBackers)
+// 			return output
+// 		}
+// 		case 'markdown': {
+// 			const output: any = {}
+// 			for (const field of backerFields) {
+// 				if (formatOptions[field] && result[field].length) {
+// 					const customFormatOptions = getFieldFormatOptions(field, formatOptions)
+// 					output[field] = renderJoin(
+// 						result[field].map((i) => i.toMarkdown(customFormatOptions)),
+// 						formatOptions.joinBacker,
+// 					)
+// 				}
+// 			}
+// 			if (formatOptions.joinBackers != null)
+// 				return renderJoin(output, formatOptions.joinBackers)
+// 			return output
+// 		}
+// 		case 'html': {
+// 			const output: any = {}
+// 			for (const field of backerFields) {
+// 				const customFormatOptions = getFieldFormatOptions(field, formatOptions)
+// 				if (formatOptions[field] && result[field].length) {
+// 					output[field] = renderJoin(
+// 						result[field].map((i) => i.toHTML(customFormatOptions)),
+// 						formatOptions.joinBacker,
+// 					)
+// 				}
+// 			}
+// 			if (formatOptions.joinBackers != null)
+// 				return renderJoin(output, formatOptions.joinBackers)
+// 			return output
+// 		}
+// 		default: {
+// 			throw new Error(`Invalid format [${formatOptions.format}]`)
+// 		}
+// 	}
+// }

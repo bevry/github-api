@@ -1,14 +1,15 @@
 <!-- TITLE/ -->
 
-<h1>@bevry/github</h1>
+<h1>@bevry/github-api</h1>
 
 <!-- /TITLE -->
+
 
 <!-- BADGES/ -->
 
 <span class="badge-githubworkflow"><a href="https://github.com/bevry/github-api/actions?query=workflow%3Abevry" title="View the status of this project's GitHub Workflow: bevry"><img src="https://github.com/bevry/github-api/workflows/bevry/badge.svg" alt="Status of the GitHub Workflow: bevry" /></a></span>
-<span class="badge-npmversion"><a href="https://npmjs.org/package/@bevry/github" title="View this project on NPM"><img src="https://img.shields.io/npm/v/@bevry/github.svg" alt="NPM version" /></a></span>
-<span class="badge-npmdownloads"><a href="https://npmjs.org/package/@bevry/github" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/@bevry/github.svg" alt="NPM downloads" /></a></span>
+<span class="badge-npmversion"><a href="https://npmjs.org/package/@bevry/github-api" title="View this project on NPM"><img src="https://img.shields.io/npm/v/@bevry/github-api.svg" alt="NPM version" /></a></span>
+<span class="badge-npmdownloads"><a href="https://npmjs.org/package/@bevry/github-api" title="View this project on NPM"><img src="https://img.shields.io/npm/dm/@bevry/github-api.svg" alt="NPM downloads" /></a></span>
 <br class="badge-separator" />
 <span class="badge-githubsponsors"><a href="https://github.com/sponsors/balupton" title="Donate to this project using GitHub Sponsors"><img src="https://img.shields.io/badge/github-donate-yellow.svg" alt="GitHub Sponsors donate button" /></a></span>
 <span class="badge-thanksdev"><a href="https://thanks.dev/u/gh/bevry" title="Donate to this project using ThanksDev"><img src="https://img.shields.io/badge/thanksdev-donate-yellow.svg" alt="ThanksDev donate button" /></a></span>
@@ -24,56 +25,50 @@
 
 <!-- /BADGES -->
 
+
 <!-- DESCRIPTION/ -->
 
-Interact with the GitHub API. CLI updates backer information (authors, maintainers, contributors, funders, sponsors, donors)
+Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)
 
 <!-- /DESCRIPTION -->
 
+
 ## Usage
 
-[Complete API Documentation.](http://master.github.bevry.surge.sh/docs/)
+[Complete API Documentation.](http://master.github-api.bevry.surge.sh/docs/)
 
 <!-- INSTALL/ -->
 
 <h2>Install</h2>
 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
-
-<h4>Install Globally</h4>
 <ul>
-<li>Install: <code>npm install --global @bevry/github</code></li>
-<li>Executable: <code>update-backers</code></li>
-</ul>
-<h4>Install Locally</h4>
-<ul>
-<li>Install: <code>npm install --save @bevry/github</code></li>
-<li>Executable: <code>npx update-backers</code></li>
-<li>Import: <code>import pkg from ('@bevry/github')</code></li>
-<li>Require: <code>const pkg = require('@bevry/github').default</code></li>
+<li>Install: <code>npm install --save @bevry/github-api</code></li>
+<li>Import: <code>import pkg from ('@bevry/github-api')</code></li>
+<li>Require: <code>const pkg = require('@bevry/github-api').default</code></li>
 </ul>
 
 <a href="https://www.skypack.dev" title="Skypack is a JavaScript Delivery Network for modern web apps"><h3>Skypack</h3></a>
 
-```html
+``` html
 <script type="module">
-    import pkg from '//cdn.skypack.dev/@bevry/github@^11.0.0'
+    import pkg from '//cdn.skypack.dev/@bevry/github-api@^11.0.0'
 </script>
 ```
 
 <a href="https://unpkg.com" title="unpkg is a fast, global content delivery network for everything on npm"><h3>unpkg</h3></a>
 
-```html
+``` html
 <script type="module">
-    import pkg from '//unpkg.com/@bevry/github@^11.0.0'
+    import pkg from '//unpkg.com/@bevry/github-api@^11.0.0'
 </script>
 ```
 
 <a href="https://jspm.io" title="Native ES Modules CDN"><h3>jspm</h3></a>
 
-```html
+``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/@bevry/github@11.0.0'
+    import pkg from '//dev.jspm.io/@bevry/github-api@11.0.0'
 </script>
 ```
 
@@ -81,14 +76,15 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <p>This package is published with the following editions:</p>
 
-<ul><li><code>@bevry/github/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>@bevry/github/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>@bevry/github</code> aliases <code>@bevry/github/edition-es2022/index.js</code></li>
-<li><code>@bevry/github/edition-es2022/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
-<li><code>@bevry/github/edition-es2022-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
-<li><code>@bevry/github/edition-types/index.d.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled Types with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
+<ul><li><code>@bevry/github-api/source/index.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> source code with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>@bevry/github-api/edition-browsers/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for web browsers with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>@bevry/github-api</code> aliases <code>@bevry/github-api/edition-es2022/index.js</code></li>
+<li><code>@bevry/github-api/edition-es2022/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://nodejs.org/dist/latest-v5.x/docs/api/modules.html" title="Node/CJS Modules">Require</a> for modules</li>
+<li><code>@bevry/github-api/edition-es2022-esm/index.js</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled against ES2022 for <a href="https://nodejs.org" title="Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine">Node.js</a> 18 || 20 || 21 with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li>
+<li><code>@bevry/github-api/edition-types/index.d.ts</code> is <a href="https://www.typescriptlang.org/" title="TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. ">TypeScript</a> compiled Types with <a href="https://babeljs.io/docs/learn-es2015/#modules" title="ECMAScript Modules">Import</a> for modules</li></ul>
 
 <!-- /INSTALL -->
+
 
 <!-- HISTORY/ -->
 
@@ -98,6 +94,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 
 <!-- /HISTORY -->
 
+
 <!-- CONTRIBUTE/ -->
 
 <h2>Contribute</h2>
@@ -105,6 +102,7 @@ Interact with the GitHub API. CLI updates backer information (authors, maintaine
 <a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
 <!-- /CONTRIBUTE -->
+
 
 <!-- BACKERS/ -->
 
@@ -139,13 +137,14 @@ These amazing people have contributed code to this project:
 
 <!-- /BACKERS -->
 
+
 <!-- LICENSE/ -->
 
 <h2>License</h2>
 
 Unless stated otherwise all works are:
 
-<ul><li>Copyright &copy; 2018+ <a href="https://balupton.com">Benjamin Lupton</a></li></ul>
+<ul><li>Copyright &copy; <a href="https://balupton.com">Benjamin Lupton</a></li></ul>
 
 and licensed under:
 

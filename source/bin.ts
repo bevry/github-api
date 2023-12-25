@@ -1,206 +1,112 @@
 // builtin
 import { execSync } from 'node:child_process'
-import process, { argv, exit } from 'node:process'
-process.on('uncaughtException', (error: any) => {
-	console.error(error.stack || error.message)
-	if (error.code != null) {
-		exit(error.code)
-	} else {
-		exit(1)
-	}
-})
+import process, { argv } from 'node:process'
 
 // external
 import { writeJSON, readJSON } from '@bevry/json'
 import { isReadable } from '@bevry/fs-readable'
 import writeFile from '@bevry/fs-write'
+import arrangePackageData from 'arrange-package-json'
 
 // local
 import {
 	Backers,
 	getBackersFromRepository,
 	renderBackers,
-	FormatOptions,
-	getBackersFromPackageData,
-	BackerQueryOptions,
+	BackersRenderOptions,
+	BackersQueryOptions,
 	PackageData,
 	getGitHubSlugFromUrl,
 	getPackageData,
 	getGitHubSlugFromPackageData,
 } from './index.js'
 
-class Argument {
-	public readonly arg: string
-	public readonly key: string
-	public readonly value: string | null = null
-	public readonly inverted: boolean = false
-	public readonly truthy = ['true', '1', 'yes', 'y', 'on']
-	public readonly falsey = ['false', '0', 'no', 'n', 'off']
+// cli
+import Argument from '@bevry/argument'
+const help = `
+	ABOUT:
+	Fetch backers (authors, maintainers, contributors, funders, sponsors, donors) and if desired output/write to package.json, json, string, text, markdown, html.
 
-	constructor(arg: string) {
-		this.arg = arg
-		let key: string,
-			value: string | null = null
-		if (arg === '--') {
-			key = '--'
-		} else if (arg.startsWith('--')) {
-			const index = arg.indexOf('=')
-			if (index === -1) {
-				key = arg.substring(2)
-			} else {
-				key = arg.substring(2, index)
-				value = arg.substring(index + 1)
-			}
-			if (key.startsWith('no-')) {
-				key = key.substring(3)
-				this.inverted = true
-			}
-		} else {
-			key = ''
-			value = arg
-		}
-		this.key = key
-		this.value = value
-	}
-	string(
-		enabled: string | null = null,
-		disabled: string | null = null,
-	): string {
-		if (this.value == null) {
-			if (this.inverted) {
-				if (disabled == null)
-					throw new InputError(
-						`Argument ${this.arg} must have a string value, e.g. --${this.key}=string`,
-					)
-				return disabled
-			} else {
-				if (enabled == null)
-					throw new InputError(
-						`Argument ${this.arg} must have a string value, e.g. --${this.key}=string`,
-					)
-				return enabled
-			}
-		} else {
-			return this.value
-		}
-	}
-	boolean(): boolean {
-		if (this.value == null || this.value === '') {
-			return !this.inverted
-		} else if (this.truthy.includes(this.value)) {
-			if (this.inverted) return false
-			return true
-		} else if (this.falsey.includes(this.value)) {
-			if (this.inverted) return true
-			return false
-		} else {
-			throw new InputError(
-				`Argument ${this.arg} must have a boolean value, e.g. --${this.key} or --no-${this.key} or --${this.key}=yes`,
-			)
-		}
-	}
-	number(): number {
-		const number =
-			this.value == null || this.value === '' ? NaN : Number(this.value)
-		if (isNaN(number))
-			throw new InputError(
-				`Argument ${this.arg} must have a number value, e.g. --${this.key}=123`,
-			)
-		return number
-	}
-}
+	USAGE:
+	github-backers [...options] [-- [...options]]
 
-class InputError extends Error {
-	code?: number
-	constructor(error?: string) {
-		let message = `
-			ABOUT:
-			Fetch backers (authors, maintainers, contributors, funders, sponsors, donors) and if desired output/write to package.json, json, string, text, markdown, html.
+	OPTIONS:
+	--package=<string>
+	  The package.json file to retrieve the data for and from.
 
-			USAGE:
-			github-backers [...options] [-- [...options]]
+	--slug=<string>
+	  The GitHub Repository slug, defaults to fetching it from <package> or git.
+	  This option is not reset with --.
 
-			OPTIONS:
-			--package=<string>
-			  The package.json file to retrieve the data for and from.
+	--[no-]offline[=<boolean>]
+	  If provided, skip remote update, and only use the data from <package>
 
-			--slug=<string>
-			  The GitHub Repository slug, defaults to fetching it from <package> or git.
-			  This option is not reset with --.
+	--sponsorCentsThreshold=<number>
+	  The minimum amount of monthly cents to be considered a financial sponsor. Defaults to 100.
 
-			--[no-]offline[=<boolean>]
-			  If provided, skip remote update, and only use the data from <package>
+	--donorCentsThreshold=<number>
+	  The minimum amount of eternal cents to be considered a financial donor. Defaults to 100.
 
-			--sponsorCentsThreshold=<number>
-			  The minimum amount of monthly cents to be considered a financial sponsor. Defaults to 100.
+	--
+	  Act upon the previously specified options, and reset the following options:
 
-			--donorCentsThreshold=<number>
-			  The minimum amount of eternal cents to be considered a financial donor. Defaults to 100.
+	--write=<string>
+	  The path that should be updated. If no path is provided, stdout is used.
 
-			--
-			  Act upon the previously specified options, and reset the following options:
+	--format=<string>
+	  The format of the file that should be updated, defaults to autodetection
+	  Valid formats: package, json, string, text, markdown, html
 
-			--write=<string>
-			  The path that should be updated. If no path is provided, stdout is used.
+	--joinBackers=<string>
+	  The string to join groups of backers by.
 
-			--format=<string>
-			  The format of the file that should be updated, defaults to autodetection
-			  Valid formats: package, json, string, text, markdown, html
+	--joinBacker=<string>
+	  The string to join individual backers by.
 
-			--joinBackers=<string>
-			  The string to join groups of backers by.
+	--[no-]author[=<boolean>]
+	  Whether to display/modify author.
 
-			--joinBacker=<string>
-			  The string to join individual backers by.
+	--[no-]authors[=<boolean>]
+	  Whether to display/modify authors.
 
-			--[no-]authors[=<boolean>]
-			  Whether to display/modify authors.
+	--[no-]maintainers[=<boolean>]
+	  Whether to display/modify maintainers.
 
-			--[no-]maintainers[=<boolean>]
-			  Whether to display/modify maintainers.
+	--[no-]contributors[=<boolean>]
+	  Whether to display/modify contributors.
 
-			--[no-]contributors[=<boolean>]
-			  Whether to display/modify contributors.
+	--[no-]sponsors[=<boolean>]
+	  Whether to display/modify sponsors.
 
-			--[no-]sponsors[=<boolean>]
-			  Whether to display/modify sponsors.
+	--[no-]funders[=<boolean>]
+	  Whether to display/modify funders.
 
-			--[no-]funders[=<boolean>]
-			  Whether to display/modify funders.
+	--[no-]donors[=<boolean>]
+	  Whether to display/modify donors.
 
-			--[no-]donors[=<boolean>]
-			  Whether to display/modify donors.
+	--prefix[=<string>]
+	  A string to proceed each entry. If just [--prefix] then the default prefixes will be used.
 
-			--prefix[=<string>]
-			  A string to proceed each entry. If just [--prefix] then the default prefixes will be used.
+	--[no-]displayUrl[=<boolean>]
+	  Whether or not to display {@link Fellow.url}
 
-			--[no-]displayUrl[=<boolean>]
-			  Whether or not to display {@link Fellow.url}
+	--[no-]displayDescription[=<boolean>]
+	  Whether or not to display {@link Fellow.description}
 
-			--[no-]displayDescription[=<boolean>]
-			  Whether or not to display {@link Fellow.description}
+	--[no-]displayEmail[=<boolean>]
+	  Whether or not to display {@link Fellow.email}
 
-			--[no-]displayEmail[=<boolean>]
-			  Whether or not to display {@link Fellow.email}
+	--[no-]displayCopyright[=<boolean>]
+	  Whether or not to display the copright icon
 
-			--[no-]displayCopyright[=<boolean>]
-			  Whether or not to display the copright icon
+	--[no-]displayYears[=<boolean>]
+	  Whether or not to display {@link Fellow.years}
 
-			--[no-]displayYears[=<boolean>]
-			  Whether or not to display {@link Fellow.years}
-
-			--[no-]displayContributions[=<boolean>]
-			  Whether or not to display a link to the user's contributions
-		`.replace(/^\t\t/g, '')
-		if (error) message += `\n\nERROR: ${error}`
-		super(message)
-		this.stack = '' // we don't care about the stack for CLI errors
-		process.exitCode = 22 // invalid argument
-	}
-}
+	--[no-]displayContributions[=<boolean>]
+	  Whether or not to display a link to the user's contributions`
 
 // arguments
-const queryOptions: BackerQueryOptions = {
+const queryOptions: BackersQueryOptions = {
 	sponsorCentsThreshold: 100,
 	donorCentsThreshold: 100,
 }
@@ -211,11 +117,11 @@ let result: Backers | null = null,
 	packageData: PackageData | null = null,
 	// resetable:
 	write: string = '',
-	formatOptions: FormatOptions = {}
+	renderOptions: BackersRenderOptions = {}
 function reset() {
 	// don't reset slug, package, offline, queryOptions
 	write = ''
-	formatOptions = {}
+	renderOptions = {}
 }
 reset()
 async function action() {
@@ -265,32 +171,23 @@ async function action() {
 			`Slug from the resolved package data ${pkgSlug} is not the same as the slug provided ${slug}, this is unexpected.`,
 		)
 	}
-	if (!formatOptions.format) {
+	if (!renderOptions.format) {
 		if (write) {
 			if (write === '<auto>') write = pkg || 'package.json'
-			if (write.endsWith('package.json')) formatOptions.format = 'package'
-			else if (write.endsWith('.json')) formatOptions.format = 'json'
-			else if (write.endsWith('.txt')) formatOptions.format = 'text'
-			else if (write.endsWith('.md')) formatOptions.format = 'markdown'
-			else if (write.endsWith('.html')) formatOptions.format = 'html'
-			else formatOptions.format = 'string'
-		} else formatOptions.format = 'json'
+			if (write.endsWith('package.json')) renderOptions.format = 'package'
+			else if (write.endsWith('.json')) renderOptions.format = 'json'
+			else if (write.endsWith('.txt')) renderOptions.format = 'text'
+			else if (write.endsWith('.md')) renderOptions.format = 'markdown'
+			else if (write.endsWith('.html')) renderOptions.format = 'html'
+			else renderOptions.format = 'string'
+		} else renderOptions.format = 'json'
 	}
 	if (!result) {
-		if (!slug || offline) {
-			if (packageData == null) {
-				throw new InputError(
-					'Inside offlin mode (via --offline or indeterminate --slug), --package must be valid (defaults to package.json).',
-				)
-			}
-			result = getBackersFromPackageData(packageData)
-		} else {
-			result = await getBackersFromRepository(slug, queryOptions)
-		}
+		result = await getBackersFromRepository(packageData || slug, queryOptions)
 	}
 	// output
-	formatOptions.githubRepoSlug = slug || pkgSlug // for markdown rendering
-	const output = renderBackers(result, formatOptions, packageData)
+	renderOptions.githubRepoSlug = slug || pkgSlug // for markdown rendering
+	const output = renderBackers(result, renderOptions, packageData)
 	if (write) {
 		if (write.endsWith('.json') || typeof output !== 'string') {
 			if (write.endsWith('.json') === false)
@@ -310,6 +207,10 @@ async function parse(args: string[]) {
 				reset()
 				break
 			}
+			case 'help': {
+				Argument.help(help)
+				return
+			}
 			case 'offline': {
 				offline = a.boolean()
 				break
@@ -317,17 +218,17 @@ async function parse(args: string[]) {
 			case 'slug': {
 				result = null
 				packageData = null
-				slug = a.string('<auto>', '')
+				slug = a.string({ enabled: '<auto>', disabled: '' })
 				break
 			}
 			case 'package': {
 				result = null
 				packageData = null
-				pkg = a.string('<auto>', '')
+				pkg = a.string({ enabled: '<auto>', disabled: '' })
 				break
 			}
 			case 'write': {
-				write = a.string('<auto>', '')
+				write = a.string({ enabled: '<auto>', disabled: '' })
 				break
 			}
 			// number options
@@ -337,47 +238,40 @@ async function parse(args: string[]) {
 				break
 			}
 			// string format options
-			case 'prefix': {
-				formatOptions.prefix = a.string('', null)
-				break
-			}
-			case 'joinBackers':
-			case 'joinBacker': {
-				formatOptions[a.key] = a.string('\n', null)
-				break
-			}
 			case 'format': {
-				formatOptions.format = a.string('', null) as any
+				renderOptions.format = a.string({ enabled: '' }) as any
 				break
 			}
-			// boolean format options
-			case 'author':
-			case 'authors': {
-				formatOptions.authors = a.boolean()
-				break
-			}
-			case 'maintainers':
-			case 'contributors':
-			case 'sponsors':
-			case 'funders':
-			case 'donors':
-			case 'displayUrl':
-			case 'displayDescription':
-			case 'displayEmail':
-			case 'displayCopyright':
-			case 'displayYears':
-			case 'displayContributions': {
-				formatOptions[a.key] = a.boolean()
-				break
-			}
-			case '': {
-				throw new InputError(`Invalid argument [${arg}]`)
-			}
+			// case 'prefix': {
+			// 	renderOptions.prefix = a.string({ enabled: '' })
+			// 	break
+			// }
+			// case 'joinBackers':
+			// case 'joinBacker': {
+			// 	renderOptions[a.key] = a.string({ enabled: '\n' })
+			// 	break
+			// }
+			// case 'author':
+			// case 'authors':
+			// case 'maintainers':
+			// case 'contributors':
+			// case 'sponsors':
+			// case 'funders':
+			// case 'donors':
+			// case 'displayUrl':
+			// case 'displayDescription':
+			// case 'displayEmail':
+			// case 'displayCopyright':
+			// case 'displayYears':
+			// case 'displayContributions': {
+			// 	renderOptions[a.key] = a.boolean()
+			// 	break
+			// }
 			default: {
-				throw new InputError(`Invalid flag [${arg}]`)
+				a.unknown()
 			}
 		}
 	}
 	await action()
 }
-parse(argv.slice(2))
+parse(argv.slice(2)).catch(Argument.catch(help))

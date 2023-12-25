@@ -12,13 +12,13 @@ import getGitHubLatestCommit, {
 	getGitHubMembersFromOrganizations,
 	backerFields,
 	GitHubCredentials,
-	Fellow,
 	Backers,
 	getBackersFromRepository,
 	getBackersFromUsernames,
 	getGitHubRepositories,
 	getGitHubRepositoriesFromUsernames,
 	getGitHubRepositoriesFromSearch,
+	getGitHubSlugFromPackageData,
 } from './index.js'
 
 type Errback = (error?: Error) => void
@@ -45,14 +45,14 @@ const apiFixtures: Fixture[] = [
 		input: {
 			GITHUB_CLIENT_ID: 'gci',
 		},
-		error: 'missing',
+		error: 'INVALID_GITHUB_AUTH',
 	},
 	{
 		// @ts-ignore deliberately invalid for testing
 		input: {
 			GITHUB_CLIENT_SECRET: 'gcs',
 		},
-		error: 'missing',
+		error: 'INVALID_GITHUB_AUTH',
 	},
 	{
 		input: {
@@ -63,7 +63,7 @@ const apiFixtures: Fixture[] = [
 	},
 	{
 		input: {} as GitHubCredentials,
-		error: 'missing',
+		error: 'INVALID_GITHUB_AUTH',
 	},
 ]
 const redactFixtures: RedactFixture[] = [
@@ -123,6 +123,62 @@ function checkBackersCallback(
 }
 
 kava.suite('@bevry/github-api', function (suite, test) {
+	suite('slug', function (suite, test) {
+		test('short repo', function () {
+			equal(
+				getGitHubSlugFromPackageData({ repository: 'bevry/projectz' }),
+				'bevry/projectz',
+			)
+		})
+		test('short explicit', function () {
+			equal(
+				getGitHubSlugFromPackageData({ repository: 'github:bevry/projectz' }),
+				'bevry/projectz',
+			)
+		})
+		test('gist failure', function () {
+			equal(
+				getGitHubSlugFromPackageData({ repository: 'gist:11081aaa281' }),
+				null,
+			)
+		})
+		test('bitbucket failure', function () {
+			equal(
+				getGitHubSlugFromPackageData({ repository: 'bitbucket:bb/repo' }),
+				null,
+			)
+		})
+		test('gitlab failure', function () {
+			equal(
+				getGitHubSlugFromPackageData({ repository: 'gitlab:gl/repo' }),
+				null,
+			)
+		})
+		test('full repo', function () {
+			equal(
+				getGitHubSlugFromPackageData({
+					repository: { url: 'https://github.com/bevry/projectz' },
+				}),
+				'bevry/projectz',
+			)
+		})
+		test('full repo with .git', function () {
+			equal(
+				getGitHubSlugFromPackageData({
+					repository: { url: 'https://github.com/bevry/projectz.git' },
+				}),
+				'bevry/projectz',
+			)
+		})
+		test('full repo with ssh', function () {
+			equal(
+				getGitHubSlugFromPackageData({
+					repository: { url: 'git@github.com:bevry/projectz.git' },
+				}),
+				'bevry/projectz',
+			)
+		})
+	})
 	suite('api', function (suite, test) {
 		suite('fixtures', function (suite, test) {
 			apiFixtures.forEach(function ({ input, output, error }, index) {

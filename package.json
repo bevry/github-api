@@ -1,9 +1,17 @@
 {
-  "name": "@bevry/github",
+  "name": "@bevry/github-api",
   "version": "11.0.0",
-  "description": "Interact with the GitHub API. CLI can fetch and update backer information (authors, maintainers, contributors, funders, sponsors, donors)",
-  "homepage": "https://github.com/bevry/github-api",
   "license": "Artistic-2.0",
+  "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
+  "homepage": "https://github.com/bevry/github-api",
+  "funding": "https://bevry.me/fund",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bevry/github-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bevry/github-api/issues"
+  },
   "keywords": [
     "api",
     "auth",
@@ -88,24 +96,16 @@
       "githubUsername": "bevry",
       "githubRepository": "github-api",
       "githubSlug": "bevry/github-api",
-      "npmPackageName": "@bevry/github"
+      "npmPackageName": "@bevry/github-api"
     }
   },
-  "funding": "https://bevry.me/fund",
-  "author": "2018+ Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
+  "author": "Benjamin Lupton <b@lupton.cc> (https://balupton.com)",
   "maintainers": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
   "contributors": [
     "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
   ],
-  "bugs": {
-    "url": "https://github.com/bevry/github-api/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bevry/github-api.git"
-  },
   "engines": {
     "node": ">=18"
   },
@@ -177,9 +177,6 @@
       "engines": false
     }
   ],
-  "bin": {
-    "github-backers": "bin.cjs"
-  },
   "types": "edition-types/index.d.ts",
   "type": "module",
   "main": "edition-es2022/index.js",
@@ -197,24 +194,25 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
+    "@bevry/argument": "../argument",
     "@bevry/fs-readable": "^2.3.0",
-    "@bevry/fs-write": "^1.4.0",
     "@bevry/json": "^2.2.0",
     "@bevry/list": "^2.3.0",
     "@bevry/wait": "^2.4.0",
     "@octokit/graphql": "^7.0.2",
-    "arrange-package-json": "^5.0.0",
+    "arrange-package-json": "^5.0.1",
     "errlop": "^8.2.0",
-    "fellow": "../fellow",
+    "fellow": "^7.0.2",
     "js-yaml": "^4.1.0",
     "native-promise-pool": "^3.26.0",
-    "simplytyped": "^3.3.0"
+    "simplytyped": "^3.3.0",
+    "trim-empty-keys": "^1.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "assert-helpers": "^11.9.0",
+    "assert-helpers": "^11.10.0",
     "eslint": "^8.56.0",
     "eslint-config-bevry": "^5.3.0",
     "eslint-config-prettier": "^9.1.0",
@@ -228,7 +226,6 @@
     "valid-module": "^2.6.0"
   },
   "scripts": {
-    "our:bin": "node ./bin.cjs",
     "our:clean": "rm -rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
     "our:compile": "npm run our:compile:edition-browsers && npm run our:compile:edition-es2022 && npm run our:compile:edition-es2022-esm && npm run our:compile:edition-types",
     "our:compile:edition-browsers": "tsc --module ESNext --target ES2022 --outDir ./edition-browsers --project tsconfig.json && ( test ! -d edition-browsers/source || ( mv edition-browsers/source edition-temp && rm -rf edition-browsers && mv edition-temp edition-browsers ) )",
@@ -255,6 +252,12 @@
     "our:verify:prettier": "prettier --write .",
     "test": "node ./edition-es2022/test.js"
   },
+  "boundation": {
+    "nodeVersionsRange": ">=18",
+    "githubActionTestEnv": {
+      "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "bevry"
@@ -265,11 +268,5 @@
     "singleQuote": true,
     "trailingComma": "all",
     "endOfLine": "lf"
-  },
-  "boundation": {
-    "nodeVersionsRange": ">=18",
-    "githubActionTestEnv": {
-      "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-    }
   }
 }
