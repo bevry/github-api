@@ -1,6 +1,6 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
@@ -22,6 +22,10 @@
     "browser",
     "contributor",
     "contributors",
+    "deno",
+    "deno-edition",
+    "deno-entry",
+    "denoland",
     "es2022",
     "export-default",
     "finance",
@@ -99,15 +103,40 @@
       "npmPackageName": "@bevry/github-api"
     }
   },
-  "author": "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)",
+  "author": "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton)",
+  "authors": [
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton): Accelerating collaborative wisdom."
+  ],
   "maintainers": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton): Accelerating collaborative wisdom."
   ],
   "contributors": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
+    "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton)"
+  ],
+  "sponsors": [
+    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew): Software engineer and researcher",
+    "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa): We're Balsa, and we're building tools for builders.",
+    "Codecov <hello-codecov@sentry.io> (https://codecov.io/) (https://github.com/codecov): Empower developers with tools to improve code quality and testing.",
+    "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
+    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Sentry (https://sentry.io) (https://github.com/getsentry): Real-time crash reporting for your web apps, mobile apps, and games.",
+    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm): Syntax Podcast"
   ],
   "donors": [
-    "Skunk Team (https://skunk.team) (https://github.com/skunkteam)"
+    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew)",
+    "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa)",
+    "Chad (https://opencollective.com/chad8)",
+    "Codecov <hello-codecov@sentry.io> (https://codecov.io/) (https://github.com/codecov)",
+    "entroniq (https://gitlab.com/entroniq) (https://thanks.dev/d/gl/entroniq)",
+    "Jean-Luc Geering (https://github.com/jlgeering) (https://opencollective.com/jlgeering) (https://twitter.com/jlgeering)",
+    "Michael Duane Mooring (https://mdm.cc) (https://github.com/mikeumus) (https://opencollective.com/mikeumus) (https://twitter.com/mikeumus)",
+    "Mohammed Shah <shah@idk.uno> (https://github.com/smashah) (https://thanks.dev/d/gh/smashah) (https://twitter.com/smashah)",
+    "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
+    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Sentry (https://sentry.io) (https://github.com/getsentry)",
+    "ServieJS (https://github.com/serviejs) (https://thanks.dev/d/gh/serviejs)",
+    "Skunk Team (https://skunk.team) (https://github.com/skunkteam)",
+    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm)"
   ],
   "engines": {
     "node": ">=18"
@@ -178,6 +207,20 @@
         "import"
       ],
       "engines": false
+    },
+    {
+      "description": "TypeScript source code made to be compatible with Deno",
+      "directory": "edition-deno",
+      "entry": "index.ts",
+      "tags": [
+        "typescript",
+        "import",
+        "deno"
+      ],
+      "engines": {
+        "deno": true,
+        "browsers": true
+      }
     }
   ],
   "bin": {
@@ -197,18 +240,19 @@
       "import": "./edition-browsers/index.js"
     }
   },
+  "deno": "edition-deno/index.ts",
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
-    "@bevry/argument": "^1.0.0",
-    "@bevry/fs-readable": "^2.3.0",
-    "@bevry/json": "^2.2.1",
+    "@bevry/argument": "^1.1.0",
+    "@bevry/fs-readable": "^2.4.0",
+    "@bevry/json": "^2.3.0",
     "@bevry/list": "^2.3.0",
-    "@bevry/wait": "^2.4.0",
+    "@bevry/wait": "^2.5.0",
     "@octokit/graphql": "^7.0.2",
-    "arrange-package-json": "^5.0.1",
-    "errlop": "^8.2.0",
-    "fellow": "^7.0.4",
+    "arrange-package-json": "^5.1.0",
+    "errlop": "^8.3.0",
+    "fellow": "^7.1.0",
     "js-yaml": "^4.1.0",
     "native-promise-pool": "^3.26.0",
     "simplytyped": "^3.3.0",
@@ -218,14 +262,15 @@
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
-    "assert-helpers": "^11.10.0",
+    "assert-helpers": "^11.11.0",
     "eslint": "^8.56.0",
     "eslint-config-bevry": "^5.3.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
-    "kava": "^7.5.0",
+    "kava": "^7.6.0",
+    "make-deno-edition": "^2.1.0",
     "prettier": "^3.1.1",
-    "projectz": "^3.4.0",
+    "projectz": "^4.0.0",
     "typedoc": "^0.25.4",
     "typescript": "5.3.3",
     "valid-directory": "^4.7.0",
@@ -234,7 +279,8 @@
   "scripts": {
     "our:bin": "node ./bin.cjs",
     "our:clean": "rm -rf ./docs ./edition* ./es2015 ./es5 ./out ./.next",
-    "our:compile": "npm run our:compile:edition-browsers && npm run our:compile:edition-es2022 && npm run our:compile:edition-es2022-esm && npm run our:compile:edition-types",
+    "our:compile": "npm run our:compile:deno && npm run our:compile:edition-browsers && npm run our:compile:edition-es2022 && npm run our:compile:edition-es2022-esm && npm run our:compile:edition-types",
+    "our:compile:deno": "make-deno-edition --attempt",
     "our:compile:edition-browsers": "tsc --module ESNext --target ES2022 --outDir ./edition-browsers --project tsconfig.json && ( test ! -d edition-browsers/source || ( mv edition-browsers/source edition-temp && rm -rf edition-browsers && mv edition-temp edition-browsers ) )",
     "our:compile:edition-es2022": "tsc --module commonjs --target ES2022 --outDir ./edition-es2022 --project tsconfig.json && ( test ! -d edition-es2022/source || ( mv edition-es2022/source edition-temp && rm -rf edition-es2022 && mv edition-temp edition-es2022 ) ) && printf '%s' '{\"type\": \"commonjs\"}' > edition-es2022/package.json",
     "our:compile:edition-es2022-esm": "tsc --module ESNext --target ES2022 --outDir ./edition-es2022-esm --project tsconfig.json && ( test ! -d edition-es2022-esm/source || ( mv edition-es2022-esm/source edition-temp && rm -rf edition-es2022-esm && mv edition-temp edition-es2022-esm ) ) && printf '%s' '{\"type\": \"module\"}' > edition-es2022-esm/package.json",
@@ -243,7 +289,7 @@
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:docs": "npm run our:meta:docs:typedoc",
     "our:meta:docs:typedoc": "rm -rf ./docs && typedoc --exclude '**/+(*test*|node_modules)' --excludeExternals --out ./docs ./source",
-    "our:meta:projectz": "projectz compile",
+    "our:meta:projectz": "projectz",
     "our:release": "npm run our:release:prepare && npm run our:release:check-changelog && npm run our:release:check-dirty && npm run our:release:tag && npm run our:release:push",
     "our:release:check-changelog": "cat ./HISTORY.md | grep \"v$npm_package_version\" || (printf '%s\n' \"add a changelog entry for v$npm_package_version\" && exit -1)",
     "our:release:check-dirty": "git diff --exit-code",
@@ -275,8 +321,5 @@
     "singleQuote": true,
     "trailingComma": "all",
     "endOfLine": "lf"
-  },
-  "authors": [
-    "Benjamin Lupton <b@lupton.cc> (https://github.com/balupton)"
-  ]
+  }
 }

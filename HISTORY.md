@@ -1,5 +1,10 @@
 # History
 
+## v11.1.0 2023 December 28
+
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+-   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
+
 ## v11.0.0 2023 December 27
 
 -   Rewrote to inline [github-commit](https://github.com/bevry-archive/github-commit), [github-contributors](https://github.com/bevry-archive/github-contributors), [github-members](https://github.com/bevry-archive/github-members), [github-repos](https://github.com/bevry-archive/github-repos), and added CLI to to integrate [update-contributors](https://github.com/bevry-archive/update-contributors) and the unreleased update-sponsors/update-backers/[sponsored](https://github.com/bevry-archive/sponsored)
