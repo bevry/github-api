@@ -42,8 +42,15 @@ Interact with the GitHub API, fetching commits, repositories, members, and backe
 <h2>Install</h2>
 
 <a href="https://npmjs.com" title="npm is a package manager for javascript"><h3>npm</h3></a>
+<h4>Install Globally</h4>
+<ul>
+<li>Install: <code>npm install --global @bevry/github-api</code></li>
+<li>Executable: <code>github-backers</code></li>
+</ul>
+<h4>Install Locally</h4>
 <ul>
 <li>Install: <code>npm install --save @bevry/github-api</code></li>
+<li>Executable: <code>npx github-backers</code></li>
 <li>Import: <code>import pkg from ('@bevry/github-api')</code></li>
 <li>Require: <code>const pkg = require('@bevry/github-api').default</code></li>
 </ul>
@@ -95,15 +102,6 @@ Interact with the GitHub API, fetching commits, repositories, members, and backe
 <!-- /HISTORY -->
 
 
-<!-- CONTRIBUTE/ -->
-
-<h2>Contribute</h2>
-
-<a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
-
-<!-- /CONTRIBUTE -->
-
-
 <!-- BACKERS/ -->
 
 <h2>Backers</h2>
@@ -112,7 +110,7 @@ Interact with the GitHub API, fetching commits, repositories, members, and backe
 
 These amazing people are maintaining this project:
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
+<ul><li><a href="https://github.com/balupton">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
 
 <h3>Sponsors</h3>
 
@@ -131,7 +129,7 @@ No sponsors yet! Will you be the first?
 
 These amazing people have contributed code to this project:
 
-<ul><li><a href="https://balupton.com">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
+<ul><li><a href="https://github.com/balupton">Benjamin Lupton</a> — <a href="https://github.com/bevry/github-api/commits?author=balupton" title="View the GitHub contributions of Benjamin Lupton on repository bevry/github-api">view contributions</a></li></ul>
 
 <a href="https://github.com/bevry/github-api/blob/master/CONTRIBUTING.md#files">Discover how you can contribute by heading on over to the <code>CONTRIBUTING.md</code> file.</a>
 
@@ -144,7 +142,7 @@ These amazing people have contributed code to this project:
 
 Unless stated otherwise all works are:
 
-<ul><li>Copyright &copy; <a href="https://balupton.com">Benjamin Lupton</a></li></ul>
+<ul><li>Copyright &copy; <a href="https://github.com/balupton">Benjamin Lupton</a></li></ul>
 
 and licensed under:
 

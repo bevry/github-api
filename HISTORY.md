@@ -1,12 +1,13 @@
 # History
 
-## v11.0.0 2023 December 19
+## v11.0.0 2023 December 27
 
--   Renamed from `@bevry/github-api` to `@bevry/github` to reflect the new scope and CLI tooling
--   Added methods for fetching backers from a variety of sources
--   `query` renamed to `queryREST` and now handles errors, parsing, and paging directly, and added `queryGraphQL`
 -   Rewrote to inline [github-commit](https://github.com/bevry-archive/github-commit), [github-contributors](https://github.com/bevry-archive/github-contributors), [github-members](https://github.com/bevry-archive/github-members), [github-repos](https://github.com/bevry-archive/github-repos), and added CLI to to integrate [update-contributors](https://github.com/bevry-archive/update-contributors) and the unreleased update-sponsors/update-backers/[sponsored](https://github.com/bevry-archive/sponsored)
+-   Added methods for fetching backers from a variety of sources, including a `github-backers` CLI for interacting your backers, such as updating your `package.json` with their details: `github-backers --write`
+-   `query` renamed to `queryREST` and now handles errors, parsing, and paging directly, and added `queryGraphQL`
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+-   Thank you to the funders: [Skunk Team](https://skunk.team)
+-   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
 
 ## v10.2.0 2023 November 20
 

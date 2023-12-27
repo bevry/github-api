@@ -1,17 +1,16 @@
 // builtin
 import { execSync } from 'node:child_process'
-import process, { argv } from 'node:process'
+import { argv } from 'node:process'
 
 // external
 import { writeJSON, readJSON } from '@bevry/json'
 import { isReadable } from '@bevry/fs-readable'
 import writeFile from '@bevry/fs-write'
-import arrangePackageData from 'arrange-package-json'
 
 // local
 import {
 	Backers,
-	getBackersFromRepository,
+	getBackers,
 	renderBackers,
 	BackersRenderOptions,
 	BackersQueryOptions,
@@ -19,6 +18,7 @@ import {
 	getGitHubSlugFromUrl,
 	getPackageData,
 	getGitHubSlugFromPackageData,
+	BackersRenderFormat,
 } from './index.js'
 
 // cli
@@ -41,6 +41,15 @@ const help = `
 	--[no-]offline[=<boolean>]
 	  If provided, skip remote update, and only use the data from <package>
 
+	--githubSponsorsUsername=<string>
+	  Instead of autodetecting, use this username for fetching backers from GitHub Sponsors
+
+	--opencollectiveUsername=<string>
+	  Instead of autodetecting, use this username for fetching backers from OpenCollective
+
+	--thanksdevGithubUsername=<string>
+	  Instead of autodetecting, use this username for fetching backers from ThanksDev
+
 	--sponsorCentsThreshold=<number>
 	  The minimum amount of monthly cents to be considered a financial sponsor. Defaults to 100.
 
@@ -55,148 +64,120 @@ const help = `
 
 	--format=<string>
 	  The format of the file that should be updated, defaults to autodetection
-	  Valid formats: package, json, string, text, markdown, html
-
-	--joinBackers=<string>
-	  The string to join groups of backers by.
-
-	--joinBacker=<string>
-	  The string to join individual backers by.
-
-	--[no-]author[=<boolean>]
-	  Whether to display/modify author.
-
-	--[no-]authors[=<boolean>]
-	  Whether to display/modify authors.
-
-	--[no-]maintainers[=<boolean>]
-	  Whether to display/modify maintainers.
-
-	--[no-]contributors[=<boolean>]
-	  Whether to display/modify contributors.
-
-	--[no-]sponsors[=<boolean>]
-	  Whether to display/modify sponsors.
-
-	--[no-]funders[=<boolean>]
-	  Whether to display/modify funders.
-
-	--[no-]donors[=<boolean>]
-	  Whether to display/modify donors.
-
-	--prefix[=<string>]
-	  A string to proceed each entry. If just [--prefix] then the default prefixes will be used.
-
-	--[no-]displayUrl[=<boolean>]
-	  Whether or not to display {@link Fellow.url}
-
-	--[no-]displayDescription[=<boolean>]
-	  Whether or not to display {@link Fellow.description}
-
-	--[no-]displayEmail[=<boolean>]
-	  Whether or not to display {@link Fellow.email}
-
-	--[no-]displayCopyright[=<boolean>]
-	  Whether or not to display the copright icon
-
-	--[no-]displayYears[=<boolean>]
-	  Whether or not to display {@link Fellow.years}
-
-	--[no-]displayContributions[=<boolean>]
-	  Whether or not to display a link to the user's contributions`
+	  Valid formats: string, text, markdown, html, package, copyright, shoutout, release, update`
 
 // arguments
-const queryOptions: BackersQueryOptions = {
+interface CliBackersRenderOptions extends BackersRenderOptions {
+	writePath?: string | boolean | null
+}
+interface CliBackersQueryOptions extends BackersQueryOptions {
+	packagePath?: string | boolean | null
+}
+let result: Backers | null = null
+let renderOptions: CliBackersRenderOptions = {
+	writePath: false,
+}
+const queryOptions: CliBackersQueryOptions = {
+	githubSlug: null,
+	packagePath: null,
+	packageData: null,
+	offline: false,
+	githubSponsorsUsername: null,
+	opencollectiveUsername: null,
+	thanksdevGithubUsername: null,
 	sponsorCentsThreshold: 100,
 	donorCentsThreshold: 100,
 }
-let result: Backers | null = null,
-	offline: boolean = false,
-	slug: string = '<auto>',
-	pkg: string = '<auto>',
-	packageData: PackageData | null = null,
-	// resetable:
-	write: string = '',
-	renderOptions: BackersRenderOptions = {}
-function reset() {
-	// don't reset slug, package, offline, queryOptions
-	write = ''
-	renderOptions = {}
+function auto(value: any) {
+	return value == null || value === true
 }
-reset()
 async function action() {
-	// arguments
-	let pkgSlug: string = ''
-	if (pkg === '<auto>' && slug === '<auto>') {
+	// query
+	if (auto(queryOptions.githubSlug)) {
+		queryOptions.githubSlug =
+			getGitHubSlugFromUrl(execSync('git remote get-url origin').toString()) ||
+			null
+	}
+	if (auto(queryOptions.packagePath)) {
 		if (await isReadable('package.json')) {
-			pkg = 'package.json'
-			packageData = (await readJSON(pkg)) as PackageData
-			pkgSlug = slug = getGitHubSlugFromPackageData(packageData) || ''
-		}
-		if (!slug) {
-			slug = getGitHubSlugFromUrl(
-				execSync('git remote get-url origin').toString(),
-			)
-		}
-		if (!packageData && !offline) {
-			pkg = ''
-			packageData = await getPackageData(slug)
-		}
-	} else if (pkg === '<auto>') {
-		if (await isReadable('package.json')) {
-			pkg = 'package.json'
-			packageData = await readJSON(pkg)
-		}
-		if (!packageData && slug && !offline) {
-			pkg = ''
-			packageData = await getPackageData(slug)
-		}
-	} else if (slug === '<auto>') {
-		if (pkg) {
-			packageData = (await readJSON(pkg)) as PackageData
-			pkgSlug = slug = getGitHubSlugFromPackageData(packageData) || ''
+			queryOptions.packagePath = 'package.json'
+			queryOptions.packageData = (await readJSON(
+				queryOptions.packagePath,
+			)) as PackageData
+		} else if (
+			queryOptions.githubSlug &&
+			typeof queryOptions.githubSlug === 'string'
+		) {
+			queryOptions.packageData = await getPackageData(queryOptions.githubSlug)
+			queryOptions.packagePath = 'package.json'
 		}
 	}
-	if (pkg && !packageData) {
-		packageData = (await readJSON(pkg)) as PackageData
-	}
-	if (!slug && packageData) {
-		pkgSlug = slug = getGitHubSlugFromPackageData(packageData) || ''
-	}
-	if (!pkgSlug && packageData) {
-		pkgSlug = getGitHubSlugFromPackageData(packageData) || ''
-	}
-	if (slug && pkgSlug && slug !== pkgSlug) {
-		console.warn(
-			`Slug from the resolved package data ${pkgSlug} is not the same as the slug provided ${slug}, this is unexpected.`,
+	if (
+		auto(queryOptions.githubSlug) &&
+		queryOptions.packageData &&
+		typeof queryOptions.packageData === 'object'
+	) {
+		queryOptions.githubSlug = getGitHubSlugFromPackageData(
+			queryOptions.packageData,
 		)
 	}
-	if (!renderOptions.format) {
-		if (write) {
-			if (write === '<auto>') write = pkg || 'package.json'
-			if (write.endsWith('package.json')) renderOptions.format = 'package'
-			else if (write.endsWith('.json')) renderOptions.format = 'json'
-			else if (write.endsWith('.txt')) renderOptions.format = 'text'
-			else if (write.endsWith('.md')) renderOptions.format = 'markdown'
-			else if (write.endsWith('.html')) renderOptions.format = 'html'
-			else renderOptions.format = 'string'
-		} else renderOptions.format = 'json'
+	// fetch
+	if (!result) result = await getBackers(queryOptions)
+	// write
+	if (auto(renderOptions.writePath)) {
+		renderOptions.writePath = queryOptions.packagePath || 'package.json'
 	}
-	if (!result) {
-		result = await getBackersFromRepository(packageData || slug, queryOptions)
+	if (
+		queryOptions.packageData &&
+		typeof queryOptions.packageData === 'object'
+	) {
+		renderOptions.packageData = queryOptions.packageData
+	}
+	if (auto(renderOptions.format)) {
+		if (typeof renderOptions.writePath === 'string') {
+			if (renderOptions.writePath.endsWith('package.json'))
+				renderOptions.format = BackersRenderFormat.package
+			else if (
+				renderOptions.writePath.endsWith('shoutout.txt') ||
+				renderOptions.writePath.endsWith('shoutouts.txt')
+			)
+				renderOptions.format = BackersRenderFormat.shoutout
+			else if (renderOptions.writePath.endsWith('.json'))
+				renderOptions.format = BackersRenderFormat.string
+			else if (renderOptions.writePath.endsWith('.txt'))
+				renderOptions.format = BackersRenderFormat.text
+			else if (renderOptions.writePath.endsWith('.md'))
+				renderOptions.format = BackersRenderFormat.markdown
+			else if (renderOptions.writePath.endsWith('.html'))
+				renderOptions.format = BackersRenderFormat.html
+		}
+		if (auto(renderOptions.format))
+			renderOptions.format = BackersRenderFormat.string // @todo add a raw mode
 	}
 	// output
-	renderOptions.githubRepoSlug = slug || pkgSlug // for markdown rendering
-	const output = renderBackers(result, renderOptions, packageData)
-	if (write) {
-		if (write.endsWith('.json') || typeof output !== 'string') {
-			if (write.endsWith('.json') === false)
+	const output = renderBackers(result, renderOptions as any)
+	if (typeof renderOptions.writePath === 'string') {
+		if (renderOptions.writePath.endsWith('.json')) {
+			if (typeof output === 'string') {
 				console.warn(
-					`Wrote to ${write} as JSON. Specify --join argument to write as text.`,
+					`Writing to ${renderOptions.writePath} as string... this is probably not intended, and you'll have to do some post-processing...`,
 				)
-			await writeJSON(write, output)
-		} else await writeFile(write, output)
-	} else console.log(output)
+				await writeFile(renderOptions.writePath, output)
+			} else {
+				await writeJSON(renderOptions.writePath, output)
+			}
+		} else if (typeof output === 'string') {
+			await writeFile(renderOptions.writePath, output)
+		} else {
+			console.warn(
+				`Writing to ${renderOptions.writePath} as JSON... this is probably not intended, and you'll have to do some post-processing...`,
+			)
+			await writeJSON(renderOptions.writePath, output)
+		}
+		console.log(`Wrote to ${renderOptions.writePath}`)
+	} else {
+		console.log(output)
+	}
 }
 async function parse(args: string[]) {
 	for (const arg of args) {
@@ -204,71 +185,51 @@ async function parse(args: string[]) {
 		switch (a.key) {
 			case '--': {
 				await action()
-				reset()
+				renderOptions = {
+					writePath: false,
+				}
 				break
 			}
 			case 'help': {
-				Argument.help(help)
-				return
-			}
-			case 'offline': {
-				offline = a.boolean()
-				break
+				return Argument.help(help)
 			}
 			case 'slug': {
 				result = null
-				packageData = null
-				slug = a.string({ enabled: '<auto>', disabled: '' })
+				queryOptions.packageData = null
+				queryOptions.githubSlug = a.string({ enabled: true, disabled: false })
 				break
 			}
 			case 'package': {
 				result = null
-				packageData = null
-				pkg = a.string({ enabled: '<auto>', disabled: '' })
+				queryOptions.packageData = null
+				queryOptions.packagePath = a.string({ enabled: true, disabled: false })
 				break
 			}
-			case 'write': {
-				write = a.string({ enabled: '<auto>', disabled: '' })
+			case 'offline': {
+				queryOptions.offline = a.boolean()
 				break
 			}
-			// number options
+			case 'githubSponsorsUsername':
+			case 'opencollectiveUsername':
+			case 'thanksdevGithubUsername': {
+				queryOptions[a.key] = a.string({ enabled: true })
+				break
+			}
 			case 'sponsorCentsThreshold':
 			case 'donorCentsThreshold': {
 				queryOptions[a.key] = a.number()
 				break
 			}
-			// string format options
+			case 'write': {
+				renderOptions.writePath = a.string({ enabled: true, disabled: false })
+				break
+			}
 			case 'format': {
 				renderOptions.format = a.string({ enabled: '' }) as any
 				break
 			}
-			// case 'prefix': {
-			// 	renderOptions.prefix = a.string({ enabled: '' })
-			// 	break
-			// }
-			// case 'joinBackers':
-			// case 'joinBacker': {
-			// 	renderOptions[a.key] = a.string({ enabled: '\n' })
-			// 	break
-			// }
-			// case 'author':
-			// case 'authors':
-			// case 'maintainers':
-			// case 'contributors':
-			// case 'sponsors':
-			// case 'funders':
-			// case 'donors':
-			// case 'displayUrl':
-			// case 'displayDescription':
-			// case 'displayEmail':
-			// case 'displayCopyright':
-			// case 'displayYears':
-			// case 'displayContributions': {
-			// 	renderOptions[a.key] = a.boolean()
-			// 	break
-			// }
 			default: {
-				a.unknown()
+				return a.unknown()
 			}
 		}
 	}

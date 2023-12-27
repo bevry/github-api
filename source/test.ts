@@ -1,5 +1,11 @@
 // external
-import { equal, errorEqual, gt, gte } from 'assert-helpers'
+import {
+	equal,
+	errorEqual,
+	expectThrowViaFunction,
+	gt,
+	gte,
+} from 'assert-helpers'
 import kava from 'kava'
 import Errlop from 'errlop'
 
@@ -13,7 +19,7 @@ import getGitHubLatestCommit, {
 	backerFields,
 	GitHubCredentials,
 	Backers,
-	getBackersFromRepository,
+	getBackers,
 	getBackersFromUsernames,
 	getGitHubRepositories,
 	getGitHubRepositoriesFromUsernames,
@@ -109,7 +115,10 @@ function checkBackersCallback(
 		for (const field of backerFields) {
 			try {
 				gte(
-					result[field].length,
+					// workaround for author returning CSV string
+					typeof result[field] === 'string'
+						? (result[field] as any as string).split(', ')
+						: result[field].length,
 					expected[field],
 					`had at least ${expected[field]} ${field}`,
 				)
@@ -137,21 +146,30 @@ kava.suite('@bevry/github-api', function (suite, test) {
 			)
 		})
 		test('gist failure', function () {
-			equal(
-				getGitHubSlugFromPackageData({ repository: 'gist:11081aaa281' }),
-				null,
+			expectThrowViaFunction(
+				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
+				() =>
+					getGitHubSlugFromPackageData({
+						repository: 'gist:11081aaa281',
+					}) as never,
 			)
 		})
 		test('bitbucket failure', function () {
-			equal(
-				getGitHubSlugFromPackageData({ repository: 'bitbucket:bb/repo' }),
-				null,
+			expectThrowViaFunction(
+				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
+				() =>
+					getGitHubSlugFromPackageData({
+						repository: 'bitbucket:bb/repo',
+					}) as never,
 			)
 		})
 		test('gitlab failure', function () {
-			equal(
-				getGitHubSlugFromPackageData({ repository: 'gitlab:gl/repo' }),
-				null,
+			expectThrowViaFunction(
+				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
+				() =>
+					getGitHubSlugFromPackageData({
+						repository: 'gitlab:gl/repo',
+					}) as never,
 			)
 		})
 		test('full repo', function () {
@@ -277,9 +295,10 @@ kava.suite('@bevry/github-api', function (suite, test) {
 	})
 	suite('backers', function (suite, test) {
 		test('github', function (done) {
-			getBackersFromRepository('docpad/docpad')
+			getBackers({ githubSlug: 'docpad/docpad' })
 				.then(
 					checkBackersCallback(done, {
+						author: 1,
 						authors: 1,
 						maintainers: 1,
 						contributors: 10,
@@ -294,6 +313,7 @@ kava.suite('@bevry/github-api', function (suite, test) {
 			getBackersFromUsernames(['bevry-labs'])
 				.then(
 					checkBackersCallback(done, {
+						author: 1,
 						authors: 1,
 						maintainers: 1,
 						contributors: 1,
