@@ -1,6 +1,6 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.1.0",
+  "version": "11.2.0",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
@@ -124,19 +124,30 @@
   ],
   "donors": [
     "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew)",
+    "Armen Mkrtchian (https://mogoni.dev) (https://github.com/Armenm)",
     "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa)",
     "Chad (https://opencollective.com/chad8)",
     "Codecov <hello-codecov@sentry.io> (https://codecov.io) (https://github.com/codecov)",
+    "dr.dimitru (https://veliovgroup.com) (https://github.com/dr-dimitru)",
+    "Elliott Ditman (https://elliottditman.com) (https://github.com/elliottditman)",
     "entroniq (https://gitlab.com/entroniq) (https://thanks.dev/d/gl/entroniq)",
+    "GitHub (https://github.com/about) (https://github.com/github)",
+    "Hunter Beast (https://cryptoquick.com) (https://github.com/cryptoquick)",
     "Jean-Luc Geering (https://github.com/jlgeering) (https://opencollective.com/jlgeering) (https://twitter.com/jlgeering)",
     "Michael Duane Mooring (https://mdm.cc) (https://github.com/mikeumus) (https://opencollective.com/mikeumus) (https://twitter.com/mikeumus)",
+    "Michael Harry Scepaniak <mhs1.sys@gmail.com> (https://michaelscepaniak.com) (https://github.com/hispanic)",
     "Mohammed Shah <shah@idk.uno> (https://github.com/smashah) (https://thanks.dev/d/gh/smashah) (https://twitter.com/smashah)",
+    "Mr. Henry <hello@mrhenry.be> (https://mrhenry.be) (https://github.com/mrhenry)",
+    "Nermal <nermalcat69@skiff.com> (https://arjunaditya.vercel.app) (https://github.com/nermalcat69)",
+    "Pleo (https://www.pleo.io) (https://github.com/pleo-io)",
     "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
     "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Robert de Forest <guitar.robot@gmail.com> (https://github.com/rdeforest)",
     "Sentry (https://sentry.io) (https://github.com/getsentry)",
     "ServieJS (https://github.com/serviejs) (https://thanks.dev/d/gh/serviejs)",
     "Skunk Team (https://skunk.team) (https://github.com/skunkteam)",
-    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm)"
+    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm)",
+    "WriterJohnBuck (https://github.com/WriterJohnBuck)"
   ],
   "engines": {
     "node": ">=18"

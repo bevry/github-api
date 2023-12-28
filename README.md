@@ -56,27 +56,27 @@ Interact with the GitHub API, fetching commits, repositories, members, and backe
 ### [Deno](https://deno.land "Deno is a secure runtime for JavaScript and TypeScript, it is an alternative for Node.js")
 
 ``` typescript
-import pkg from 'https://unpkg.com/@bevry/github-api@^11.1.0/edition-deno/index.ts'
+import pkg from 'https://unpkg.com/@bevry/github-api@^11.2.0/edition-deno/index.ts'
 ```
 ### [Skypack](https://www.skypack.dev "Skypack is a JavaScript Delivery Network for modern web apps")
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.skypack.dev/@bevry/github-api@^11.1.0'
+    import pkg from '//cdn.skypack.dev/@bevry/github-api@^11.2.0'
 </script>
 ```
 ### [unpkg](https://unpkg.com "unpkg is a fast, global content delivery network for everything on npm")
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/@bevry/github-api@^11.1.0'
+    import pkg from '//unpkg.com/@bevry/github-api@^11.2.0'
 </script>
 ```
 ### [jspm](https://jspm.io "Native ES Modules CDN")
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/@bevry/github-api@11.1.0'
+    import pkg from '//dev.jspm.io/@bevry/github-api@11.2.0'
 </script>
 ```
 ### [Editions](https://editions.bevry.me "Editions are the best way to produce and consume packages you care about.")
@@ -144,19 +144,30 @@ This package is published with the following editions:
 #### Donors
 
 -   [Andrew Nesbitt](https://nesbitt.io)
+-   [Armen Mkrtchian](https://mogoni.dev)
 -   [Balsa](https://balsa.com)
 -   [Chad](https://opencollective.com/chad8)
 -   [Codecov](https://codecov.io)
+-   [dr.dimitru](https://veliovgroup.com)
+-   [Elliott Ditman](https://elliottditman.com)
 -   [entroniq](https://gitlab.com/entroniq)
+-   [GitHub](https://github.com/about)
+-   [Hunter Beast](https://cryptoquick.com)
 -   [Jean-Luc Geering](https://github.com/jlgeering)
 -   [Michael Duane Mooring](https://mdm.cc)
+-   [Michael Harry Scepaniak](https://michaelscepaniak.com)
 -   [Mohammed Shah](https://github.com/smashah)
+-   [Mr. Henry](https://mrhenry.be)
+-   [Nermal](https://arjunaditya.vercel.app)
+-   [Pleo](https://www.pleo.io)
 -   [Poonacha Medappa](https://poonachamedappa.com)
 -   [Rob Morris](https://github.com/Rob-Morris)
+-   [Robert de Forest](https://github.com/rdeforest)
 -   [Sentry](https://sentry.io)
 -   [ServieJS](https://github.com/serviejs)
 -   [Skunk Team](https://skunk.team)
 -   [Syntax](https://syntax.fm)
+-   [WriterJohnBuck](https://github.com/WriterJohnBuck)
 
 <!-- /BACKERS -->
 

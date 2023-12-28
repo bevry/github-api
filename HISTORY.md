@@ -1,5 +1,14 @@
 # History
 
+## v11.2.0 2023 December 28
+
+-   If able to fetch the current sponsors, drop the old sponsors to donors
+-   Maintainers should display homepage instead of github url if they have it
+-   Add various repository slug and url helper methods
+-   Cleanup documentation
+-   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
+-   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
+
 ## v11.1.0 2023 December 28
 
 -   Updated dependencies, [base files](https://github.com/bevry/base), and [editions](https://editions.bevry.me) using [boundation](https://github.com/bevry/boundation)
