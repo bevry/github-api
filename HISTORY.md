@@ -2,7 +2,7 @@
 
 ## v11.3.1 2023 December 28
 
--   Fixed a regression in v11.2.0 where `packageData` would always be fetched remotely, now if it is probided, it is respected once again
+-   Fixed a regression in v11.2.0 where `packageData` would always be fetched remotely, now if it is provided, it is respected once again
 -   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
 
 ## v11.3.0 2023 December 28
