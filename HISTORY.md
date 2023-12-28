@@ -1,5 +1,11 @@
 # History
 
+## v11.3.0 2023 December 28
+
+-   Default cents thresholds to `100` in the API, rather than just the CLI
+-   Don't complain about invalid usernames in offline mode, as usernames aren't used in offline mode
+-   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
+
 ## v11.2.0 2023 December 28
 
 -   If able to fetch the current sponsors, drop the old sponsors to donors

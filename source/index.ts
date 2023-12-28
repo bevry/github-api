@@ -243,9 +243,9 @@ export interface BackersQueryOptions extends QueryOptions {
 	/** If true, do not fetch any remote data when determing backers. */
 	offline?: boolean | null
 
-	/** The minimum amount of monthly cents to be considered a financial donor (only applies if we are aware of the financial amount). */
+	/** The minimum amount of monthly cents to be considered a financial donor (only applies if we are aware of the financial amount, defaults to 100). */
 	sponsorCentsThreshold?: number | null
-	/** The minimum amount of eternal cents to be considered a financial donor (only applies if we are aware of the financial amount). */
+	/** The minimum amount of eternal cents to be considered a financial donor (only applies if we are aware of the financial amount, defaults to 100). */
 	donorCentsThreshold?: number | null
 }
 
@@ -513,6 +513,8 @@ export async function getBackersFromThanksDev(
 	username: string,
 	opts: BackersQueryOptions = {},
 ): Promise<ThanksDevBackers> {
+	const sponsorCentsThreshold = opts.sponsorCentsThreshold ?? 100
+	const donorCentsThreshold = opts.donorCentsThreshold ?? 100
 	let sponsors: Array<ThanksDevDonor> = [],
 		donors: Array<ThanksDevDonor> = []
 	// monthly
@@ -522,8 +524,7 @@ export async function getBackersFromThanksDev(
 		const data: ThanksDevResponse = await resp.json()
 		sponsors = data.donors.filter(
 			([, , cents]) =>
-				cents &&
-				(!opts.sponsorCentsThreshold || cents >= opts.sponsorCentsThreshold),
+				cents && (!sponsorCentsThreshold || cents >= sponsorCentsThreshold),
 		)
 	} catch (err: any) {
 		throw new Errlop(
@@ -538,8 +539,7 @@ export async function getBackersFromThanksDev(
 		const data: ThanksDevResponse = await resp.json()
 		donors = data.donors.filter(
 			([, , cents]) =>
-				cents &&
-				(!opts.donorCentsThreshold || cents >= opts.donorCentsThreshold),
+				cents && (!donorCentsThreshold || cents >= donorCentsThreshold),
 		)
 	} catch (err: any) {
 		throw new Errlop(
@@ -618,6 +618,8 @@ export async function getBackersFromOpenCollective(
 	opts: BackersQueryOptions = {},
 ): Promise<OpenCollectiveBackers> {
 	try {
+		const sponsorCentsThreshold = opts.sponsorCentsThreshold ?? 100
+		const donorCentsThreshold = opts.donorCentsThreshold ?? 100
 		const url = `https://opencollective.com/${username}/members.json`
 		const resp = await fetch(url, {})
 		const profiles: OpenCollectiveResponse = await resp.json()
@@ -639,16 +641,16 @@ export async function getBackersFromOpenCollective(
 			(member) =>
 				member.role === 'BACKER' &&
 				member.lastTransactionAmount &&
-				(!opts.sponsorCentsThreshold ||
-					member.lastTransactionAmount * 100 > opts.sponsorCentsThreshold) &&
+				(!sponsorCentsThreshold ||
+					member.lastTransactionAmount * 100 > sponsorCentsThreshold) &&
 				isWithinLastMonth(member.lastTransactionAt, lastMonth),
 		)
 		const donors = profiles.filter(
 			(member) =>
 				member.role === 'BACKER' &&
 				member.totalAmountDonated &&
-				(!opts.donorCentsThreshold ||
-					member.totalAmountDonated * 100 > opts.donorCentsThreshold),
+				(!donorCentsThreshold ||
+					member.totalAmountDonated * 100 > donorCentsThreshold),
 		)
 		return {
 			sponsors: Fellow.add(sponsors.map(getOpenCollectiveProfile)),
@@ -1991,60 +1993,14 @@ export async function getBackers(
 			githubSlug,
 		)
 
-		// add contributors
-		if (authed && opts.offline !== true) {
-			try {
-				const fetchedContributors = await getGitHubContributors(
-					githubSlug,
-					opts,
-				)
-				append(result.contributors, fetchedContributors)
-			} catch (err: any) {
-				console.warn(err.stack)
-			}
-		}
-
-		// order by least details, to most accurate details, so ThanksDev, OpenCollective, GitHub Sponsors
-
-		// ThanksDev
-		if (thanksdevGithubUsername && opts.offline !== true) {
-			try {
-				const fetchedBackers = await getBackersFromThanksDev(
-					ThanksDevPlatform.GitHub,
-					thanksdevGithubUsername,
-					opts,
-				)
-				appendBackers(result, fetchedBackers)
-			} catch (err: any) {
-				console.warn(err.stack)
-			}
-		} else {
-			console.warn(`Unable to determine ThanksDev username for ${githubSlug}`)
-		}
-
-		// OpenCollective
-		if (opencollectiveUsername && opts.offline !== true) {
-			try {
-				const fetchedBackers = await getBackersFromOpenCollective(
-					opencollectiveUsername,
-					opts,
-				)
-				appendBackers(result, fetchedBackers)
-			} catch (err: any) {
-				console.warn(err.stack)
-			}
-		} else {
-			console.warn(
-				`Unable to determine OpenCollective username for ${githubSlug}`,
-			)
-		}
-
-		// GitHubSponsors
-		if (authed && opts.offline !== true) {
-			if (githubSponsorsUsername) {
+		// if not offline, fetch from remote sources
+		if (opts.offline !== true) {
+			// ThanksDev
+			if (thanksdevGithubUsername) {
 				try {
-					const fetchedBackers = await getBackersFromGitHubSponsors(
-						githubSponsorsUsername,
+					const fetchedBackers = await getBackersFromThanksDev(
+						ThanksDevPlatform.GitHub,
+						thanksdevGithubUsername,
 						opts,
 					)
 					appendBackers(result, fetchedBackers)
@@ -2053,24 +2009,70 @@ export async function getBackers(
 				}
 			} else {
 				console.warn(
-					`Unable to determine GitHub Sponsors username for ${githubSlug}`,
+					`Unable to fetch backers from ThanksDev, as unable to resolve the ThanksDev username for ${githubSlug}`,
 				)
 			}
-		}
 
-		// fetch additional details, if able
-		if (authed && opts.offline !== true) {
-			await Promise.all(
-				Array.from(result.donors).map(async (fellow) => {
-					if (fellow.githubUsername && !fellow.githubProfile) {
-						await getGitHubProfile(fellow.githubUsername, opts)
+			// OpenCollective
+			if (opencollectiveUsername) {
+				try {
+					const fetchedBackers = await getBackersFromOpenCollective(
+						opencollectiveUsername,
+						opts,
+					)
+					appendBackers(result, fetchedBackers)
+				} catch (err: any) {
+					console.warn(err.stack)
+				}
+			} else {
+				console.warn(
+					`Unable to fetch backers from OpenCollective, as unable to resolve the OpenCollective username for ${githubSlug}`,
+				)
+			}
+
+			// GitHub
+			if (authed) {
+				// GitHub Contributors
+				try {
+					const fetchedContributors = await getGitHubContributors(
+						githubSlug,
+						opts,
+					)
+					append(result.contributors, fetchedContributors)
+				} catch (err: any) {
+					console.warn(err.stack)
+				}
+
+				// GitHub Sponsors
+				if (githubSponsorsUsername) {
+					try {
+						const fetchedBackers = await getBackersFromGitHubSponsors(
+							githubSponsorsUsername,
+							opts,
+						)
+						appendBackers(result, fetchedBackers)
+					} catch (err: any) {
+						console.warn(err.stack)
 					}
-				}),
-			)
-		}
+				} else {
+					console.warn(
+						`Unable to fetch backers from GitHub Sponsors, as unable to resolve the GitHub Sponsors username for ${githubSlug}`,
+					)
+				}
 
-		// verify their details
-		if (opts.offline !== false) verifyUrlsOfBackers(result)
+				// fetch additional details, if able
+				await Promise.all(
+					Array.from(result.donors).map(async (fellow) => {
+						if (fellow.githubUsername && !fellow.githubProfile) {
+							await getGitHubProfile(fellow.githubUsername, opts)
+						}
+					}),
+				)
+			}
+
+			// verify their details
+			verifyUrlsOfBackers(result)
+		}
 
 		// attach to slug, which enables us to remove duplicates by fetching by slug
 		// (duplicates can occur if new details allowed us to merge two old entries)

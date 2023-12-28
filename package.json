@@ -1,6 +1,6 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.2.0",
+  "version": "11.3.0",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
@@ -300,7 +300,7 @@
     "our:meta": "npm run our:meta:docs && npm run our:meta:projectz",
     "our:meta:docs": "npm run our:meta:docs:typedoc",
     "our:meta:docs:typedoc": "rm -rf ./docs && typedoc --exclude '**/+(*test*|node_modules)' --excludeExternals --out ./docs ./source",
-    "our:meta:projectz": "projectz",
+    "our:meta:projectz": "projectz --offline",
     "our:release": "npm run our:release:prepare && npm run our:release:check-changelog && npm run our:release:check-dirty && npm run our:release:tag && npm run our:release:push",
     "our:release:check-changelog": "cat ./HISTORY.md | grep \"v$npm_package_version\" || (printf '%s\n' \"add a changelog entry for v$npm_package_version\" && exit -1)",
     "our:release:check-dirty": "git diff --exit-code",

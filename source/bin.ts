@@ -85,8 +85,8 @@ const queryOptions: CliBackersQueryOptions = {
 	githubSponsorsUsername: null,
 	opencollectiveUsername: null,
 	thanksdevGithubUsername: null,
-	sponsorCentsThreshold: 100,
-	donorCentsThreshold: 100,
+	sponsorCentsThreshold: null,
+	donorCentsThreshold: null,
 }
 function auto(value: any) {
 	return value == null || value === true
@@ -212,12 +212,15 @@ async function parse(args: string[]) {
 			case 'githubSponsorsUsername':
 			case 'opencollectiveUsername':
 			case 'thanksdevGithubUsername': {
-				queryOptions[a.key] = a.string({ enabled: true })
+				queryOptions[a.key] = a.string({ enabled: true, disabled: false })
 				break
 			}
 			case 'sponsorCentsThreshold':
 			case 'donorCentsThreshold': {
-				queryOptions[a.key] = a.number()
+				queryOptions[a.key] = a.number({
+					enabled: null,
+					disabled: 0,
+				})
 				break
 			}
 			case 'write': {
