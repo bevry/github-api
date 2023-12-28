@@ -1,13 +1,13 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.3.0",
+  "version": "11.3.1",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
   "funding": "https://bevry.me/fund",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bevry/github-api.git"
+    "url": "git+https://github.com/bevry/github-api.git"
   },
   "bugs": {
     "url": "https://github.com/bevry/github-api/issues"

@@ -15,6 +15,14 @@ export { Fellow, PromisePool, Errlop }
 import { env } from 'node:process'
 const envCredentials = env as GitHubCredentials
 
+export function shouldAutomate(value: any): boolean {
+	return value == null || value === true
+}
+
+export function getFallback(value: any, fallback: any) {
+	return shouldAutomate(value) ? fallback : value
+}
+
 // ====================================
 // Our Types
 
@@ -513,8 +521,13 @@ export async function getBackersFromThanksDev(
 	username: string,
 	opts: BackersQueryOptions = {},
 ): Promise<ThanksDevBackers> {
-	const sponsorCentsThreshold = opts.sponsorCentsThreshold ?? 100
-	const donorCentsThreshold = opts.donorCentsThreshold ?? 100
+	// defaults
+	const sponsorCentsThreshold: number = getFallback(
+		opts.sponsorCentsThreshold,
+		100,
+	)
+	const donorCentsThreshold: number = getFallback(opts.donorCentsThreshold, 100)
+	// prepare
 	let sponsors: Array<ThanksDevDonor> = [],
 		donors: Array<ThanksDevDonor> = []
 	// monthly
@@ -618,8 +631,16 @@ export async function getBackersFromOpenCollective(
 	opts: BackersQueryOptions = {},
 ): Promise<OpenCollectiveBackers> {
 	try {
-		const sponsorCentsThreshold = opts.sponsorCentsThreshold ?? 100
-		const donorCentsThreshold = opts.donorCentsThreshold ?? 100
+		// defaults
+		const sponsorCentsThreshold: number = getFallback(
+			opts.sponsorCentsThreshold,
+			100,
+		)
+		const donorCentsThreshold: number = getFallback(
+			opts.donorCentsThreshold,
+			100,
+		)
+		// fetch
 		const url = `https://opencollective.com/${username}/members.json`
 		const resp = await fetch(url, {})
 		const profiles: OpenCollectiveResponse = await resp.json()
@@ -1899,11 +1920,15 @@ export async function getBackers(
 			{}
 	try {
 		// if auto-detect package data, fetch from slug if not offline
-		if (githubSlug && opts.packageData !== false && opts.offline !== true) {
+		if (
+			githubSlug &&
+			shouldAutomate(opts.packageData) &&
+			opts.offline !== true
+		) {
 			packageData = await getPackageData(githubSlug, {})
 		}
 		// if auto-detect slug, fetch from package data
-		if (opts.githubSlug !== false && packageData) {
+		if (shouldAutomate(opts.githubSlug) && packageData) {
 			githubSlug = getGitHubSlugFromPackageData(packageData) || ''
 		}
 

@@ -9,6 +9,7 @@ import writeFile from '@bevry/fs-write'
 
 // local
 import {
+	shouldAutomate,
 	Backers,
 	getBackers,
 	renderBackers,
@@ -88,17 +89,14 @@ const queryOptions: CliBackersQueryOptions = {
 	sponsorCentsThreshold: null,
 	donorCentsThreshold: null,
 }
-function auto(value: any) {
-	return value == null || value === true
-}
 async function action() {
 	// query
-	if (auto(queryOptions.githubSlug)) {
+	if (shouldAutomate(queryOptions.githubSlug)) {
 		queryOptions.githubSlug =
 			getGitHubSlugFromUrl(execSync('git remote get-url origin').toString()) ||
 			null
 	}
-	if (auto(queryOptions.packagePath)) {
+	if (shouldAutomate(queryOptions.packagePath)) {
 		if (await isReadable('package.json')) {
 			queryOptions.packagePath = 'package.json'
 			queryOptions.packageData = (await readJSON(
@@ -113,7 +111,7 @@ async function action() {
 		}
 	}
 	if (
-		auto(queryOptions.githubSlug) &&
+		shouldAutomate(queryOptions.githubSlug) &&
 		queryOptions.packageData &&
 		typeof queryOptions.packageData === 'object'
 	) {
@@ -124,7 +122,7 @@ async function action() {
 	// fetch
 	if (!result) result = await getBackers(queryOptions)
 	// write
-	if (auto(renderOptions.writePath)) {
+	if (shouldAutomate(renderOptions.writePath)) {
 		renderOptions.writePath = queryOptions.packagePath || 'package.json'
 	}
 	if (
@@ -133,7 +131,7 @@ async function action() {
 	) {
 		renderOptions.packageData = queryOptions.packageData
 	}
-	if (auto(renderOptions.format)) {
+	if (shouldAutomate(renderOptions.format)) {
 		if (typeof renderOptions.writePath === 'string') {
 			if (renderOptions.writePath.endsWith('package.json'))
 				renderOptions.format = BackersRenderFormat.package
@@ -151,7 +149,7 @@ async function action() {
 			else if (renderOptions.writePath.endsWith('.html'))
 				renderOptions.format = BackersRenderFormat.html
 		}
-		if (auto(renderOptions.format))
+		if (shouldAutomate(renderOptions.format))
 			renderOptions.format = BackersRenderFormat.string // @todo add a raw mode
 	}
 	// output
