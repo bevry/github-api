@@ -358,6 +358,20 @@ export function getGitHubSlugFromUrl(url: string): string | null {
 	)
 }
 
+/** Get the GitHub Repository website url of a GitHub slug */
+export function getRepositoryWebsiteUrlFromGitHubSlugOrUrl(githubSlug = '') {
+	const result = getGitHubSlugFromUrl(githubSlug)
+	if (!result) return result
+	return `https://github.com/${githubSlug}`
+}
+
+/** Get the GitHub Repository issues url of a GitHub slug */
+export function getRepositoryIssuesUrlFromGitHubSlugOrUrl(githubSlug = '') {
+	const result = getGitHubSlugFromUrl(githubSlug)
+	if (!result) return result
+	return `https://github.com/${githubSlug}/issues`
+}
+
 /** Get the GitHub Repository url of a GitHub slug or GitHub url */
 export function getRepositoryUrlFromGitHubSlugOrUrl(
 	githubSlug: string,
