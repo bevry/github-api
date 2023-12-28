@@ -135,7 +135,7 @@ This package is published with the following editions:
 
 -   [Andrew Nesbitt](https://nesbitt.io) — Software engineer and researcher
 -   [Balsa](https://balsa.com) — We're Balsa, and we're building tools for builders.
--   [Codecov](https://codecov.io/) — Empower developers with tools to improve code quality and testing.
+-   [Codecov](https://codecov.io) — Empower developers with tools to improve code quality and testing.
 -   [Poonacha Medappa](https://poonachamedappa.com)
 -   [Rob Morris](https://github.com/Rob-Morris)
 -   [Sentry](https://sentry.io) — Real-time crash reporting for your web apps, mobile apps, and games.
@@ -146,10 +146,10 @@ This package is published with the following editions:
 -   [Andrew Nesbitt](https://nesbitt.io)
 -   [Balsa](https://balsa.com)
 -   [Chad](https://opencollective.com/chad8)
--   [Codecov](https://codecov.io/)
+-   [Codecov](https://codecov.io)
 -   [entroniq](https://gitlab.com/entroniq)
 -   [Jean-Luc Geering](https://github.com/jlgeering)
--   [Michael Duane Mooring](https://mdm.cc)
+-   [Michael Duane Mooring](https://bevry.me)
 -   [Mohammed Shah](https://github.com/smashah)
 -   [Poonacha Medappa](https://poonachamedappa.com)
 -   [Rob Morris](https://github.com/Rob-Morris)

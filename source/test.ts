@@ -6,7 +6,7 @@ import {
 	gt,
 	gte,
 } from 'assert-helpers'
-import kava from 'kava'
+import kava, { Test } from 'kava'
 import Errlop from 'errlop'
 
 // local
@@ -24,22 +24,101 @@ import getGitHubLatestCommit, {
 	getGitHubRepositories,
 	getGitHubRepositoriesFromUsernames,
 	getGitHubRepositoriesFromSearch,
-	getGitHubSlugFromPackageData,
+	getGitHubSlugFromUrl,
+	hasCredentials,
 } from './index.js'
 
 type Errback = (error?: Error) => void
 
 interface Fixture {
-	input: GitHubCredentials
-	output?: string
+	name?: string
+	input: any
+	output?: any
 	error?: string
 }
-interface RedactFixture {
-	input: string
-	output: string
-}
 
-const apiFixtures: Fixture[] = [
+const slugFixtures: Array<Fixture> = [
+	{
+		input: 'bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'github:bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		name: 'gist failure',
+		input: 'gist:11081aaa281',
+		output: null,
+	},
+	{
+		name: 'bitbucket failure',
+		input: 'bitbucket:bb/repo',
+		output: null,
+	},
+	{
+		name: 'gitlab failure',
+		input: 'gitlab:gl/repo',
+		output: null,
+	},
+	{
+		input: 'git@github.com:bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'https://github.com/bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'https://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'ssh://github.com/bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'ssh://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git://github.com/bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git://github.com/bevry/github-api.git#commit-ish',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+https://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+https://github.com/bevry/github-api.git#commit-ish',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+ssh://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+ssh+https://github.com/bevry/github-api',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+ssh+https://github.com/bevry/github-api.git',
+		output: 'bevry/github-api',
+	},
+	{
+		input: 'git+ssh+https://github.com/bevry/github-api.git#commit-ish',
+		output: 'bevry/github-api',
+	},
+]
+const apiFixtures: Array<Fixture> = [
 	{
 		input: {
 			GITHUB_ACCESS_TOKEN: 'gat',
@@ -72,7 +151,7 @@ const apiFixtures: Fixture[] = [
 		error: 'INVALID_GITHUB_AUTH',
 	},
 ]
-const redactFixtures: RedactFixture[] = [
+const redactFixtures: Array<Fixture> = [
 	{
 		input: 'url?client_id=9d5&client_secret=fbd58',
 		output: 'url?client_id=REDACTED&client_secret=REDACTED',
@@ -107,6 +186,27 @@ const redactFixtures: RedactFixture[] = [
 	},
 ]
 
+function testFixtures(fixtures: Array<Fixture>, call: Function, test: Test) {
+	for (const [index, { name, input, output, error }] of Object.entries(
+		fixtures,
+	)) {
+		test(
+			name || `${JSON.stringify(input)} => ${JSON.stringify(output)}`,
+			function () {
+				let resultError: any = null
+				try {
+					const actual = call(input)
+					equal(actual, output, 'value was as expected')
+				} catch (err) {
+					resultError = err
+				}
+				if (resultError || error)
+					errorEqual(resultError, error, 'error was as expected')
+			},
+		)
+	}
+}
+
 function checkBackersCallback(
 	done: Errback,
 	expected: { [key: string]: number },
@@ -133,90 +233,21 @@ function checkBackersCallback(
 
 kava.suite('@bevry/github-api', function (suite, test) {
 	suite('slug', function (suite, test) {
-		test('short repo', function () {
-			equal(
-				getGitHubSlugFromPackageData({ repository: 'bevry/projectz' }),
-				'bevry/projectz',
-			)
-		})
-		test('short explicit', function () {
-			equal(
-				getGitHubSlugFromPackageData({ repository: 'github:bevry/projectz' }),
-				'bevry/projectz',
-			)
-		})
-		test('gist failure', function () {
-			expectThrowViaFunction(
-				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
-				() =>
-					getGitHubSlugFromPackageData({
-						repository: 'gist:11081aaa281',
-					}) as never,
-			)
-		})
-		test('bitbucket failure', function () {
-			expectThrowViaFunction(
-				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
-				() =>
-					getGitHubSlugFromPackageData({
-						repository: 'bitbucket:bb/repo',
-					}) as never,
-			)
-		})
-		test('gitlab failure', function () {
-			expectThrowViaFunction(
-				'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
-				() =>
-					getGitHubSlugFromPackageData({
-						repository: 'gitlab:gl/repo',
-					}) as never,
-			)
-		})
-		test('full repo', function () {
-			equal(
-				getGitHubSlugFromPackageData({
-					repository: { url: 'https://github.com/bevry/projectz' },
-				}),
-				'bevry/projectz',
-			)
-		})
-		test('full repo with .git', function () {
-			equal(
-				getGitHubSlugFromPackageData({
-					repository: { url: 'https://github.com/bevry/projectz.git' },
-				}),
-				'bevry/projectz',
-			)
-		})
-		test('full repo with ssh', function () {
-			equal(
-				getGitHubSlugFromPackageData({
-					repository: { url: 'git@github.com:bevry/projectz.git' },
-				}),
-				'bevry/projectz',
-			)
+		suite('fixtures', function (suite, test) {
+			testFixtures(slugFixtures, getGitHubSlugFromUrl, test)
 		})
 	})
+	suite('fixtures', function (suite, test) {
+		testFixtures(apiFixtures, getQueryString, test)
+	})
+	suite('redact', function (suite, test) {
+		testFixtures(redactFixtures, redactSearchParams, test)
+	})
 	suite('api', function (suite, test) {
-		suite('fixtures', function (suite, test) {
-			apiFixtures.forEach(function ({ input, output, error }, index) {
-				test(`test ${index}`, function () {
-					try {
-						equal(getQueryString(input), output)
-					} catch (err) {
-						if (!error) throw err
-						errorEqual(err, error, 'error was as expected')
-					}
-				})
-			})
-		})
-		suite('redact', function (suite, test) {
-			redactFixtures.forEach(function ({ input, output }, index) {
-				test(`test ${index}`, function () {
-					equal(redactSearchParams(input), output)
-				})
-			})
-		})
+		if (!hasCredentials()) {
+			console.warn('unable to test API, as github credentials not set')
+			return
+		}
 		test('fetch', function (done) {
 			queryREST<any>({
 				pathname: `rate_limit`,
@@ -233,96 +264,96 @@ kava.suite('@bevry/github-api', function (suite, test) {
 				})
 				.catch(done)
 		})
-	})
-	suite('commits', function (suite, test) {
-		test('latest', function (done) {
-			getGitHubLatestCommit('bevry/github')
-				.then(function (result) {
-					equal(typeof result, 'string', `${result} was a string`)
-					equal(Boolean(result), true, `${result} was truthy`)
-					done()
-				})
-				.catch(done)
+		suite('commits', function (suite, test) {
+			test('latest', function (done) {
+				getGitHubLatestCommit('bevry/github')
+					.then(function (result) {
+						equal(typeof result, 'string', `${result} was a string`)
+						equal(Boolean(result), true, `${result} was truthy`)
+						done()
+					})
+					.catch(done)
+			})
 		})
-	})
-	suite('repositories', function (suite, test) {
-		test('repos', function (done) {
-			getGitHubRepositories(['bevry/github'])
-				.then(function (result) {
-					equal(Array.isArray(result), true, 'result is array')
-					gt(result.length, 0, 'result had items')
-					done()
-				})
-				.catch(done)
+		suite('repositories', function (suite, test) {
+			test('repos', function (done) {
+				getGitHubRepositories(['bevry/github'])
+					.then(function (result) {
+						equal(Array.isArray(result), true, 'result is array')
+						gt(result.length, 0, 'result had items')
+						done()
+					})
+					.catch(done)
+			})
+			test('users', function (done) {
+				getGitHubRepositoriesFromUsernames(['browserstate'])
+					.then(function (result) {
+						equal(Array.isArray(result), true, 'result is array')
+						gt(result.length, 0, 'result had items')
+						done()
+					})
+					.catch(done)
+			})
+			// note that rate limits are per category, and for searches it is only 10 searches per interval
+			// test('search', function (done) {
+			// 	getGitHubRepositoriesFromSearch('@bevry-labs language:typescript')
+			// 		.then(function (result) {
+			// 			equal(Array.isArray(result), true, 'result is array')
+			// 			gt(result.length, 0, 'result had items')
+			// 			done()
+			// 		})
+			// 		.catch(done)
+			// })
 		})
-		test('users', function (done) {
-			getGitHubRepositoriesFromUsernames(['browserstate'])
-				.then(function (result) {
-					equal(Array.isArray(result), true, 'result is array')
-					gt(result.length, 0, 'result had items')
-					done()
-				})
-				.catch(done)
+		suite('members', function (suite, test) {
+			test('org', function (done) {
+				getGitHubMembersFromOrganization('bevry')
+					.then((result) => {
+						gte(result.length, 2) // balupton, bevryme
+						setImmediate(done) // don't wrap done call in this promise
+					})
+					.catch(done)
+			})
+			test('orgs', function (done) {
+				getGitHubMembersFromOrganizations(['browserstate', 'interconnectapp'])
+					.then((result) => {
+						gte(result.length, 1)
+						setImmediate(done) // don't wrap done call in this promise
+					})
+					.catch(done)
+			})
 		})
-		// note that rate limits are per category, and for searches it is only 10 searches per interval
-		// test('search', function (done) {
-		// 	getGitHubRepositoriesFromSearch('@bevry-labs language:typescript')
-		// 		.then(function (result) {
-		// 			equal(Array.isArray(result), true, 'result is array')
-		// 			gt(result.length, 0, 'result had items')
-		// 			done()
-		// 		})
-		// 		.catch(done)
-		// })
-	})
-	suite('members', function (suite, test) {
-		test('org', function (done) {
-			getGitHubMembersFromOrganization('bevry')
-				.then((result) => {
-					gte(result.length, 2) // balupton, bevryme
-					setImmediate(done) // don't wrap done call in this promise
-				})
-				.catch(done)
-		})
-		test('orgs', function (done) {
-			getGitHubMembersFromOrganizations(['browserstate', 'interconnectapp'])
-				.then((result) => {
-					gte(result.length, 1)
-					setImmediate(done) // don't wrap done call in this promise
-				})
-				.catch(done)
-		})
-	})
-	suite('backers', function (suite, test) {
-		test('github', function (done) {
-			getBackers({ githubSlug: 'docpad/docpad' })
-				.then(
-					checkBackersCallback(done, {
-						author: 1,
-						authors: 1,
-						maintainers: 1,
-						contributors: 10,
-						sponsors: 3,
-						funders: 4,
-						donors: 5,
-					}),
-				)
-				.catch(done)
-		})
-		test('orgs', function (done) {
-			getBackersFromUsernames(['bevry-labs'])
-				.then(
-					checkBackersCallback(done, {
-						author: 1,
-						authors: 1,
-						maintainers: 1,
-						contributors: 1,
-						sponsors: 3,
-						funders: 0,
-						donors: 3,
-					}),
-				)
-				.catch(done)
+		suite('backers', function (suite, test) {
+			test('github', function (done) {
+				getBackers({ githubSlug: 'docpad/docpad' })
+					.then(
+						checkBackersCallback(done, {
+							author: 1,
+							authors: 1,
+							maintainers: 1,
+							contributors: 10,
+							sponsors: 3,
+							funders: 4,
+							donors: 5,
+						}),
+					)
+					.catch(done)
+			})
+			test('orgs', function (done) {
+				getBackersFromUsernames(['bevry-labs'])
+					.then(
+						checkBackersCallback(done, {
+							author: 1,
+							authors: 1,
+							maintainers: 1,
+							contributors: 1,
+							sponsors: 3,
+							funders: 0,
+							donors: 3,
+						}),
+					)
+					.catch(done)
+			})
 		})
 	})
 })

@@ -300,13 +300,13 @@ export interface PackageData {
 
 /** Fetch the package data of a repository. */
 export async function getPackageData(
-	slug: string,
+	githubSlug: string,
 	fallback?: PackageData,
 ): Promise<PackageData> {
-	const url = `http://raw.github.com/${slug}/master/package.json`
+	const url = `http://raw.github.com/${githubSlug}/master/package.json`
 	const resp = await fetch(url, {})
 	if (!resp.ok) {
-		const error = new Error(`package.json not found for ${slug}`)
+		const error = new Error(`package.json not found for ${githubSlug}`)
 		if (!fallback) throw error
 		console.warn(error.stack)
 		return fallback
@@ -315,58 +315,108 @@ export async function getPackageData(
 		const packageData: PackageData = await resp.json()
 		return packageData
 	} catch (err: any) {
-		const error = new Errlop(`failed to parse package.json of ${slug}`, err)
+		const error = new Errlop(
+			`failed to parse package.json of ${githubSlug}`,
+			err,
+		)
 		if (!fallback) throw error
 		console.warn(error.stack)
 		return fallback
 	}
 }
 
-export function getGitHubSlugFromUrl(url: string) {
-	return url
-		.trim()
-		.replace(/\.git$/, '')
-		.replace(/^.*github\.com[:/]/, '')
+/**
+ * Get the GitHub slug of this GitHub url
+ * @example
+ * ```
+ * bevry/github-api
+ * github:bevry/github-api
+ * git@github.com:bevry/github-api.git
+ * https://github.com/bevry/github-api.git
+ * ssh://github.com/bevry/github-api.git
+ * git://github.com/user/project.git#commit-ish
+ * git+https://github.com/bevry/github-api.git#commit-ish
+ * git+ssh://github.com/bevry/github-api.git#commit-ish
+ * git+ssh+ssh://github.com/bevry/github-api.git#commit-ish
+ * ```
+ */
+export function getGitHubSlugFromUrl(url: string): string | null {
+	// https://docs.npmjs.com/cli/v10/configuring-npm/package-json#repository
+	// https://stackoverflow.com/a/31457913/130638
+
+	// Extract the slug a GitHub URL
+	const match = url.match(
+		/^(?:github:|git@github[.]com:|(?:(?:git|ssh|https?)[+]?)+:[/][/]github[.]com[/])?([^:/]+[/][^:/]+?)(?:[.]git)?(?:#.*)?$/,
+	)
+	// Verify and return the slug
+	return (
+		(match &&
+			match[1] &&
+			match[1].split('/').filter(Boolean).length === 2 &&
+			match[1]) ||
+		null
+	)
 }
 
-export function getGitHubSlugFromPackageData(
+/** Get the GitHub Repository url of a GitHub slug or GitHub url */
+export function getRepositoryUrlFromGitHubSlugOrUrl(
+	githubSlug: string,
+): string | null {
+	const result = getGitHubSlugFromUrl(githubSlug)
+	if (!result) return result
+	// this is what npm prefers:
+	// https://github.com/bevry/oneday/actions/runs/7338411760/job/19980939564#step:9:22
+	return `git+https://github.com/${result}.git`
+}
+
+/** Get the Repository url of a URL or GitHub slug */
+export function getRepositoryUrlFromUrlOrGitHubSlug(
+	input: string,
+): string | null {
+	return getRepositoryUrlFromGitHubSlugOrUrl(input) || input || null
+}
+
+/** Get the Repository url (or shorthand url) from package.json data */
+export function getRepositoryUrlFromPackageData(
 	packageData: Pick<PackageData, 'homepage' | 'repository'>,
-): string {
-	let url: null | string = null,
-		slug: null | string = null
+): string | null {
 	if (typeof packageData.repository === 'string') {
-		url = packageData.repository
+		// modernize if possible
+		return getRepositoryUrlFromUrlOrGitHubSlug(packageData.repository)
 	} else if (
 		packageData.repository &&
 		typeof packageData.repository.url === 'string'
 	) {
-		url = packageData.repository && packageData.repository.url
-	} else if (typeof packageData.homepage === 'string') {
-		url = packageData.homepage
-	}
-	// bevry/projectz
-	// github:bevry/projectz
-	// https://github.com/bevry/projectz
-	// https://github.com/bevry/projectz.git
-	// git@github.com:bevry/projectz.git
-	if (url) {
-		const match = url.match(
-			/^(?:https?:\/\/github\.com\/|git@github\.com:|github:)?([^:/]+\/[^:/]+?)(?:\.git)?$/,
+		// modernize if possible
+		return getRepositoryUrlFromUrlOrGitHubSlug(
+			packageData.repository && packageData.repository.url,
 		)
-		slug = match && match[1]
-		if (slug && slug.split('/').filter(Boolean).length !== 2) slug = null
+	} else if (typeof packageData.homepage === 'string') {
+		// this may or may not be a repository, so if it can be converted then do it
+		return getRepositoryUrlFromGitHubSlugOrUrl(packageData.homepage)
+	} else {
+		return null
 	}
-	if (!slug) {
-		throw new Errlop({
-			code: 'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
-			message: `Could not determine GitHub slug from package data: ${JSON.stringify(
-				packageData,
-				null,
-				'  ',
-			)}`,
-		})
-	}
-	return slug
+}
+
+/** Get the GitHub slug from package.json data  */
+export function getGitHubSlugFromPackageData(
+	packageData: Pick<PackageData, 'homepage' | 'repository'>,
+): string | null {
+	// extract the url (or shorthand url)
+	const url = getRepositoryUrlFromPackageData(packageData)
+	// extract the slug
+	const githubSlug = url && getGitHubSlugFromUrl(url)
+	if (githubSlug) return githubSlug
+	// fail if no slug
+	throw new Errlop({
+		code: 'PACKAGE_DATA_NOT_CONFIGURED_FOR_GITHUB_REPOSITORY',
+		message: `Could not determine GitHub slug from package data: ${JSON.stringify(
+			packageData,
+			null,
+			'  ',
+		)}`,
+	})
 }
 
 // ====================================
@@ -384,13 +434,13 @@ export interface FundingData {
 
 /** Fetch the funding data of a repository. */
 async function getFundingData(
-	slug: string,
+	githubSlug: string,
 	fallback?: FundingData,
 ): Promise<FundingData> {
-	const url = `http://raw.github.com/${slug}/master/.github/FUNDING.yml`
+	const url = `http://raw.github.com/${githubSlug}/master/.github/FUNDING.yml`
 	const resp = await fetch(url, {})
 	if (!resp.ok) {
-		const error = new Error(`.github/FUNDING.yml not found for ${slug}`)
+		const error = new Error(`.github/FUNDING.yml not found for ${githubSlug}`)
 		if (!fallback) throw error
 		console.warn(error.stack)
 		return fallback
@@ -401,7 +451,7 @@ async function getFundingData(
 		return fundingData
 	} catch (err: any) {
 		const error = new Errlop(
-			`failed to fetch .github/FUNDING.yml of ${slug}`,
+			`failed to fetch .github/FUNDING.yml of ${githubSlug}`,
 			err,
 		)
 		if (!fallback) throw error
@@ -443,7 +493,7 @@ function getThanksDevProfile([
 	})
 }
 
-/** Fetch backers from the ThanksDev API */
+/** Get the {@link Backers} of the from the ThanksDev API */
 export async function getBackersFromThanksDev(
 	platform: ThanksDevPlatform,
 	username: string,
@@ -548,7 +598,7 @@ function getOpenCollectiveProfile(member: OpenCollectiveMember): Fellow {
 	})
 }
 
-/** Fetch backers from the OpenCollective API */
+/** Get the {@link Backers} of the from the OpenCollective API */
 export async function getBackersFromOpenCollective(
 	username: string,
 	opts: BackersQueryOptions = {},
@@ -984,7 +1034,7 @@ export function getAccessToken(
 	return credentials.GITHUB_ACCESS_TOKEN || credentials.GITHUB_TOKEN || null
 }
 
-/**  Check whether or not sufficient GitHub credentials were supplied. */
+/** Check whether or not sufficient GitHub credentials were supplied. */
 export function hasCredentials(
 	credentials: GitHubCredentials = envCredentials,
 ): boolean {
@@ -1378,24 +1428,23 @@ export async function queryGraphQL<T>(
 // =================================
 // GitHub Misc
 
-/**
- * Get the latest commit for a github repository
- * @param slug the organization/user name along with the repository name, e.g. `bevry/github`
- */
+/** Get the latest commit for a GitHub Repository */
 export default async function getGitHubLatestCommit(
-	slug: string,
+	githubSlug: string,
 	opts: QueryOptions = {},
 ): Promise<string> {
 	// fetch
 	const commits: Array<GitHubCommitREST> = await queryREST({
 		...opts,
-		pathname: `repos/${slug}/commits`,
+		pathname: `repos/${githubSlug}/commits`,
 	})
 
 	// unexpected result
 	const commit = commits[0] && commits[0].sha
 	if (!commit)
-		throw new Error(`GitHub Commit was not present in response for: ${slug}`)
+		throw new Error(
+			`GitHub Commit was not present in response for: ${githubSlug}`,
+		)
 
 	// success
 	return commit
@@ -1404,39 +1453,35 @@ export default async function getGitHubLatestCommit(
 // =================================
 // GitHub Repository
 
-/**
- * Fetch data for a repository from a repository slug (org/name)
- * @param slug repository slug, such as `'bevry/github'`
- */
+/** Get this GitHub Repository */
 export async function getGitHubRepository(
-	slug: string,
+	githubSlug: string,
 	opts: QueryOptions = {},
 ): Promise<GitHubRepositoryREST> {
 	const result = await queryREST<GitHubRepositoryREST>({
 		...opts,
-		pathname: `repos/${slug}`,
+		pathname: `repos/${githubSlug}`,
 	})
 	if (!result || !result.full_name)
 		throw new Error(
-			`GitHub Repository was not present in response for: ${slug}`,
+			`GitHub Repository was not present in response for: ${githubSlug}`,
 		)
 	return result
 }
 
-/**
- * Fetch data for repositories from their repository slugs
- * @param slugs array of repository slugs, such as `['bevry/github']`
- */
+/** Get the GitHub Repositories of these slugs */
 export async function getGitHubRepositories(
-	slugs: string[],
+	githubSlugs: string[],
 	opts: QueryOptions = {},
 ): Promise<Array<GitHubRepositoryREST>> {
-	return await Promise.all(slugs.map((slug) => getGitHubRepository(slug, opts)))
+	return await Promise.all(
+		githubSlugs.map((githubSlug) => getGitHubRepository(githubSlug, opts)),
+	)
 }
 
 /**
- * Fetch data for repositories from a search, will iterate all subsequent pages
- * @param search the search query to send to GitHub, such as `@bevry language:typescript`
+ * Get the GitHub Repositories of this search query
+ * @param search e.g. `\@bevry language:typescript`
  */
 export async function getGitHubRepositoriesFromSearch(
 	search: string,
@@ -1452,7 +1497,7 @@ export async function getGitHubRepositoriesFromSearch(
 	})
 }
 
-/** Fetch repositories for these usernames (users, organizations) */
+/** Get the GitHub Repositories of these usernames (users, organizations) */
 export async function getGitHubRepositoriesFromUsernames(
 	usernames: string[],
 	opts: QueryOptions = {},
@@ -1464,10 +1509,7 @@ export async function getGitHubRepositoriesFromUsernames(
 // ====================================
 // GitHub Models
 
-/**
- * Fetch fellow from the GitHub User GraphQL API.
- * @param username the profile to fetch the data for
- */
+/** Get the {@link Fellow} entity of this GitHub User via the GitHub GraphQL API */
 export async function getGitHubUser(
 	username: string,
 	opts: BackersQueryOptions = {},
@@ -1516,10 +1558,7 @@ export async function getGitHubUser(
 	}
 }
 
-/**
- * Fetch fellow from the GitHub Organization GraphQL API.
- * @param username the profile to fetch the data for
- */
+/** Get the {@link Fellow} entity of this GitHub Organization via the GitHub GraphQL API */
 export async function getGitHubOrganization(
 	username: string,
 	opts: BackersQueryOptions = {},
@@ -1568,7 +1607,7 @@ export async function getGitHubOrganization(
 	}
 }
 
-/** Fetch a fellow via the GitHub REST API */
+/** Get the {@link Fellow} entity of this GitHub User/Organisation via the GitHub REST API */
 export async function getGitHubProfileFromApiUrl(
 	url: string,
 	opts: QueryOptions = {},
@@ -1594,7 +1633,7 @@ export async function getGitHubProfileFromApiUrl(
 	return fellow
 }
 
-/** Fetch a fellow via the GitHub API */
+/** Get the {@link Fellow} entity of this GitHub User/Organisation via the GitHub API */
 export async function getGitHubProfile(
 	username: string,
 	opts: QueryOptions = {},
@@ -1617,25 +1656,7 @@ export async function getGitHubProfile(
 	}
 }
 
-/** Get a Fellow of a GitHub Sponsors member */
-export function getGitHubSponsorsProfile(
-	githubProfile: GitHubSponsorGraphQL,
-): Fellow {
-	return Fellow.ensure({
-		githubProfile,
-		company: githubProfile.company,
-		description: githubProfile.bio || githubProfile.description,
-		email: githubProfile.email,
-		githubUrl: githubProfile.url,
-		githubUsername: githubProfile.login,
-		hireable: githubProfile.isHireable,
-		location: githubProfile.location,
-		name: githubProfile.name,
-		websiteUrl: githubProfile.websiteUrl,
-	})
-}
-
-/** Fetch backers from the GitHub Sponsors API */
+/** Get the {@link Fellow} entities for the GitHub Sponsors of this GitHub Profile via the GitHub Sponsors API */
 export async function getBackersFromGitHubSponsors(
 	username: string,
 	opts: BackersQueryOptions = {},
@@ -1704,7 +1725,22 @@ export async function getBackersFromGitHubSponsors(
 		}
 
 		// convert
-		const sponsors = Fellow.add(profiles.map(getGitHubSponsorsProfile))
+		const sponsors = Fellow.add(
+			profiles.map((githubProfile) =>
+				Fellow.ensure({
+					githubProfile,
+					company: githubProfile.company,
+					description: githubProfile.bio || githubProfile.description,
+					email: githubProfile.email,
+					githubUrl: githubProfile.url,
+					githubUsername: githubProfile.login,
+					hireable: githubProfile.isHireable,
+					location: githubProfile.location,
+					name: githubProfile.name,
+					websiteUrl: githubProfile.websiteUrl,
+				}),
+			),
+		)
 		return { sponsors, donors: sponsors }
 	} catch (err: any) {
 		throw new Errlop(
@@ -1714,16 +1750,16 @@ export async function getBackersFromGitHubSponsors(
 	}
 }
 
-/** Fetch the contributors (minus bots) of a repository via the GitHub REST API */
+/** Get the {@link Fellow} entities for GitHub Contributors (minus bots) of this GitHub Repository via the GitHub REST API */
 export async function getGitHubContributors(
-	slug: string,
+	githubSlug: string,
 	opts: QueryOptions = {},
 ): Promise<Array<Fellow>> {
 	// fetch
 	// https://docs.github.com/en/rest/reference/repos#list-repository-contributors
 	const data = await queryREST<GitHubContributorsREST>({
 		...opts,
-		pathname: `repos/${slug}/contributors`,
+		pathname: `repos/${githubSlug}/contributors`,
 		pages: opts.pages ?? 0,
 	})
 	if (data.length === 0) return []
@@ -1739,8 +1775,11 @@ export async function getGitHubContributors(
 				.filter((profile) => profile.login.includes('[bot]') === false)
 				.map(async (profile) => {
 					const fellow = await getGitHubProfileFromApiUrl(profile.url, opts)
-					fellow.contributionsOfRepository.set(slug, profile.contributions)
-					fellow.contributorOfRepositories.add(slug)
+					fellow.contributionsOfRepository.set(
+						githubSlug,
+						profile.contributions,
+					)
+					fellow.contributorOfRepositories.add(githubSlug)
 					return fellow
 				}),
 		),
@@ -1750,7 +1789,7 @@ export async function getGitHubContributors(
 	return Fellow.sort(results)
 }
 
-/** Fetch members from a GitHub organization */
+/** Get the {@link Fellow} entities for GitHub Members of this GitHub Organisation via the GitHub REST API */
 export async function getGitHubMembersFromOrganization(
 	org: string,
 	opts: QueryOptions = {},
@@ -1778,7 +1817,7 @@ export async function getGitHubMembersFromOrganization(
 	return Fellow.sort(members)
 }
 
-/** Fetch members from multiple GitHub organizations */
+/** Get the {@link Fellow} entities for the GitHub Members of these GitHub Organisations via the GitHub REST API */
 export async function getGitHubMembersFromOrganizations(
 	orgs: Array<string>,
 	opts: BackersQueryOptions = {},
@@ -1827,7 +1866,7 @@ async function verifyUrlsOfBackers(source: Partial<Backers>) {
 	return source
 }
 
-/** Process latest backers from a GitHub repository, fetching remote data */
+/** Get the {@link Backers} of this GitHub Repository */
 export async function getBackers(
 	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
@@ -1839,18 +1878,13 @@ export async function getBackers(
 				opts.packageData) ||
 			{}
 	try {
-		// if slug, fetch remote packageData, if packageData, extract slug
-		if (githubSlug && opts.packageData == null && opts.offline !== true) {
-			// fetch packageData from slug
+		// if auto-detect package data, fetch from slug if not offline
+		if (githubSlug && opts.packageData !== false && opts.offline !== true) {
 			packageData = await getPackageData(githubSlug, {})
 		}
-		if (opts.githubSlug == null && packageData) {
-			// extract slug from packagedata, will throw if could not be determined
-			try {
-				githubSlug = getGitHubSlugFromPackageData(packageData)
-			} catch (error) {
-				// ignore
-			}
+		// if auto-detect slug, fetch from package data
+		if (opts.githubSlug !== false && packageData) {
+			githubSlug = getGitHubSlugFromPackageData(packageData) || ''
 		}
 
 		// prepare
@@ -2048,13 +2082,13 @@ export async function getBackers(
 	}
 }
 
-/** Fetch backers from GitHub repository slugs */
+/** Get the {@link Backers} of these GitHub Repositories */
 export async function getBackersFromRepositories(
-	slugs: Array<string>,
+	githubSlugs: Array<string>,
 	opts: BackersQueryOptions = {},
 ): Promise<Backers> {
 	const results = await Promise.all(
-		slugs.map((githubSlug) => getBackers({ ...opts, githubSlug })),
+		githubSlugs.map((githubSlug) => getBackers({ ...opts, githubSlug })),
 	)
 
 	// flattern and de-duplicate across repos
@@ -2086,7 +2120,7 @@ export async function getBackersFromRepositories(
 	}
 }
 
-/**  Fetch backers for all repositories by these usernames (users, organizations) */
+/** Get the {@link Backers} for the GitHub Repositories of these usernames (users, organizations) */
 export async function getBackersFromUsernames(
 	usernames: Array<string>,
 	opts: BackersQueryOptions = {},
@@ -2103,8 +2137,8 @@ export async function getBackersFromUsernames(
 }
 
 /**
- * Fetch backers for all repositories that match a certain search query.
- * @param query the search query to send to GitHub, such as `@bevry language:typescript`
+ * Get the {@link Backers} for the GitHub Repositories of this search query
+ * @param query e.g.`\@bevry language:typescript`
  */
 export async function getBackersFromSearch(
 	query: string,
@@ -2113,10 +2147,10 @@ export async function getBackersFromSearch(
 	const repos = await getGitHubRepositoriesFromSearch(query, opts)
 
 	// Just grab the slugs
-	const slugs = repos.map((repo) => repo.full_name)
+	const githubSlugs = repos.map((repo) => repo.full_name)
 
 	// Fetch the backers for the repos
-	return getBackersFromRepositories(slugs, opts)
+	return getBackersFromRepositories(githubSlugs, opts)
 }
 
 export function renderBackers<T extends BackersRenderFormat>(
@@ -2127,6 +2161,7 @@ export function renderBackers<T extends BackersRenderFormat>(
 	backers: Partial<Backers>,
 	opts: BackersRenderOptions & { format: T },
 ): BackersRenderResult[T]
+/** Render the {@link Backers} */
 export function renderBackers(
 	backers: Partial<Backers>,
 	opts: BackersRenderOptions,
