@@ -56,27 +56,27 @@ Interact with the GitHub API, fetching commits, repositories, members, and backe
 ### [Deno](https://deno.land "Deno is a secure runtime for JavaScript and TypeScript, it is an alternative for Node.js")
 
 ``` typescript
-import pkg from 'https://unpkg.com/@bevry/github-api@^11.3.1/edition-deno/index.ts'
+import pkg from 'https://unpkg.com/@bevry/github-api@^11.3.2/edition-deno/index.ts'
 ```
 ### [Skypack](https://www.skypack.dev "Skypack is a JavaScript Delivery Network for modern web apps")
 
 ``` html
 <script type="module">
-    import pkg from '//cdn.skypack.dev/@bevry/github-api@^11.3.1'
+    import pkg from '//cdn.skypack.dev/@bevry/github-api@^11.3.2'
 </script>
 ```
 ### [unpkg](https://unpkg.com "unpkg is a fast, global content delivery network for everything on npm")
 
 ``` html
 <script type="module">
-    import pkg from '//unpkg.com/@bevry/github-api@^11.3.1'
+    import pkg from '//unpkg.com/@bevry/github-api@^11.3.2'
 </script>
 ```
 ### [jspm](https://jspm.io "Native ES Modules CDN")
 
 ``` html
 <script type="module">
-    import pkg from '//dev.jspm.io/@bevry/github-api@11.3.1'
+    import pkg from '//dev.jspm.io/@bevry/github-api@11.3.2'
 </script>
 ```
 ### [Editions](https://editions.bevry.me "Editions are the best way to produce and consume packages you care about.")

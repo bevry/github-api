@@ -89,13 +89,17 @@ const queryOptions: CliBackersQueryOptions = {
 	sponsorCentsThreshold: null,
 	donorCentsThreshold: null,
 }
+async function getGitHubSlugFromGit() {
+	try {
+		const remote = execSync('git remote get-url origin').toString().trim() // trim is essential, as exec appends trailing line
+		const slug = remote ? getGitHubSlugFromUrl(remote) : null
+		return slug
+	} catch (err) {
+		return null
+	}
+}
 async function action() {
 	// query
-	if (shouldAutomate(queryOptions.githubSlug)) {
-		queryOptions.githubSlug =
-			getGitHubSlugFromUrl(execSync('git remote get-url origin').toString()) ||
-			null
-	}
 	if (shouldAutomate(queryOptions.packagePath)) {
 		if (await isReadable('package.json')) {
 			queryOptions.packagePath = 'package.json'
@@ -118,6 +122,9 @@ async function action() {
 		queryOptions.githubSlug = getGitHubSlugFromPackageData(
 			queryOptions.packageData,
 		)
+	}
+	if (shouldAutomate(queryOptions.githubSlug)) {
+		queryOptions.githubSlug = await getGitHubSlugFromGit()
 	}
 	// fetch
 	if (!result) result = await getBackers(queryOptions)

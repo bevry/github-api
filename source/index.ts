@@ -314,7 +314,7 @@ export async function getPackageData(
 	const url = `http://raw.github.com/${githubSlug}/master/package.json`
 	const resp = await fetch(url, {})
 	if (!resp.ok) {
-		const error = new Error(`package.json not found for ${githubSlug}`)
+		const error = new Error(`package.json not found for: ${githubSlug}`)
 		if (!fallback) throw error
 		console.warn(error.stack)
 		return fallback
@@ -462,7 +462,7 @@ async function getFundingData(
 	const url = `http://raw.github.com/${githubSlug}/master/.github/FUNDING.yml`
 	const resp = await fetch(url, {})
 	if (!resp.ok) {
-		const error = new Error(`.github/FUNDING.yml not found for ${githubSlug}`)
+		const error = new Error(`.github/FUNDING.yml not found for: ${githubSlug}`)
 		if (!fallback) throw error
 		console.warn(error.stack)
 		return fallback
@@ -2021,38 +2021,38 @@ export async function getBackers(
 		// if not offline, fetch from remote sources
 		if (opts.offline !== true) {
 			// ThanksDev
-			if (thanksdevGithubUsername) {
-				try {
-					const fetchedBackers = await getBackersFromThanksDev(
-						ThanksDevPlatform.GitHub,
-						thanksdevGithubUsername,
-						opts,
-					)
-					appendBackers(result, fetchedBackers)
-				} catch (err: any) {
-					console.warn(err.stack)
-				}
-			} else {
-				console.warn(
-					`Unable to fetch backers from ThanksDev, as unable to resolve the ThanksDev username for ${githubSlug}`,
+			try {
+				if (!thanksdevGithubUsername)
+					throw new Errlop('Unable to resolve the ThanksDev username')
+				const fetchedBackers = await getBackersFromThanksDev(
+					ThanksDevPlatform.GitHub,
+					thanksdevGithubUsername,
+					opts,
 				)
+				appendBackers(result, fetchedBackers)
+			} catch (err: any) {
+				const error = new Errlop(
+					`Unable to fetch backers from ThanksDev for: ${githubSlug}`,
+					err,
+				)
+				console.warn(error.stack)
 			}
 
 			// OpenCollective
-			if (opencollectiveUsername) {
-				try {
-					const fetchedBackers = await getBackersFromOpenCollective(
-						opencollectiveUsername,
-						opts,
-					)
-					appendBackers(result, fetchedBackers)
-				} catch (err: any) {
-					console.warn(err.stack)
-				}
-			} else {
-				console.warn(
-					`Unable to fetch backers from OpenCollective, as unable to resolve the OpenCollective username for ${githubSlug}`,
+			try {
+				if (!opencollectiveUsername)
+					throw new Errlop('Unable to resolve the OpenCollective username')
+				const fetchedBackers = await getBackersFromOpenCollective(
+					opencollectiveUsername,
+					opts,
 				)
+				appendBackers(result, fetchedBackers)
+			} catch (err: any) {
+				const error = new Errlop(
+					`Unable to fetch backers from OpenCollective for: ${githubSlug}`,
+					err,
+				)
+				console.warn(error.stack)
 			}
 
 			// GitHub
@@ -2065,24 +2065,28 @@ export async function getBackers(
 					)
 					append(result.contributors, fetchedContributors)
 				} catch (err: any) {
-					console.warn(err.stack)
+					const error = new Errlop(
+						`Unable to fetch contributors from GitHub for: ${githubSlug}`,
+						err,
+					)
+					console.warn(error.stack)
 				}
 
 				// GitHub Sponsors
-				if (githubSponsorsUsername) {
-					try {
-						const fetchedBackers = await getBackersFromGitHubSponsors(
-							githubSponsorsUsername,
-							opts,
-						)
-						appendBackers(result, fetchedBackers)
-					} catch (err: any) {
-						console.warn(err.stack)
-					}
-				} else {
-					console.warn(
-						`Unable to fetch backers from GitHub Sponsors, as unable to resolve the GitHub Sponsors username for ${githubSlug}`,
+				try {
+					if (!githubSponsorsUsername)
+						throw new Errlop('Unable to resolve the GitHub Sponsors username')
+					const fetchedBackers = await getBackersFromGitHubSponsors(
+						githubSponsorsUsername,
+						opts,
 					)
+					appendBackers(result, fetchedBackers)
+				} catch (err: any) {
+					const error = new Errlop(
+						`Unable to fetch backers from GitHub Sponsors for: ${githubSlug}`,
+						err,
+					)
+					console.warn(error.stack)
 				}
 
 				// fetch additional details, if able
