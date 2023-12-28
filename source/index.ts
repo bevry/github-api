@@ -1666,14 +1666,18 @@ export async function getBackersFromGitHubSponsors(
 		// https://docs.github.com/en/graphql/reference/interfaces#sponsorable
 		// https://stackoverflow.com/a/65272597/130638
 		// https://docs.github.com/en/graphql/reference/objects#sponsorconnection
-		// sponsors (first: 100) {
 		// https://docs.github.com/en/graphql/overview/explorer
 		// @todo no idea how to fetch the cents the user gave in the past month
+		// only possible to fetch your prior sponsorships as a sponsor: https://github.com/orgs/community/discussions/38393
+		// not possible to fetch your prior sponsors as someone who receives sponsorship
+		// although perhaps https://github.com/orgs/community/discussions/3818#discussioncomment-2155340 will be the magic
+		// also no idea how to fetch privacy level with the below, however I guess all below are public as it is a public api endpoint
 		const profiles: Array<GitHubSponsorGraphQL> = []
 		let hasNextPage = true,
 			afterCursor = opts.afterCursor
 		while (hasNextPage) {
-			const filters = [`first: ${opts.size || 100}`] // do not apply size default, as that causes shared opts to have pagination which isn't desired
+			// do not apply size default, as that causes shared opts to have pagination which isn't desired
+			const filters = [`first: ${opts.size || 100}`]
 			if (afterCursor) filters.push(`after: "${afterCursor}"`)
 			const responseData: GitHubSponsorsGraphQL = await queryGraphQL(
 				/* GraphQL */ `{
@@ -1948,6 +1952,10 @@ export async function getBackers(
 			}
 		}
 
+		// shall we refresh sponsors? that is disregard existing package.json entries for remote data?
+		const refreshSponsors =
+			githubSponsorsUsername && authed && opts.offline !== true
+
 		// prepare backers from package data
 		const result = attachBackersToGitHubSlug(
 			{
@@ -1959,7 +1967,7 @@ export async function getBackers(
 					packageData.contributors,
 				),
 				funders: Fellow.add(packageData.funders),
-				sponsors: Fellow.add(packageData.sponsors),
+				sponsors: refreshSponsors ? [] : Fellow.add(packageData.sponsors),
 				donors: Fellow.add(
 					packageData.funders,
 					packageData.sponsors,
@@ -2216,10 +2224,6 @@ export function renderBackers(
 				backers.maintainers?.map((fellow) =>
 					fellow.toFormat({
 						displayDescription: true,
-						urlFields:
-							opts.format === BackersRenderFormat.string
-								? []
-								: ['githubUrl', 'url'],
 						...opts,
 						githubSlug,
 						format: opts.format as any as FellowFormat,
@@ -2228,6 +2232,7 @@ export function renderBackers(
 			contributors:
 				backers.contributors?.map((fellow) =>
 					fellow.toFormat({
+						// show contributions as such use github url
 						displayContributions: true,
 						urlFields:
 							opts.format === BackersRenderFormat.string

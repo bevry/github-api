@@ -149,7 +149,7 @@ This package is published with the following editions:
 -   [Codecov](https://codecov.io)
 -   [entroniq](https://gitlab.com/entroniq)
 -   [Jean-Luc Geering](https://github.com/jlgeering)
--   [Michael Duane Mooring](https://bevry.me)
+-   [Michael Duane Mooring](https://mdm.cc)
 -   [Mohammed Shah](https://github.com/smashah)
 -   [Poonacha Medappa](https://poonachamedappa.com)
 -   [Rob Morris](https://github.com/Rob-Morris)
