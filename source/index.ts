@@ -1993,9 +1993,10 @@ export async function getBackers(
 			}
 		}
 
-		// shall we refresh sponsors? that is disregard existing package.json entries for remote data?
-		const refreshSponsors =
-			githubSponsorsUsername && authed && opts.offline !== true
+		// shall we refresh sponsors and contributors, that is disregard existing package.json entries for remote data?
+		const refresh = authed && opts.offline !== true
+		const refreshContributors = refresh && githubSlug
+		const refreshSponsors = refresh && githubSponsorsUsername
 
 		// prepare backers from package data
 		const result = attachBackersToGitHubSlug(
@@ -2005,7 +2006,7 @@ export async function getBackers(
 				maintainers: Fellow.add(packageData.maintainers),
 				contributors: Fellow.add(
 					packageData.maintainers,
-					packageData.contributors,
+					refreshContributors ? [] : packageData.contributors,
 				),
 				funders: Fellow.add(packageData.funders),
 				sponsors: refreshSponsors ? [] : Fellow.add(packageData.sponsors),

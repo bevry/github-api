@@ -1,5 +1,11 @@
 # History
 
+## v11.3.3 2023 December 28
+
+-   If able to fetch the current contributors, drop non-existent/incorrect contributor data
+    -   Closes [issue #275](https://github.com/bevry/github-api/issues/275)
+-   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Balsa](https://balsa.com), [Codecov](https://codecov.io/), [Poonacha Medappa](https://poonachamedappa.com), [Rob Morris](https://github.com/Rob-Morris), [Sentry](https://sentry.io), [Syntax](https://syntax.fm)
+
 ## v11.3.2 2023 December 28
 
 -   Fixed github-backers CLI creating an incorrect slug (likely a regression in v11.2.0)
