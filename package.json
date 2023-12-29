@@ -1,6 +1,6 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.3.3",
+  "version": "11.4.0",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
@@ -255,19 +255,19 @@
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
-    "@bevry/argument": "^1.1.0",
-    "@bevry/fs-readable": "^2.4.0",
-    "@bevry/json": "^2.3.0",
-    "@bevry/list": "^2.4.0",
-    "@bevry/wait": "^2.5.0",
+    "@bevry/argument": "^1.2.0",
+    "@bevry/fs-readable": "^2.5.0",
+    "@bevry/json": "^2.4.0",
+    "@bevry/list": "^2.5.0",
+    "@bevry/wait": "^2.6.0",
     "@octokit/graphql": "^7.0.2",
-    "arrange-package-json": "^5.1.0",
+    "arrange-package-json": "^5.2.0",
     "errlop": "^8.4.0",
-    "fellow": "^7.1.2",
+    "fellow": "^7.2.1",
     "js-yaml": "^4.1.0",
-    "native-promise-pool": "^3.27.0",
+    "native-promise-pool": "^3.28.0",
     "simplytyped": "^3.3.0",
-    "trim-empty-keys": "^1.1.0"
+    "trim-empty-keys": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
@@ -279,12 +279,12 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "kava": "^7.8.0",
-    "make-deno-edition": "^2.2.0",
+    "make-deno-edition": "^2.3.0",
     "prettier": "^3.1.1",
-    "projectz": "^4.1.1",
+    "projectz": "^4.2.0",
     "typedoc": "^0.25.4",
     "typescript": "5.3.3",
-    "valid-directory": "^4.8.0",
+    "valid-directory": "^4.9.0",
     "valid-module": "^2.6.0"
   },
   "scripts": {
