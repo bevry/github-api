@@ -15,12 +15,33 @@ export { Fellow, PromisePool, Errlop }
 import { env } from 'node:process'
 const envCredentials = env as GitHubCredentials
 
+// ====================================
+// Helpers
+
+/** Is the value indicating that it should use an automatic value? */
 export function shouldAutomate(value: any): boolean {
 	return value == null || value === true
 }
 
+/** Pass the value, and the automation fallback if the value is desiring to be automated. */
 export function getFallback(value: any, fallback: any) {
 	return shouldAutomate(value) ? fallback : value
+}
+
+/** Return a date instance that is the last month */
+function getLastMonth(now: Date = new Date()): Date {
+	const date = new Date()
+	date.setMonth(date.getMonth() - 1)
+	return date
+}
+/** Is the date within the last month */
+function isWithinLastMonth(
+	when: Date | string,
+	lastMonth: Date | number = getLastMonth(),
+): boolean {
+	if (lastMonth instanceof Date) lastMonth = lastMonth.getTime()
+	if (typeof when === 'string') when = new Date(when)
+	return when.getTime() >= lastMonth
 }
 
 // ====================================
@@ -483,7 +504,7 @@ async function getFundingData(
 }
 
 // ====================================
-// ThanksDev Types
+// ThanksDev
 
 export enum ThanksDevPlatform {
 	GitHub = 'gh',
@@ -567,6 +588,16 @@ export async function getBackersFromThanksDev(
 	}
 }
 
+// ====================================
+// Patreon
+
+// @todo add when someone cares about patreon
+// https://docs.patreon.com/#paging-through-a-list-of-pledges
+// https://github.com/bevry-archive/sponsored/blob/master/source/app/patreon-data.js
+
+// ====================================
+// OpenCollective
+
 export interface OpenCollectiveMember {
 	MemberId: number
 	createdAt: string
@@ -593,22 +624,6 @@ export type OpenCollectiveResponse = Array<OpenCollectiveMember>
 export interface OpenCollectiveBackers {
 	sponsors: Array<Fellow>
 	donors: Array<Fellow>
-}
-
-/** Return a date instance that is the last month */
-function getLastMonth(now: Date = new Date()): Date {
-	const date = new Date()
-	date.setMonth(date.getMonth() - 1)
-	return date
-}
-/** Is the date within the last month */
-function isWithinLastMonth(
-	when: Date | string,
-	lastMonth: Date | number = getLastMonth(),
-): boolean {
-	if (lastMonth instanceof Date) lastMonth = lastMonth.getTime()
-	if (typeof when === 'string') when = new Date(when)
-	return when.getTime() >= lastMonth
 }
 
 /** Get a Fellow of an OpenCollective member */
@@ -686,7 +701,10 @@ export async function getBackersFromOpenCollective(
 }
 
 // ====================================
-// GitHub API
+// GitHub
+
+// ------------------------------------
+// GitHub API Types
 
 /** GitHub's response when an error occurs. */
 export interface GitHubError {
@@ -1058,7 +1076,7 @@ export interface GitHubRepositoryREST extends GitHubSearchRepositoryREST {
 	source?: GitHubRepositoryREST
 }
 
-// ====================================
+// ------------------------------------
 // GitHub API Methods
 
 /**
@@ -1462,7 +1480,7 @@ export async function queryGraphQL<T>(
 	) as T
 }
 
-// =================================
+// ------------------------------------
 // GitHub Misc
 
 /** Get the latest commit for a GitHub Repository */
@@ -1487,7 +1505,7 @@ export default async function getGitHubLatestCommit(
 	return commit
 }
 
-// =================================
+// ------------------------------------
 // GitHub Repository
 
 /** Get this GitHub Repository */
@@ -1543,7 +1561,7 @@ export async function getGitHubRepositoriesFromUsernames(
 	return await getGitHubRepositoriesFromSearch(query, opts)
 }
 
-// ====================================
+// ------------------------------------
 // GitHub Models
 
 /** Get the {@link Fellow} entity of this GitHub User via the GitHub GraphQL API */
@@ -1868,6 +1886,9 @@ export async function getGitHubMembersFromOrganizations(
 	)
 	return flatten(lists)
 }
+
+// ====================================
+// Backers
 
 /** For each backer, append to the result */
 function appendBackers(target: Backers, source: Partial<Backers>): Backers {
