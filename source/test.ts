@@ -26,6 +26,9 @@ import getGitHubLatestCommit, {
 	getGitHubRepositoriesFromSearch,
 	getGitHubSlugFromUrl,
 	hasCredentials,
+	getPool,
+	defaultConcurrency,
+	QueryOptions,
 } from './index.js'
 
 type Errback = (error?: Error) => void
@@ -242,6 +245,79 @@ kava.suite('@bevry/github-api', function (suite, test) {
 	})
 	suite('redact', function (suite, test) {
 		testFixtures(redactFixtures, redactSearchParams, test)
+	})
+	suite('pool', function (suite, test) {
+		test('limits concurrent requests', function (done: Errback) {
+			// Drives the public path with a stubbed fetch, so it needs no network
+			// and no credentials. Before the pool was shared, this peaked at the
+			// full request count rather than the requested concurrency.
+			const originalFetch = globalThis.fetch
+			const concurrency = 3
+			const requests = 30
+			let inflight = 0
+			let peak = 0
+			globalThis.fetch = async function () {
+				inflight++
+				peak = Math.max(peak, inflight)
+				await new Promise((resolve) => setTimeout(resolve, 15))
+				inflight--
+				return {
+					ok: true,
+					status: 200,
+					statusText: 'OK',
+					json: async () => ({ ok: true }),
+				}
+			} as any
+			const credentials: GitHubCredentials = { GITHUB_ACCESS_TOKEN: 'stub' }
+			Promise.all(
+				Array.from({ length: requests }, () =>
+					queryREST({ pathname: 'rate_limit', concurrency, credentials }),
+				),
+			)
+				.finally(() => {
+					globalThis.fetch = originalFetch
+				})
+				.then(() => {
+					equal(
+						peak <= concurrency,
+						true,
+						`peak of ${peak} concurrent requests was within the concurrency of ${concurrency}`,
+					)
+					done()
+				})
+				.catch(done)
+		})
+		test('shares one pool across spread options', function () {
+			// The bug this guards against: queryREST and queryGraphQL receive
+			// `{ ...opts }` from their callers, so a pool constructed from those
+			// options applied only to the single request that constructed it, and
+			// the concurrency option silently limited nothing.
+			const opts: QueryOptions = { concurrency: 5 }
+			const a: QueryOptions = { ...opts }
+			const b: QueryOptions = { ...opts }
+			a.pool ??= getPool(a.concurrency)
+			b.pool ??= getPool(b.concurrency)
+			equal(a.pool === b.pool, true, 'spread options resolved to the same pool')
+		})
+		test('separates pools by concurrency', function () {
+			equal(
+				getPool(5) === getPool(7),
+				false,
+				'a different concurrency resolved to a different pool',
+			)
+		})
+		test('defaults to defaultConcurrency', function () {
+			equal(
+				getPool() === getPool(defaultConcurrency),
+				true,
+				'an unspecified concurrency resolved to the default pool',
+			)
+			equal(
+				getPool().concurrency,
+				defaultConcurrency,
+				'the default pool limits to the documented concurrency',
+			)
+		})
 	})
 	suite('api', function (suite, test) {
 		if (!hasCredentials()) {
