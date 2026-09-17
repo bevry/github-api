@@ -3,6 +3,7 @@
 ## v11.4.1 2026 September 17
 
 -   Fixed `concurrency` option
+    -   Closes [issue #280](https://github.com/bevry/github-api/issues/280)
     -   Thanks to [Doug Donohoe](https://github.com/dougdonohoe) for [pull request #297](https://github.com/bevry/github-api/pull/297)
 -   Thank you to the sponsors: [Andrew Nesbitt](https://nesbitt.io), [Poonacha Medappa](https://poonachamedappa.com), [Roboflow](https://roboflow.com)
 
