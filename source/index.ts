@@ -1324,13 +1324,41 @@ export function getCredentialedURL(
 }
 
 /**
+ * The concurrency used when {@link QueryOptions.concurrency} is not specified.
+ * Defaults to 100 as that is upper limit of GitHub API concurrency:
+ * > Make too many concurrent requests. No more than 100 concurrent requests are allowed. This limit is shared across the REST API and GraphQL API.
+ * > https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2026-03-10#about-secondary-rate-limits
+ */
+export const defaultConcurrency = 100
+
+/**
+ * The pools shared by all queries, keyed by their concurrency.
+ * Shared because query options are spread into a new object on their way to
+ * {@link queryREST} and {@link queryGraphQL}, so a pool created against those
+ * options would only ever apply to the single request that created it.
+ */
+const pools = new Map<number, PromisePool<any>>()
+
+/** Get the pool shared by all queries of this concurrency, creating it if needed. */
+export function getPool(
+	concurrency: number = defaultConcurrency,
+): PromisePool<any> {
+	let pool = pools.get(concurrency)
+	if (!pool) {
+		pool = new PromisePool(concurrency)
+		pools.set(concurrency, pool)
+	}
+	return pool
+}
+
+/**
  * Fetches a GitHub REST API response with authentication, parsing, waiting, pooling, paging.
  * If the credentials property is nullish, then the environment variables are attempted.
  * If the user agent is nullish, then it will be set to `"@bevry/github"`
  */
 export async function queryREST<T>(opts: QueryOptions = {}): Promise<T> {
 	// defaults
-	opts.pool ??= new PromisePool(opts.concurrency)
+	opts.pool ??= getPool(opts.concurrency)
 	const searchParams = new URLSearchParams()
 	applySearchParams(searchParams, opts.searchParams)
 	if (opts.page != null || opts.pages != null || opts.size != null) {
@@ -1360,7 +1388,7 @@ export async function queryREST<T>(opts: QueryOptions = {}): Promise<T> {
 		responseREST = await fetch(url, fetchOpts)
 		while (responseREST.status === 429) {
 			console.warn(
-				`Request to ${url} failed with status 429: Too Many Requests, will try again in a minute...`,
+				`REST request to ${url} failed with status [429: Too Many Requests], will try again in a minute`,
 			)
 			await wait(60 * 1000)
 			responseREST = await fetch(url, fetchOpts)
@@ -1438,7 +1466,7 @@ export async function queryGraphQL<T>(
 	opts: QueryOptions = {},
 ): Promise<T> {
 	// prepare
-	opts.pool ??= new PromisePool(opts.concurrency)
+	opts.pool ??= getPool(opts.concurrency)
 
 	// prepare fetch
 	// https://docs.github.com/en/graphql/overview/explorer
@@ -1456,7 +1484,7 @@ export async function queryGraphQL<T>(
 		responseGraphQL = await octokitGraphQL(query, fetchOpts)
 		while (responseGraphQL.status === 429) {
 			console.warn(
-				`GraphQL returned status code [429 Too Many Requests] will try again in a minute`,
+				`GraphQL query failed with [429 Too Many Requests], will try again in a minute`,
 			)
 			await wait(60 * 1000)
 			responseGraphQL = await octokitGraphQL(query, fetchOpts)
