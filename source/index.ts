@@ -1325,8 +1325,9 @@ export function getCredentialedURL(
 
 /**
  * The concurrency used when {@link QueryOptions.concurrency} is not specified.
- * GitHub allows no more than 100 concurrent requests, shared across its REST and GraphQL APIs.
- * https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api#about-secondary-rate-limits
+ * Defaults to 100 as that is upper limit of GitHub API concurrency:
+ * > Make too many concurrent requests. No more than 100 concurrent requests are allowed. This limit is shared across the REST API and GraphQL API.
+ * > https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2026-03-10#about-secondary-rate-limits
  */
 export const defaultConcurrency = 100
 
@@ -1387,7 +1388,7 @@ export async function queryREST<T>(opts: QueryOptions = {}): Promise<T> {
 		responseREST = await fetch(url, fetchOpts)
 		while (responseREST.status === 429) {
 			console.warn(
-				`Request to ${url} failed with status 429: Too Many Requests, will try again in a minute...`,
+				`REST request to ${url} failed with status [429: Too Many Requests], will try again in a minute`,
 			)
 			await wait(60 * 1000)
 			responseREST = await fetch(url, fetchOpts)
@@ -1483,7 +1484,7 @@ export async function queryGraphQL<T>(
 		responseGraphQL = await octokitGraphQL(query, fetchOpts)
 		while (responseGraphQL.status === 429) {
 			console.warn(
-				`GraphQL returned status code [429 Too Many Requests] will try again in a minute`,
+				`GraphQL query failed with [429 Too Many Requests], will try again in a minute`,
 			)
 			await wait(60 * 1000)
 			responseGraphQL = await octokitGraphQL(query, fetchOpts)
