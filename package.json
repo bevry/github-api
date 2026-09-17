@@ -1,6 +1,6 @@
 {
   "name": "@bevry/github-api",
-  "version": "11.4.0",
+  "version": "11.4.1",
   "license": "Artistic-2.0",
   "description": "Interact with the GitHub API, fetching commits, repositories, members, and backers (authors, maintainers, contributors, funders, sponsors, donors)",
   "homepage": "https://github.com/bevry/github-api",
@@ -22,10 +22,6 @@
     "browser",
     "contributor",
     "contributors",
-    "deno",
-    "deno-edition",
-    "deno-entry",
-    "denoland",
     "es2022",
     "export-default",
     "finance",
@@ -114,36 +110,35 @@
     "Benjamin Lupton <b@lupton.cc> (https://balupton.com) (https://github.com/balupton)"
   ],
   "sponsors": [
-    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew): Software engineer and researcher",
-    "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa): We're Balsa, and we're building tools for builders.",
-    "Codecov <hello-codecov@sentry.io> (https://codecov.io) (https://github.com/codecov): Empower developers with tools to improve code quality and testing.",
+    "Andrew Nesbitt <andrewnez@gmail.com> (https://nesbitt.io) (https://github.com/andrew): Building @ecosyste-ms and @git-pkgs. Maintaining @Homebrew. Package management nerd.",
     "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
-    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
-    "Sentry (https://sentry.io) (https://github.com/getsentry): Real-time crash reporting for your web apps, mobile apps, and games.",
-    "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm): Syntax Podcast"
+    "Roboflow <hello@roboflow.com> (https://roboflow.com) (https://github.com/roboflow)"
   ],
   "donors": [
-    "Andrew Nesbitt (https://nesbitt.io) (https://github.com/andrew)",
+    "Andrew Nesbitt <andrewnez@gmail.com> (https://nesbitt.io) (https://github.com/andrew)",
+    "Arjun Aditya <nermalcat69@skiff.com> (https://arjunaditya.xyz) (https://github.com/nermalcat69)",
     "Armen Mkrtchian (https://mogoni.dev) (https://github.com/Armenm)",
     "Balsa <hello@balsa.com> (https://balsa.com) (https://github.com/balsa)",
+    "Canonical (https://canonical.com) (https://github.com/canonical) (https://thanks.dev/d/gh/canonical)",
     "Chad (https://opencollective.com/chad8)",
     "Codecov <hello-codecov@sentry.io> (https://codecov.io) (https://github.com/codecov)",
     "dr.dimitru (https://veliovgroup.com) (https://github.com/dr-dimitru)",
     "Elliott Ditman (https://elliottditman.com) (https://github.com/elliottditman)",
     "entroniq (https://gitlab.com/entroniq) (https://thanks.dev/d/gl/entroniq)",
+    "Frontend Masters <support@frontendmasters.com> (https://FrontendMasters.com) (https://github.com/FrontendMasters) (https://thanks.dev/d/gh/FrontendMasters)",
     "GitHub (https://github.com/about) (https://github.com/github)",
     "Hunter Beast (https://cryptoquick.com) (https://github.com/cryptoquick)",
     "Jean-Luc Geering (https://github.com/jlgeering) (https://opencollective.com/jlgeering) (https://twitter.com/jlgeering)",
-    "Michael Duane Mooring (https://mdm.cc) (https://github.com/mikeumus) (https://opencollective.com/mikeumus) (https://twitter.com/mikeumus)",
+    "Michael Duane Mooring (https://divinci.ai) (https://github.com/mikeumus) (https://opencollective.com/mikeumus) (https://twitter.com/mikeumus)",
     "Michael Harry Scepaniak <mhs1.sys@gmail.com> (https://michaelscepaniak.com) (https://github.com/hispanic)",
     "Mohammed Shah <shah@idk.uno> (https://github.com/smashah) (https://thanks.dev/d/gh/smashah) (https://twitter.com/smashah)",
     "Mr. Henry <hello@mrhenry.be> (https://mrhenry.be) (https://github.com/mrhenry)",
-    "Nermal <nermalcat69@skiff.com> (https://arjunaditya.vercel.app) (https://github.com/nermalcat69)",
     "Pleo (https://pleo.io) (https://github.com/pleo-io)",
     "Poonacha Medappa (https://poonachamedappa.com) (https://github.com/km-Poonacha)",
-    "Rob Morris <rob@prismatik.com.au> (https://github.com/Rob-Morris)",
+    "Rob Morris <rob@prismatik.com.au> (https://linktr.ee/recipromancer) (https://github.com/Rob-Morris)",
     "Robert de Forest <guitar.robot@gmail.com> (https://github.com/rdeforest)",
-    "Sentry (https://sentry.io) (https://github.com/getsentry)",
+    "Roboflow <hello@roboflow.com> (https://roboflow.com) (https://github.com/roboflow)",
+    "Sentry <support@sentry.io> (https://sentry.io) (https://github.com/getsentry)",
     "ServieJS (https://github.com/serviejs) (https://thanks.dev/d/gh/serviejs)",
     "Skunk Team (https://skunk.team) (https://github.com/skunkteam)",
     "Syntax <scott@syntax.fm> (https://syntax.fm) (https://github.com/syntaxfm)",
@@ -218,20 +213,6 @@
         "import"
       ],
       "engines": false
-    },
-    {
-      "description": "TypeScript source code made to be compatible with Deno",
-      "directory": "edition-deno",
-      "entry": "index.ts",
-      "tags": [
-        "typescript",
-        "import",
-        "deno"
-      ],
-      "engines": {
-        "deno": true,
-        "browsers": true
-      }
     }
   ],
   "bin": {
@@ -251,7 +232,6 @@
       "import": "./edition-browsers/index.js"
     }
   },
-  "deno": "edition-deno/index.ts",
   "browser": "edition-browsers/index.js",
   "module": "edition-browsers/index.js",
   "dependencies": {
